@@ -27,7 +27,3 @@ allprojects {
 repositories {
     mavenCentral()
 }
-
-dependencies {
-    implementation 'org.openftc:easyopencv:1.7.0'
-} 
