@@ -101,6 +101,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
     private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
     private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
 
+    private DcMotor leftArmMotor   = null;
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static final int DESIRED_TAG_ID = 0;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
@@ -124,6 +125,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightfront_drive");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "leftback_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -191,6 +193,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
                 drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
                 strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
                 turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
             telemetry.update();

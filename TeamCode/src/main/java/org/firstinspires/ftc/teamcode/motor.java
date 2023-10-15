@@ -1,2 +1,4 @@
-package org.firstinspires.ftc.teamcode;public class motor {
+package org.firstinspires.ftc.teamcode;
+
+public class motor {
 }
