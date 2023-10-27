@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Count Ticks", group = "Concept")
+@TeleOp(name = "Test Count Ticks", group = "Concept")
 public class CountTicks extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     double MOTOR_SPEED = 0.4;
