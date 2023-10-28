@@ -10,6 +10,10 @@ import com.qualcomm.robotcore.util.RobotLog;
 @TeleOp(name = "Arm and Servo", group = "Concept")
 public class ArmAndServo extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
+
+    static final int MAX_ARM_POSITION = 740;
+    static final int FULL_CIRCLE = 1075;
+    
     static final double MAX_WRIST_POS =  0.95;     // Maximum rotational position
     static final double MIN_WRIST_POS =  0.07;     // Minimum rotational position
     static final double  STARTING_WRIST_POSITION = MAX_WRIST_POS;
@@ -24,9 +28,8 @@ public class ArmAndServo extends LinearOpMode {
     static final double STARTING_CLAW_POS = 0.67;
     
     //Arm Speed
-    double ARM_SPEED = 0.3;
-    int MAX_ARM_POSITION = 740;
-    int FULL_CIRCLE = 1075;
+    static final double ARM_SPEED = 0.3;
+
 
     double wristPosition = STARTING_WRIST_POSITION;
     double leftClawPosition = STARTING_CLAW_POS;
