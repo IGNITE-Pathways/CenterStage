@@ -66,6 +66,9 @@ public class TeleOpDrive extends LinearOpMode {
         if (gamepad2.x){
             gameMode = GameMode.PICKING_PIXELS;
         }
+        if (gamepad2.y){
+            gameMode = GameMode.DROPPING_PIXELS;
+        }
 
         while (opModeIsActive()) {
             switch(gameMode){
