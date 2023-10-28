@@ -19,14 +19,14 @@ public class ArmAndServo extends LinearOpMode {
     static final double  WRIST_PICK_POSITION = 0.73;
     static final double  CLAW_PICK_POSITION = 0.55;
 
+    static final double MIN_CLAW_POS = 0.5;
+    static final double MAX_CLAW_POS = 0.8;
+    static final double STARTING_CLAW_POS = 0.67;
+    
     //Arm Speed
     double ARM_SPEED = 0.3;
     int MAX_ARM_POSITION = 740;
     int FULL_CIRCLE = 1075;
-
-    static double MIN_CLAW_POS = 0.5;
-    static double MAX_CLAW_POS = 0.8;
-    static double STARTING_CLAW_POS = 0.67;
 
     double wristPosition = STARTING_WRIST_POSITION;
     double leftClawPosition = STARTING_CLAW_POS;
