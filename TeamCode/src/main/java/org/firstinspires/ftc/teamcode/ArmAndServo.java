@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 
 @TeleOp(name = "Arm and Servo", group = "Concept")
 public class ArmAndServo extends LinearOpMode {
@@ -30,7 +29,7 @@ public class ArmAndServo extends LinearOpMode {
     //Arm Speed
     static final double ARM_SPEED = 0.3;
 
-
+    GameMode gameMode = GameMode.NONE;
     double wristPosition = STARTING_WRIST_POSITION;
     double leftClawPosition = STARTING_CLAW_POS;
     double rightClawPosition = STARTING_CLAW_POS;
@@ -56,8 +55,31 @@ public class ArmAndServo extends LinearOpMode {
         // wait for start button.
         waitForStart();
         runtime.reset();
+        gameMode = GameMode.GOING_TO_PICK_PIXELS;
 
         while (opModeIsActive()) {
+            switch(gameMode){
+                case GOING_TO_PICK_PIXELS:
+                    // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
+                    break;
+                case PICKING_PIXELS:
+                    // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
+                    break;
+                case GOING_TO_DROP_PIXELS:
+                    // WRIST = AUTO, CLAW = CLOSED (holding pixels)
+                    break;
+                case APRIL_TAG_NAVIGATION:
+                    break;
+                case DROPPING_PIXELS:
+                    // ARM = MANUAL, WRIST = NONE, CLAWS = OPEN
+                    break;
+                case GOING_TO_HANG:
+                    // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
+                    break;
+                case HANGING:
+                    // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
+                    break;
+            }
 
             if (gamepad2.x) {
                 clawPosition = ClawPosition.FACING_DOWN;
@@ -102,6 +124,7 @@ public class ArmAndServo extends LinearOpMode {
     }
 
     private void initialize() {
+        gameMode = GameMode.INIT;
 
         //Initialize motors
         leftArmMotor = hardwareMap.dcMotor.get("leftArmMotor");
@@ -120,7 +143,7 @@ public class ArmAndServo extends LinearOpMode {
         rightClawServo = hardwareMap.get(Servo.class, "rightClaw");
 
         //Reset encoders -- making start position as zero
-        resetArmPosition();
+        resetArmEncoders();
         resetWristAndClawPosition();
 
     }
@@ -136,7 +159,7 @@ public class ArmAndServo extends LinearOpMode {
         rightClawServo.setPosition(CLAW_PICK_POSITION);
     }
 
-    private void resetArmPosition() {
+    private void resetArmEncoders() {
         leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }

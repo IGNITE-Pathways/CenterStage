@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 // PICKING_PIXELS -> GOING_TO_DROP_PIXELS ->
 // DROPPING_PIXELS -> GOING_TO_PICK_PIXELS
 public enum GameMode {
+    NONE,
     // Manual Game Initialized, Waiting for Play
     // ENTER MODE == Hit the INIT button on Driver Station
     // EXIT MODE == Hit the Play button on Driver Station
@@ -32,6 +33,8 @@ public enum GameMode {
     // EXIT MODE == USER ACTION changes game mode to DROPPING_PIXELS
     // Operator 1 = DRIVER, Operator 2 = Move ARM to right height and ACTION BUTTON
     GOING_TO_DROP_PIXELS,
+
+    APRIL_TAG_NAVIGATION,
 
     // Arm back side, wrist facing board, claw open
     // ARM = MANUAL, WRIST = NONE, CLAWS = OPEN
