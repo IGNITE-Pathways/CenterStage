@@ -17,19 +17,21 @@ public class TeleOpDrive extends LinearOpMode {
     static final int FULL_CIRCLE = 1075;
 
     static final double MAX_WRIST_POS =  0.95;     // Maximum rotational position
-    static final double MIN_WRIST_POS =  0.08;     // Minimum rotational position
-    static final double  STARTING_WRIST_POSITION = MAX_WRIST_POS;
+    static final double MIN_WRIST_POS =  0.27;     // Minimum rotational position
+    static final double  STARTING_WRIST_POSITION = MIN_WRIST_POS;
 
     //Picking pixels -- Arm, Wrist and Claw
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 20;
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 10
+            ;
     static final double  WRIST_PICK_POSITION = MIN_WRIST_POS;
-    static final double CLAW_OPEN_POSITION = 0.55;
-    static final double CLAW_CLOSE_POSITION = 0.65;
+    static final double CLAW_OPEN_POSITION = 0.63;
+
+    static final double CLAW_CLOSE_POSITION = 0.70;
 
 
     static final double MIN_CLAW_POS = 0.5;
     static final double MAX_CLAW_POS = 0.8;
-    static final double STARTING_CLAW_POS = 0.67;
+    static final double STARTING_CLAW_POS = CLAW_OPEN_POSITION;
 
     //Arm Speed
     static final double ARM_SPEED = 0.3;
@@ -50,10 +52,12 @@ public class TeleOpDrive extends LinearOpMode {
     double leftClawPosition = STARTING_CLAW_POS;
     double rightClawPosition = STARTING_CLAW_POS;
 
+    Boolean gameModeChanged = Boolean.FALSE;
+
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         int armPosition = 0;
         initialize();
         // Wait for the game to start (driver presses PLAY)
@@ -61,20 +65,23 @@ public class TeleOpDrive extends LinearOpMode {
         telemetry.update();
         waitForStart();
         runtime.reset();
-        gameMode = GameMode.GOING_TO_PICK_PIXELS;
+        changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
         // run until the end of the match (driver presses STOP)
-        if (gamepad2.x){
-            gameMode = GameMode.PICKING_PIXELS;
-        }
-        if (gamepad2.y){
-            gameMode = GameMode.DROPPING_PIXELS;
-        }
+
 
         while (opModeIsActive()) {
+            if (gamepad2.x){
+                changeGameMode(GameMode.PICKING_PIXELS);
+            }
+            if (gamepad2.y){
+                changeGameMode(GameMode.DROPPING_PIXELS);        }
             switch(gameMode){
                 case GOING_TO_PICK_PIXELS:
                     // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
-                    armPosition = goToPickPixelPosition();
+                    if (gameModeChanged) {
+                        armPosition = goToPickPixelPosition();
+                        gameModeChanged = Boolean.FALSE;
+                    }
                     break;
                 case PICKING_PIXELS:
                     // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
@@ -82,15 +89,16 @@ public class TeleOpDrive extends LinearOpMode {
                     break;
                 case GOING_TO_DROP_PIXELS:
                     // WRIST = AUTO, CLAW = CLOSED (holding pixels)
+                    armPosition += (int)-(gamepad2.left_stick_y * 10);
+                    armPosition = Math.max(0,armPosition); // cannot go below zero
+                    armPosition = Math.min(MAX_ARM_POSITION,armPosition); // cannot go above 840
+                    moveArmToPosition(armPosition);
                     break;
                 case APRIL_TAG_NAVIGATION:
                     break;
                 case DROPPING_PIXELS:
                     // ARM = MANUAL, WRIST = NONE, CLAWS = OPEN
-                    armPosition += (int)-(gamepad2.left_stick_y * 10);
-                    armPosition = Math.max(0,armPosition); // cannot go below zero
-                    armPosition = Math.min(MAX_ARM_POSITION,armPosition); // cannot go above 840
-                    moveArmToPosition(armPosition);
+
                     break;
                 case GOING_TO_HANG:
                     // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
@@ -112,8 +120,10 @@ public class TeleOpDrive extends LinearOpMode {
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower = axial - lateral + yaw;
             double rightBackPower = axial + lateral - yaw;
-            double leftArmMotorPower = -gamepad2.left_stick_y;
-            double rightArmMotorPower = gamepad2.left_stick_y;
+
+//            // ARM
+//            double leftArmMotorPower = -gamepad2.left_stick_y;
+//            double rightArmMotorPower = gamepad2.left_stick_y;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -133,11 +143,12 @@ public class TeleOpDrive extends LinearOpMode {
             rightfront.setPower(rightFrontPower);
             leftback.setPower(leftBackPower);
             rightback.setPower(rightBackPower);
-            leftArmMotor.setPower(leftArmMotorPower*ARM_SPEED);
-            rightArmMotor.setPower(rightArmMotorPower*ARM_SPEED);
+//            leftArmMotor.setPower(leftArmMotorPower*ARM_SPEED);
+//            rightArmMotor.setPower(rightArmMotorPower*ARM_SPEED);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("GameMode", gameMode);
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
@@ -151,13 +162,18 @@ public class TeleOpDrive extends LinearOpMode {
         }
     }
 
-    private void pickPixels() {
+    private void changeGameMode(GameMode mode) {
+        gameMode = mode;
+        gameModeChanged= Boolean.TRUE;
+    }
+
+    private void pickPixels() throws InterruptedException {
         leftClawServo.setPosition(CLAW_CLOSE_POSITION);
         rightClawServo.setPosition(CLAW_CLOSE_POSITION);
+        Thread.sleep(1000);
         // Move Arm up to remove friction and get clearance the ground
         moveArmToPosition(ARM_PICK_POSITION + 100);
-        gameMode = GameMode.GOING_TO_DROP_PIXELS;
-    }
+        changeGameMode(GameMode.GOING_TO_DROP_PIXELS);    }
 
     private void initialize() {
         gameMode = GameMode.INIT;
@@ -232,6 +248,9 @@ public class TeleOpDrive extends LinearOpMode {
             wristPosition = Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, wristPosition));
             wristServo.setPosition(wristPosition);
         }
+
+        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 //        leftArmMotor.setPower(0);
 //        rightArmMotor.setPower(0);
