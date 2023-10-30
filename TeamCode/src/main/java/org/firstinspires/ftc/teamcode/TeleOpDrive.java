@@ -136,22 +136,11 @@ public class TeleOpDrive extends LinearOpMode {
                     turn = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
 
                     //Look for April Tag(s)
-                    List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-                    for (AprilTagDetection detection : currentDetections) {
-                        if ((detection.metadata != null) &&
-                                ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID))) {
-                            aprilTagFound = true;
-                            //We found April Tag, change game mode to APRIL TAG NAV
-                            changeGameMode(GameMode.APRIL_TAG_NAVIGATION);
-                            desiredTag = detection;
-                            break;  // don't look any further.
-                        } else {
-                            telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
-                        }
-                    }
+                    aprilTagFound = detectAprilTags();
                     break;
                 case APRIL_TAG_NAVIGATION:
                     if (aprilTagFound && lookForAprilTag) {
+                        aprilTagFound = detectAprilTags();
                         double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
                         double headingError = desiredTag.ftcPose.bearing;
                         double yawError = desiredTag.ftcPose.yaw;
@@ -194,6 +183,24 @@ public class TeleOpDrive extends LinearOpMode {
             telemetry.update();
             idle();
         }
+    }
+
+    private boolean detectAprilTags() {
+        boolean aprilTagFound = false;
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) &&
+                    ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID))) {
+                aprilTagFound = true;
+                //We found April Tag, change game mode to APRIL TAG NAV
+                changeGameMode(GameMode.APRIL_TAG_NAVIGATION);
+                desiredTag = detection;
+                break;  // don't look any further.
+            } else {
+                telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
+            }
+        }
+        return aprilTagFound;
     }
 
     private void dropPixels() {
