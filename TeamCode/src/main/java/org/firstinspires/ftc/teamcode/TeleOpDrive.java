@@ -34,6 +34,7 @@ public class TeleOpDrive extends LinearOpMode {
     static final double STARTING_CLAW_POS = CLAW_OPEN_POSITION;
 
     //Arm Speed
+
     static final double ARM_SPEED = 0.3;
 
     // Declare OpMode members for each of the 4 motors.
@@ -72,6 +73,7 @@ public class TeleOpDrive extends LinearOpMode {
         while (opModeIsActive()) {
             if (gamepad2.x){
                 changeGameMode(GameMode.PICKING_PIXELS);
+                gamepad2.rumble(1000);
             }
             if (gamepad2.y){
                 changeGameMode(GameMode.DROPPING_PIXELS);        }
@@ -98,7 +100,7 @@ public class TeleOpDrive extends LinearOpMode {
                     break;
                 case DROPPING_PIXELS:
                     // ARM = MANUAL, WRIST = NONE, CLAWS = OPEN
-
+                    dropPixels();
                     break;
                 case GOING_TO_HANG:
                     // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
@@ -160,6 +162,14 @@ public class TeleOpDrive extends LinearOpMode {
             telemetry.update();
             idle();
         }
+    }
+
+    private void dropPixels() throws InterruptedException {
+        leftClawServo.setPosition(CLAW_OPEN_POSITION);
+        rightClawServo.setPosition(CLAW_OPEN_POSITION);
+        Thread.sleep(1000);
+        changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
+
     }
 
     private void changeGameMode(GameMode mode) {

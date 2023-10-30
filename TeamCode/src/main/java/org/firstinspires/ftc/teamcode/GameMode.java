@@ -34,6 +34,12 @@ public enum GameMode {
     // Operator 1 = DRIVER, Operator 2 = Move ARM to right height and ACTION BUTTON
     GOING_TO_DROP_PIXELS,
 
+    // Detected April Tag and Arm turns towards back board, and drops pixel
+    // Arm back side, wrist facing board, claw open
+    // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN
+    // ENTER MODE = AUTO NAVIGATION
+    // EXIT MODE == AUTO -- right when pixels drop
+    // Operator 1 = DRIVER (Light engagement), Operator 2 = ARM CONTROL, OPEN CLAWS
     APRIL_TAG_NAVIGATION,
 
     // Arm back side, wrist facing board, claw open
