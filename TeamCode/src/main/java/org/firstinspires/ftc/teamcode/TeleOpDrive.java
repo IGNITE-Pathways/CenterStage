@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -57,26 +58,30 @@ public class TeleOpDrive extends LinearOpMode {
     final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
-    // Use DESIRED_DISTANCE to set how close you want the robot to get to the target.
     final double DESIRED_DISTANCE = 7.0; //  this is how close the camera should get to the target (inches)
-    // Speed and Turn sensitivity can be adjusted using the SPEED_GAIN, STRAFE_GAIN and TURN_GAIN constants.
     final double SPEED_GAIN = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
-    GameMode gameMode = GameMode.NONE;
+
+    //Define motors and sensors
     DcMotor rightFront, leftFront, rightBack, leftBack = null;
     DcMotor leftArmMotor, rightArmMotor = null;
-    Servo wristServo = null;
-    Servo leftClawServo, rightClawServo = null;
+    Servo wristServo, leftClawServo, rightClawServo = null;
+    DistanceSensor sensorDistance = null;
+    TouchSensor leftClawTouchSensor, rightClawTouchSensor = null;
+    boolean leftPixelInClaw, rightPixelInClaw = false;
+
     double wristPosition = STARTING_WRIST_POSITION;
     double leftClawPosition = STARTING_CLAW_POS;
     double rightClawPosition = STARTING_CLAW_POS;
+
     //Robot Speed
     double driveSpeed = MAX_SPEED;
+    GameMode gameMode = GameMode.NONE;
     Boolean gameModeChanged = Boolean.FALSE;
+
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
-    private DistanceSensor sensorDistance;
     Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
     double calculatedDistance = DistanceSensor.distanceOutOfRange;
 
@@ -116,8 +121,8 @@ public class TeleOpDrive extends LinearOpMode {
 
             switch (gameMode) {
                 case GOING_TO_PICK_PIXELS:
-                    driveSpeed = MAX_SPEED;
                     // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
+                    driveSpeed = MAX_SPEED;
                     if (gameModeChanged) {
                         armPosition = goToGoingToPickPixelPosition();
                         gameModeChanged = Boolean.FALSE;
@@ -127,19 +132,21 @@ public class TeleOpDrive extends LinearOpMode {
                 case PICKING_PIXELS:
                     // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
                     if (gameModeChanged) {
-                        driveSpeed = SPEED_WHEN_PICKING_PIXELS;
+                        driveSpeed = SPEED_WHEN_PICKING_PIXELS; //Slow down, need precision to pick pixels
                         armPosition = goToPickPixelPosition();
                         gameModeChanged = Boolean.FALSE;
                     }
-                    //@TODO: This needs to be automated with touch-sensors
-                    if (gamepad2.circle)  pickPixels();
+                    if (gamepad2.circle) pickPixels(); //Manual Grab
+                    if (leftClawTouchSensor.isPressed()) pickLeftPixel(); //Auto Grab
+                    if (rightClawTouchSensor.isPressed()) pickRightPixel(); //Auto Grab
                     break;
                 case GOING_TO_DROP_PIXELS:
-                    // WRIST = AUTO, CLAW = CLOSED (holding pixels)
-                    driveSpeed = MAX_SPEED;
+                    // WRIST = AUTO (also allows Manual), CLAW = CLOSE POSITION (holding pixels)
+                    driveSpeed = MAX_SPEED; //Full speed from front to back
 
+                    // Manual Wrist Movement is allowed, but not required
                     armPosition += (int) -(gamepad2.left_stick_y * 20);
-                    armPosition = Math.max(0, armPosition); // cannot go below zero
+                    armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
                     armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
                     moveArmToPosition(armPosition);
 
@@ -159,6 +166,7 @@ public class TeleOpDrive extends LinearOpMode {
                     }
                     updateDistance();
                     //Y Button = Manual override only required if April Tag Nav doesn't work
+                    //Pressing Y Button will skill April Tag Navigation
                     if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                     break;
                 case APRIL_TAG_NAVIGATION:
@@ -204,6 +212,7 @@ public class TeleOpDrive extends LinearOpMode {
 
                         // Move robot back a bit
                         moveRobotBack();
+                        resetDistanceSensor();
 
                         // Change Mode, let's go get next set of pixels
                         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
@@ -214,7 +223,6 @@ public class TeleOpDrive extends LinearOpMode {
                     driveSpeed = MAX_SPEED;
                     break;
                 case HANGING:
-                    driveSpeed = 0;
                     // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
                     break;
             }
@@ -237,6 +245,35 @@ public class TeleOpDrive extends LinearOpMode {
             telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
             telemetry.update();
             idle();
+        }
+    }
+
+    private void waitAndMoveArmAndResetDistance() {
+        sleep(1000);
+        // Move Arm up to remove friction and get clearance the ground
+        moveArmToPosition(ARM_PICK_POSITION + 50);
+        changeGameMode(GameMode.GOING_TO_DROP_PIXELS);
+        resetDistanceSensor();
+    }
+    private void pickPixels() {
+        leftClawServo.setPosition(CLAW_CLOSE_POSITION);
+        rightClawServo.setPosition(CLAW_CLOSE_POSITION);
+        leftPixelInClaw = true;
+        rightPixelInClaw = true;
+        waitAndMoveArmAndResetDistance();
+    }
+    private void pickLeftPixel() {
+        leftClawServo.setPosition(CLAW_CLOSE_POSITION);
+        leftPixelInClaw = true;
+        if (rightPixelInClaw) {
+            waitAndMoveArmAndResetDistance();
+        }
+    }
+    private void pickRightPixel() {
+        rightClawServo.setPosition(CLAW_CLOSE_POSITION);
+        rightPixelInClaw = true;
+        if (leftPixelInClaw) {
+            waitAndMoveArmAndResetDistance();
         }
     }
 
@@ -271,6 +308,8 @@ public class TeleOpDrive extends LinearOpMode {
         leftClawServo.setPosition(CLAW_OPEN_POSITION);
         rightClawServo.setPosition(CLAW_OPEN_POSITION);
         sleep(1000);
+        leftPixelInClaw = false;
+        rightPixelInClaw = false;
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
     }
 
@@ -278,16 +317,6 @@ public class TeleOpDrive extends LinearOpMode {
         gameMode = mode;
         gameModeChanged = Boolean.TRUE;
         gamepad2.rumble(1000);
-    }
-
-    private void pickPixels() {
-        leftClawServo.setPosition(CLAW_CLOSE_POSITION);
-        rightClawServo.setPosition(CLAW_CLOSE_POSITION);
-        sleep(1000);
-        // Move Arm up to remove friction and get clearance the ground
-        moveArmToPosition(ARM_PICK_POSITION + 50);
-        changeGameMode(GameMode.GOING_TO_DROP_PIXELS);
-        resetDistanceSensor();
     }
 
     private void initialize() {
@@ -305,6 +334,8 @@ public class TeleOpDrive extends LinearOpMode {
 
         // Initialize Rev 2M Distance sensor
         sensorDistance = hardwareMap.get(DistanceSensor.class, "distance");
+        leftClawTouchSensor = hardwareMap.get(TouchSensor.class, "leftClawTouch");
+        rightClawTouchSensor = hardwareMap.get(TouchSensor.class, "rightClawTouch");
 
         // Initialize April Tag
         aprilTag = new AprilTagProcessor.Builder().build();
@@ -505,7 +536,8 @@ public class TeleOpDrive extends LinearOpMode {
     }
 
     private Double calculateDistance() {
-        if (distanceQueue.size() == 0) return DistanceSensor.distanceOutOfRange;
+        //Must have multiple entries
+        if (distanceQueue.size() < 2) return DistanceSensor.distanceOutOfRange;
         Double total = 0.0;
         for (Double d : distanceQueue) {
             total += d;
