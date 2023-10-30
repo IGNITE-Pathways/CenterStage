@@ -76,7 +76,8 @@ public class TeleOpDrive extends LinearOpMode {
                 gamepad2.rumble(1000);
             }
             if (gamepad2.y){
-                changeGameMode(GameMode.DROPPING_PIXELS);        }
+                changeGameMode(GameMode.DROPPING_PIXELS);
+            }
             switch(gameMode){
                 case GOING_TO_PICK_PIXELS:
                     // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
@@ -169,7 +170,6 @@ public class TeleOpDrive extends LinearOpMode {
         rightClawServo.setPosition(CLAW_OPEN_POSITION);
         Thread.sleep(1000);
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
-
     }
 
     private void changeGameMode(GameMode mode) {
