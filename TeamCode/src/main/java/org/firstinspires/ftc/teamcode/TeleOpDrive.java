@@ -16,7 +16,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 /*
@@ -29,7 +31,8 @@ public class TeleOpDrive extends LinearOpMode {
     static final int MAX_ARM_POSITION = 500;
     static final int MIN_ARM_POSITION = 0;
     static final int FULL_CIRCLE = 1075;
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 10;
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 5; //Robot must move slow
+    static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + 20; //Robot running across field
     static final double ARM_SPEED = 0.3;
 
     // WRIST
@@ -45,9 +48,9 @@ public class TeleOpDrive extends LinearOpMode {
 
     //DRIVE
     static final double MAX_SPEED = 1.0;
-    static final double SPEED_WHEN_PICKING_PIXELS = 0.4;
-    static final double SPEED_WHEN_GOING_TO_DROP_PIXELS = 0.8;
-    static final double SPEED_WHEN_ON_APRIL_TAG_NAV = 0.5;
+    static final double SPEED_WHEN_PICKING_PIXELS = 0.3; //gameMode = PICKING_PIXELS
+    static final double SPEED_WHEN_DROPPING_PIXELS = 0.3; //gameMode = DROPPING_PIXELS
+    static final double SPEED_WHEN_ON_APRIL_TAG_NAV = 0.5; //gameMode = APRIL_TAG_NAVIGATION
 
     //APRIL TAG
     private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -69,11 +72,14 @@ public class TeleOpDrive extends LinearOpMode {
     double leftClawPosition = STARTING_CLAW_POS;
     double rightClawPosition = STARTING_CLAW_POS;
     //Robot Speed
-    double driveSpeed = SPEED_WHEN_PICKING_PIXELS;
+    double driveSpeed = MAX_SPEED;
     Boolean gameModeChanged = Boolean.FALSE;
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
     private DistanceSensor sensorDistance;
+    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
+    double calculatedDistance = DistanceSensor.distanceOutOfRange;
+
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
@@ -85,7 +91,7 @@ public class TeleOpDrive extends LinearOpMode {
         // Initialize April Tag Variables
         boolean aprilTagFound = false;
         boolean lookForAprilTag = false;
-        boolean autoDrive = false;
+        boolean autoDrive;
 
         // Initialize all motors and sensors
         initialize();
@@ -102,7 +108,6 @@ public class TeleOpDrive extends LinearOpMode {
         while (opModeIsActive()) {
             autoDrive = aprilTagFound && lookForAprilTag;
             if (gamepad2.x) changeGameMode(GameMode.PICKING_PIXELS);
-            if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
@@ -111,21 +116,31 @@ public class TeleOpDrive extends LinearOpMode {
 
             switch (gameMode) {
                 case GOING_TO_PICK_PIXELS:
+                    driveSpeed = MAX_SPEED;
                     // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
                     if (gameModeChanged) {
-                        armPosition = goToPickPixelPosition();
+                        armPosition = goToGoingToPickPixelPosition();
                         gameModeChanged = Boolean.FALSE;
+                        resetDistanceSensor();
                     }
                     break;
                 case PICKING_PIXELS:
                     // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
-                    pickPixels();
+                    if (gameModeChanged) {
+                        driveSpeed = SPEED_WHEN_PICKING_PIXELS;
+                        armPosition = goToPickPixelPosition();
+                        gameModeChanged = Boolean.FALSE;
+                    }
+                    //@TODO: This needs to be automated with touch-sensors
+                    if (gamepad2.circle)  pickPixels();
                     break;
                 case GOING_TO_DROP_PIXELS:
                     // WRIST = AUTO, CLAW = CLOSED (holding pixels)
-                    armPosition += (int) -(gamepad2.left_stick_y * 10);
+                    driveSpeed = MAX_SPEED;
+
+                    armPosition += (int) -(gamepad2.left_stick_y * 20);
                     armPosition = Math.max(0, armPosition); // cannot go below zero
-                    armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above 840
+                    armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
                     moveArmToPosition(armPosition);
 
                     // Robot will be looking for april tag and will switch mode automatically once found
@@ -137,9 +152,22 @@ public class TeleOpDrive extends LinearOpMode {
 
                     //Look for April Tag(s)
                     aprilTagFound = detectAprilTags();
+
+                    if (gameModeChanged) {
+                        gameModeChanged = Boolean.FALSE;
+                        resetDistanceSensor();
+                    }
+                    updateDistance();
+                    //Y Button = Manual override only required if April Tag Nav doesn't work
+                    if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                     break;
                 case APRIL_TAG_NAVIGATION:
                     if (aprilTagFound && lookForAprilTag) {
+                        driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
+                        if (gameModeChanged) {
+                            gameModeChanged = Boolean.FALSE;
+                        }
+                        updateDistance();
                         aprilTagFound = detectAprilTags();
                         double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
                         double headingError = desiredTag.ftcPose.bearing;
@@ -149,22 +177,49 @@ public class TeleOpDrive extends LinearOpMode {
                         drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
                         turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
                         strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                        //Y Button = Manual override only required if April Tag Nav doesn't work
+                        if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
+                            changeGameMode(GameMode.DROPPING_PIXELS);
+                        }
                     }
                     break;
                 case DROPPING_PIXELS:
-                    // ARM = MANUAL, WRIST = NONE, CLAWS = OPEN
-                    dropPixels();
+                    // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
                     lookForAprilTag = false;
+                    driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except strafe if needed
+                    updateDistance();
+
+                    if (gameModeChanged) {
+                        gameModeChanged = Boolean.FALSE;
+                        // Move Arm to back board -- only once
+                        armPosition = MAX_ARM_POSITION;
+                        moveArmToPosition(armPosition);
+                        sleep(400);
+                    }
+                    //User Action :: Press O (or if distance sensor is close) to drop pixels
+                    if (gamepad2.circle || isDistanceSensorClose()) {
+                        dropPixels();
+                        sleep(400);
+
+                        // Move robot back a bit
+                        moveRobotBack();
+
+                        // Change Mode, let's go get next set of pixels
+                        changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
+                    }
                     break;
                 case GOING_TO_HANG:
                     // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
+                    driveSpeed = MAX_SPEED;
                     break;
                 case HANGING:
+                    driveSpeed = 0;
                     // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
                     break;
             }
 
-            moveRobot(drive, turn, strafe);
+            moveRobot(drive * driveSpeed, turn * driveSpeed, strafe * driveSpeed);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -179,10 +234,19 @@ public class TeleOpDrive extends LinearOpMode {
             telemetry.addData("Arm Angle", ((leftArmMotor.getCurrentPosition() * 360) / FULL_CIRCLE));
             telemetry.addData("Wrist: Position", wristPosition);
             telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
-            telemetry.addData("Distance", String.format("%.01f mm", sensorDistance.getDistance(DistanceUnit.MM)));
+            telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
             telemetry.update();
             idle();
         }
+    }
+
+    private void resetDistanceSensor() {
+        distanceQueue.clear();
+        calculatedDistance = DistanceSensor.distanceOutOfRange;
+    }
+
+    private boolean isDistanceSensorClose() {
+        return calculatedDistance < 40;
     }
 
     private boolean detectAprilTags() {
@@ -221,8 +285,9 @@ public class TeleOpDrive extends LinearOpMode {
         rightClawServo.setPosition(CLAW_CLOSE_POSITION);
         sleep(1000);
         // Move Arm up to remove friction and get clearance the ground
-        moveArmToPosition(ARM_PICK_POSITION + 100);
+        moveArmToPosition(ARM_PICK_POSITION + 50);
         changeGameMode(GameMode.GOING_TO_DROP_PIXELS);
+        resetDistanceSensor();
     }
 
     private void initialize() {
@@ -284,10 +349,13 @@ public class TeleOpDrive extends LinearOpMode {
 
     private int goToPickPixelPosition() {
         setClawsToPixelPickPosition();
-//        moveArmToPosition(ARM_PICK_POSITION - 50, ClawPosition.FACING_DOWN);
         return moveArmToPosition(ARM_PICK_POSITION);
     }
 
+    private int goToGoingToPickPixelPosition() {
+        setClawsToPixelPickPosition();
+        return moveArmToPosition(ARM_POSITION_HIGH);
+    }
     private void setClawsToPixelPickPosition() {
         leftClawServo.setPosition(CLAW_OPEN_POSITION);
         rightClawServo.setPosition(CLAW_OPEN_POSITION);
@@ -353,6 +421,18 @@ public class TeleOpDrive extends LinearOpMode {
         return armPosition > 700;
     }
 
+    public void moveRobotBack() {
+        leftFront.setPower(-0.2);
+        rightBack.setPower(-0.2);
+        leftBack.setPower(-0.2);
+        rightBack.setPower(-0.2);
+        sleep(1000);
+        leftFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+        rightBack.setPower(0);
+    }
+
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
         double leftFrontPower = x - y - yaw;
@@ -411,4 +491,26 @@ public class TeleOpDrive extends LinearOpMode {
             sleep(20);
         }
     }
+
+    private void addNewDistanceValue(double distance) {
+        distanceQueue.add(distance);
+    }
+
+    private void updateDistance() {
+        double distance = sensorDistance.getDistance(DistanceUnit.MM);
+        if ((distance != DistanceSensor.distanceOutOfRange)) {
+            addNewDistanceValue(distance);
+        }
+        calculatedDistance = calculateDistance();
+    }
+
+    private Double calculateDistance() {
+        if (distanceQueue.size() == 0) return DistanceSensor.distanceOutOfRange;
+        Double total = 0.0;
+        for (Double d : distanceQueue) {
+            total += d;
+        }
+        return total/distanceQueue.size();
+    }
+
 }
