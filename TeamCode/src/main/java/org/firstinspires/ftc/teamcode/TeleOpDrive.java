@@ -378,7 +378,7 @@ public class TeleOpDrive extends XBotOpMode {
 
         // Send powers to the wheels.
         leftFront.setPower(leftFrontPower);
-        rightBack.setPower(rightFrontPower);
+        rightFront.setPower(rightFrontPower);
         leftBack.setPower(leftBackPower);
         rightBack.setPower(rightBackPower);
     }
