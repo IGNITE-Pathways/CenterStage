@@ -2,12 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 public class XBot {
     // ARM
-    static final int MAX_ARM_POSITION = 500;
+    static final int FULL_CIRCLE = 3896; //3895.9 for 43RPM
+    static final int ARM_MOTOR_GEAR_RATIO = 2;
     static final int MIN_ARM_POSITION = 0;
-    static final int FULL_CIRCLE = 1075;
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 3; //Robot must move slow
-    static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + 20; //Robot running across field
-    static final double ARM_SPEED = 0.3;
+    static final int MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 70/100; //70%
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO /100;; //Robot must move slow
+    static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4/100;; // 4% //Robot running across field
+    static final double ARM_SPEED = 1;
 
     // WRIST
     static final double MAX_WRIST_POS = 0.95;     // Maximum rotational position
@@ -21,7 +22,7 @@ public class XBot {
     static final double STARTING_CLAW_POS = CLAW_OPEN_POSITION;
 
     //DRIVE
-    static final double MAX_SPEED = 0.7; //Increase as operator gets better
+    static final double MAX_SPEED = 1.0; //Increase as operator gets better
     static final double SPEED_WHEN_PICKING_PIXELS = 0.3; //gameMode = PICKING_PIXELS
     static final double SPEED_WHEN_DROPPING_PIXELS = 0.3; //gameMode = DROPPING_PIXELS
     static final double SPEED_WHEN_ON_APRIL_TAG_NAV = 0.5; //gameMode = APRIL_TAG_NAVIGATION
@@ -34,5 +35,5 @@ public class XBot {
     static final double DESIRED_DISTANCE = 7.0; //  this is how close the camera should get to the target (inches)
     static final double SPEED_GAIN = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     static final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-    static final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 dergree error. (0.25 / 25.0)
+    static final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 }
