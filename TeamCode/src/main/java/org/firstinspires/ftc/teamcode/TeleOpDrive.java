@@ -56,6 +56,9 @@ public class TeleOpDrive extends XBotOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("Arm: Target", armPosition);
+        telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+        telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
         telemetry.update();
 
         waitForStart();
@@ -63,152 +66,159 @@ public class TeleOpDrive extends XBotOpMode {
 
         // Change Game Mode on PLAY
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
+                autoDrive = aprilTagFound && lookForAprilTag;
+                if (gamepad2.x) {
+                    changeGameMode(GameMode.PICKING_PIXELS);
+                    leftPixelInClaw = false;
+                    rightPixelInClaw = false;
+                }
 
-        while (opModeIsActive()) {
-            autoDrive = aprilTagFound && lookForAprilTag;
-            if (gamepad2.x) {
-                changeGameMode(GameMode.PICKING_PIXELS);
-                leftPixelInClaw = false;
-                rightPixelInClaw = false;
-            }
+                // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+                double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+                double turn = -gamepad1.left_stick_x;
+                double strafe = -gamepad1.right_stick_x;
 
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double turn = -gamepad1.left_stick_x;
-            double strafe = -gamepad1.right_stick_x;
-
-            switch (gameMode) {
-                case GOING_TO_PICK_PIXELS:
-                    // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
-                    driveSpeed = MAX_SPEED;
-                    if (gameModeChanged) {
-                        armPosition = goToGoingToPickPixelPosition();
-                        wristServo.setPosition(STARTING_WRIST_POSITION);
-                        gameModeChanged = Boolean.FALSE;
-                        resetDistanceSensor();
-                    }
-                    break;
-                case PICKING_PIXELS:
-                    // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
-                    if (gameModeChanged) {
-                        driveSpeed = SPEED_WHEN_PICKING_PIXELS; //Slow down, need precision to pick pixels
-                        armPosition = goToPickPixelPosition();
-                        gameModeChanged = Boolean.FALSE;
-                    }
-                    if (gamepad2.circle) pickPixels(); //Manual Grab
-                    if (leftClawTouchSensor.isPressed()) pickLeftPixel(); //Auto Grab
-                    if (rightClawTouchSensor.isPressed()) pickRightPixel(); //Auto Grab
-                    break;
-                case GOING_TO_DROP_PIXELS:
-                    // WRIST = AUTO (also allows Manual), CLAW = CLOSE POSITION (holding pixels)
-                    driveSpeed = MAX_SPEED; //Full speed from front to back
-
-                    // Manual Wrist Movement is allowed, but not required
-                    armPosition += (int) -(gamepad2.left_stick_y * 20);
-                    armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
-                    armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
-                    moveArmToPosition(armPosition);
-
-                    // Robot will be looking for april tag and will switch mode automatically once found
-                    lookForAprilTag = true;
-                    // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                    drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-                    strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
-                    turn = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
-
-                    //Look for April Tag(s)
-                    aprilTagFound = detectAprilTags();
-
-                    if (gameModeChanged) {
-                        gameModeChanged = Boolean.FALSE;
-                        resetDistanceSensor();
-                    }
-                    updateDistance();
-                    //Y Button = Manual override only required if April Tag Nav doesn't work
-                    //Pressing Y Button will skill April Tag Navigation
-                    if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
-                    break;
-                case APRIL_TAG_NAVIGATION:
-                    if (aprilTagFound && lookForAprilTag) {
-                        driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
+                switch (gameMode) {
+                    case GOING_TO_PICK_PIXELS:
+                        // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
+                        driveSpeed = MAX_SPEED;
                         if (gameModeChanged) {
+                            armPosition = goToGoingToPickPixelPosition();
+                            wristServo.setPosition(STARTING_WRIST_POSITION);
+                            gameModeChanged = Boolean.FALSE;
+                            resetDistanceSensor();
+                        }
+                        break;
+                    case PICKING_PIXELS:
+                        // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
+                        if (gameModeChanged) {
+                            driveSpeed = SPEED_WHEN_PICKING_PIXELS; //Slow down, need precision to pick pixels
+                            armPosition = goToPickPixelPosition();
                             gameModeChanged = Boolean.FALSE;
                         }
-                        updateDistance();
-                        aprilTagFound = detectAprilTags();
-                        double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                        double headingError = desiredTag.ftcPose.bearing;
-                        double yawError = desiredTag.ftcPose.yaw;
+                        if (gamepad2.circle) pickPixels(); //Manual Grab
+                        if (leftClawTouchSensor.isPressed()) pickLeftPixel(); //Auto Grab
+                        if (rightClawTouchSensor.isPressed()) pickRightPixel(); //Auto Grab
+                        break;
+                    case GOING_TO_DROP_PIXELS:
+                        // WRIST = AUTO (also allows Manual), CLAW = CLOSE POSITION (holding pixels)
+                        driveSpeed = MAX_SPEED; //Full speed from front to back
 
-                        // Use the speed and turn "gains" to calculate how we want the robot to move.
-                        drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                        turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                        strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-                        //Y Button = Manual override only required if April Tag Nav doesn't work
-                        if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
-                            changeGameMode(GameMode.DROPPING_PIXELS);
+                        // Manual Wrist Movement is allowed, but not required
+                        int moveArmBy = (int) -(gamepad2.left_stick_y * 20);
+                        if (moveArmBy != 0) {
+                            armPosition += moveArmBy;
+                            armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
+                            armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
+                            moveArmToPosition(armPosition);
                         }
-                    }
-                    break;
-                case DROPPING_PIXELS:
-                    // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
-                    lookForAprilTag = false;
-                    driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except strafe if needed
-                    updateDistance();
 
-                    if (gameModeChanged) {
-                        gameModeChanged = Boolean.FALSE;
-                        // Move Arm to back board -- only once
-                        armPosition = MAX_ARM_POSITION;
-                        moveArmToPosition(armPosition);
-                        sleep(400);
-                    }
-                    //User Action :: Press O (or if distance sensor is close) to drop pixels
-                    if (gamepad2.circle || isDistanceSensorClose()) {
-                        dropPixels();
-                        sleep(400);
+                        // Robot will be looking for april tag and will switch mode automatically once found
+                        lookForAprilTag = true;
+                        // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
+                        drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
+                        strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
+                        turn = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
 
-                        // Move robot back a bit
-                        moveRobotBack();
-                        resetDistanceSensor();
+                        //Look for April Tag(s)
+                        aprilTagFound = detectAprilTags();
 
-                        // Change Mode, let's go get next set of pixels
-                        changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
-                    }
-                    break;
-                case GOING_TO_HANG:
-                    // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
-                    driveSpeed = MAX_SPEED;
-                    break;
-                case HANGING:
-                    // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
-                    break;
+                        if (gameModeChanged) {
+                            gameModeChanged = Boolean.FALSE;
+                            resetDistanceSensor();
+                        }
+                        updateDistance();
+                        //Y Button = Manual override only required if April Tag Nav doesn't work
+                        //Pressing Y Button will skill April Tag Navigation
+                        if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
+                        break;
+                    case APRIL_TAG_NAVIGATION:
+                        if (aprilTagFound && lookForAprilTag) {
+                            driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
+                            if (gameModeChanged) {
+                                gameModeChanged = Boolean.FALSE;
+                            }
+                            updateDistance();
+                            aprilTagFound = detectAprilTags();
+                            double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                            double headingError = desiredTag.ftcPose.bearing;
+                            double yawError = desiredTag.ftcPose.yaw;
+
+                            // Use the speed and turn "gains" to calculate how we want the robot to move.
+                            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                            //Y Button = Manual override only required if April Tag Nav doesn't work
+                            if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
+                                changeGameMode(GameMode.DROPPING_PIXELS);
+                            }
+                        }
+                        break;
+                    case DROPPING_PIXELS:
+                        // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
+                        lookForAprilTag = false;
+                        driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except strafe if needed
+                        updateDistance();
+
+                        if (gameModeChanged) {
+                            gameModeChanged = Boolean.FALSE;
+                            // Move Arm to back board -- only once
+                            armPosition = MAX_ARM_POSITION;
+                            moveArmToPosition(armPosition);
+                            sleep(400);
+                        }
+                        //User Action :: Press O (or if distance sensor is close) to drop pixels
+                        if (gamepad2.circle || isDistanceSensorClose()) {
+                            dropPixels();
+                            sleep(400);
+
+                            // Move robot back a bit
+                            moveRobotBack();
+                            resetDistanceSensor();
+
+                            // Change Mode, let's go get next set of pixels
+                            changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
+                        }
+                        break;
+                    case GOING_TO_HANG:
+                        // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
+                        driveSpeed = MAX_SPEED;
+                        break;
+                    case HANGING:
+                        // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
+                        break;
+                }
+
+
+                moveRobot(drive * driveSpeed, turn * driveSpeed, strafe * driveSpeed);
+
+                // Show the elapsed game time and wheel power.
+                telemetry.addData("Status", "Run Time: " + runtime.toString());
+                telemetry.addData("GameMode", gameMode);
+                if (autoDrive) {
+                    telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                } else {
+                    telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                }
+                telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+                telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+
+                telemetry.addData("Arm Angle", ((leftArmMotor.getCurrentPosition() * 360) / FULL_CIRCLE));
+                telemetry.addData("Arm: Position", armPosition);
+                telemetry.addData("Wrist: Position", wristPosition);
+                telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
+                telemetry.addData("Touch: Left", leftPixelInClaw + " Right=" + rightPixelInClaw);
+                if (calculatedDistance != DistanceSensor.distanceOutOfRange) {
+                    telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
+                }
+                telemetry.update();
+                idle();
             }
-
-            moveRobot(drive * driveSpeed, turn * driveSpeed, strafe * driveSpeed);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("GameMode", gameMode);
-            if (autoDrive) {
-                telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-            } else {
-                telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-            }
-            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-
-            telemetry.addData("Arm Angle", ((leftArmMotor.getCurrentPosition() * 360) / FULL_CIRCLE));
-            telemetry.addData("Wrist: Position", wristPosition);
-            telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
-            telemetry.addData("Touch: Left", leftPixelInClaw + " Right=" + rightPixelInClaw);
-            if (calculatedDistance != DistanceSensor.distanceOutOfRange) {
-                telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
-            }
-            telemetry.update();
-            idle();
         }
+        visionPortal.close();
     }
 
     private void resetWristAndClawPosition() {
@@ -219,7 +229,7 @@ public class TeleOpDrive extends XBotOpMode {
     private void waitAndMoveArmAndResetDistance() {
         sleep(1000);
         // Move Arm up to remove friction and get clearance the ground
-        armPosition = ARM_POSITION_HIGH + 100;
+        armPosition = ARM_POSITION_HIGH + 50;
         moveArmToPosition(armPosition);
         changeGameMode(GameMode.GOING_TO_DROP_PIXELS);
         resetDistanceSensor();
@@ -279,6 +289,7 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private int moveArmToPosition(int armPosition) {
+        int savePos = armPosition;
         // set motors to run forward for 5000 encoder counts.
         leftArmMotor.setTargetPosition(armPosition);
         rightArmMotor.setTargetPosition(armPosition);
@@ -295,7 +306,14 @@ public class TeleOpDrive extends XBotOpMode {
             armPosition = leftArmMotor.getCurrentPosition();
             wristPosition = getWristPosition(armPosition);
             setWristPosition(wristPosition);
+            telemetry.addData("Arm: Target", savePos);
+            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+            telemetry.update();
         }
+
+        leftArmMotor.setPower(0);
+        rightArmMotor.setPower(0);
 
         leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
