@@ -1,46 +1,55 @@
 package org.firstinspires.ftc.teamcode;
 
-        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-        import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-        import com.qualcomm.robotcore.hardware.DcMotor;
-        import com.qualcomm.robotcore.util.ElapsedTime;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 
-        import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-        import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-        import org.firstinspires.ftc.vision.VisionPortal;
-        import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-        import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-        import java.util.List;
-
-@TeleOp
+@TeleOp(name = "Test Motors", group = "Concept")
 public class Motor extends LinearOpMode {
 
-    // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
-    DcMotor rightfront = null;
-    DcMotor leftfront = null;
-    DcMotor rightback = null;
-    DcMotor leftback = null;
+    DcMotor rightFront = null;
+    DcMotor leftFront = null;
+    DcMotor rightBack = null;
+    DcMotor leftBack = null;
+    DcMotor leftArmMotor, rightArmMotor = null;
 
+    // Declare OpMode members for each of the 4 motors.
+    private final ElapsedTime runtime = new ElapsedTime();
+    int armPosition = 0;
 
     @Override
     public void runOpMode() {
-        double speed;
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftfront = hardwareMap.get(DcMotor.class, "leftfront");
-        leftback = hardwareMap.get(DcMotor.class, "leftback");
-        rightfront = hardwareMap.get(DcMotor.class, "rightfront");
-        rightback = hardwareMap.get(DcMotor.class, "rightback");
+        leftFront = hardwareMap.get(DcMotor.class, "leftfront");
+        leftBack = hardwareMap.get(DcMotor.class, "leftback");
+        rightFront = hardwareMap.get(DcMotor.class, "rightfront");
+        rightBack = hardwareMap.get(DcMotor.class, "rightback");
 
-        leftfront.setDirection(DcMotor.Direction.REVERSE);
-        leftback.setDirection(DcMotor.Direction.REVERSE);
-        rightfront.setDirection(DcMotor.Direction.FORWARD);
-        rightback.setDirection(DcMotor.Direction.FORWARD);
+        // Initialize Motors
+        leftArmMotor = hardwareMap.get(DcMotor.class, "leftArmMotor");
+        rightArmMotor = hardwareMap.get(DcMotor.class, "rightArmMotor");
 
+        //Left Motor is in reverse
+        rightArmMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        //Using Encoders
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setDirection(DcMotor.Direction.FORWARD);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -50,35 +59,85 @@ public class Motor extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double max;
+            double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double turn = -gamepad1.left_stick_x;
+            double strafe = -gamepad1.right_stick_x;
 
-            double power = 0.5;
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower = power;
-            double rightFrontPower = power;
-            double leftBackPower = power;
-            double rightBackPower = power;
+//            moveRobot(drive, turn, strafe);
+
+            int moveArmBy = (int) -(gamepad2.left_stick_y * 22);
+            if (moveArmBy != 0) {
+                armPosition += moveArmBy;
+//                armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
+//                armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
+                moveArmToPosition(armPosition);
+            }
 
             if (gamepad2.x) {
-                leftfront.setPower(leftFrontPower);
-            }
-            if (gamepad2.y) {
-                leftback.setPower(leftFrontPower);
-            }
-            if (gamepad2.a) {
-                rightfront.setPower(leftFrontPower);
-            }
-            if (gamepad2.b) {
-                rightback.setPower(leftFrontPower);
+                armPosition += 8000;
+                moveArmToPosition(armPosition);
             }
 
+            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+            telemetry.addData("Arm: Position", armPosition);
+            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+            telemetry.update();
+        }
+    }
 
-            }
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower = x - y - yaw;
+        double rightFrontPower = x + y + yaw;
+        double leftBackPower = x + y - yaw;
+        double rightBackPower = x - y + yaw;
 
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
 
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
         }
 
+        // Send powers to the wheels.
+        leftFront.setPower(leftFrontPower);
+        rightFront.setPower(rightFrontPower);
+        leftBack.setPower(leftBackPower);
+        rightBack.setPower(rightBackPower);
+    }
+
+    private int moveArmToPosition(int armPosition) {
+        // set motors to run forward for 5000 encoder counts.
+        leftArmMotor.setTargetPosition(armPosition);
+        rightArmMotor.setTargetPosition(armPosition);
+
+        // set motors to run to target encoder position and stop with brakes on.
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftArmMotor.setPower(ARM_SPEED);
+        rightArmMotor.setPower(ARM_SPEED);
+
+        while (opModeIsActive() && rightArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
+        {
+            telemetry.addData("Arm: Target", armPosition);
+            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+            telemetry.update();
         }
 
+        leftArmMotor.setPower(0);
+        rightArmMotor.setPower(0);
+        
+        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        return armPosition;
+    }
+}
