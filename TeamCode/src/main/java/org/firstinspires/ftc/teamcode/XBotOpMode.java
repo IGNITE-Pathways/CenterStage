@@ -65,7 +65,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
         //Left Motor is in reverse
-        leftArmMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightArmMotor.setDirection(DcMotor.Direction.REVERSE);
 
         //Using Encoders
         leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
