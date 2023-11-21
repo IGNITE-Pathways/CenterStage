@@ -21,6 +21,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     DcMotor leftArmMotor, rightArmMotor = null;
     Servo wristServo, leftClawServo, rightClawServo = null;
     DistanceSensor sensorDistance = null;
+    DistanceSensor leftClawDistance, rightClawDistance = null;
     TouchSensor leftClawTouchSensor, rightClawTouchSensor = null;
     boolean leftPixelInClaw, rightPixelInClaw = false;
     VisionPortal visionPortal;               // Used to manage the video source.
@@ -48,6 +49,8 @@ public abstract class XBotOpMode extends LinearOpMode {
 
         // Initialize Rev 2M Distance sensor
         sensorDistance = hardwareMap.get(DistanceSensor.class, "distance");
+        leftClawDistance = hardwareMap.get(DistanceSensor.class, "leftClawDistance");
+        rightClawDistance = hardwareMap.get(DistanceSensor.class, "rightClawDistance");
         leftClawTouchSensor = hardwareMap.get(TouchSensor.class, "leftClawTouch");
         rightClawTouchSensor = hardwareMap.get(TouchSensor.class, "rightClawTouch");
 
@@ -66,6 +69,9 @@ public abstract class XBotOpMode extends LinearOpMode {
 
         //Left Motor is in reverse
         rightArmMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //Using Encoders
         leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

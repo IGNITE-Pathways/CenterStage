@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 public class TeleOpDrive extends XBotOpMode {
 
     double wristPosition = STARTING_WRIST_POSITION;
-    double leftClawPosition = STARTING_CLAW_POS;
-    double rightClawPosition = STARTING_CLAW_POS;
+    double leftClawPosition = STARTING_LEFT_CLAW_POS;
+    double rightClawPosition = STARTING_RIGHT_CLAW_POS;
     int armPosition = 0;
 
     //Robot Speed
@@ -59,6 +59,7 @@ public class TeleOpDrive extends XBotOpMode {
         telemetry.addData("Arm: Target", armPosition);
         telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
         telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+        telemetry.addData("Wrist: Position", wristServo.getPosition());
         telemetry.update();
 
         waitForStart();
@@ -99,21 +100,25 @@ public class TeleOpDrive extends XBotOpMode {
                             gameModeChanged = Boolean.FALSE;
                         }
                         if (gamepad2.circle) pickPixels(); //Manual Grab
-                        if (leftClawTouchSensor.isPressed()) pickLeftPixel(); //Auto Grab
-                        if (rightClawTouchSensor.isPressed()) pickRightPixel(); //Auto Grab
+                        if (isLeftPixelInReach()) pickLeftPixel(); //Auto Grab
+                        if (isRightPixelInReach()) pickRightPixel(); //Auto Grab
                         break;
                     case GOING_TO_DROP_PIXELS:
                         // WRIST = AUTO (also allows Manual), CLAW = CLOSE POSITION (holding pixels)
                         driveSpeed = MAX_SPEED; //Full speed from front to back
 
-                        // Manual Wrist Movement is allowed, but not required
-                        int moveArmBy = (int) -(gamepad2.left_stick_y * 20);
+                        // Manual Arm Movement is allowed, but not required
+                        int moveArmBy = (int) -(gamepad2.left_stick_y * 40);
                         if (moveArmBy != 0) {
                             armPosition += moveArmBy;
                             armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
                             armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
                             moveArmToPosition(armPosition);
                         }
+
+//                        //Debug
+//                        wristPosition += gamepad2.right_stick_y / 100;
+//                        setWristPosition(wristPosition);
 
                         // Robot will be looking for april tag and will switch mode automatically once found
                         lookForAprilTag = true;
@@ -221,10 +226,21 @@ public class TeleOpDrive extends XBotOpMode {
         visionPortal.close();
     }
 
+    private boolean isRightPixelInReach() {
+        //return rightClawTouchSensor.isPressed();
+        return (rightClawDistance.getDistance(DistanceUnit.MM) < 20);
+    }
+
+    private boolean isLeftPixelInReach() {
+        //return leftClawTouchSensor.isPressed()
+        return (leftClawDistance.getDistance(DistanceUnit.MM) < 20);
+    }
+
     private void resetWristAndClawPosition() {
-        wristServo.setPosition(STARTING_WRIST_POSITION);
-        leftClawServo.setPosition(STARTING_CLAW_POS);
-        rightClawServo.setPosition(STARTING_CLAW_POS);
+        wristPosition = STARTING_WRIST_POSITION;
+        setWristPosition(wristPosition);
+        leftClawServo.setPosition(STARTING_LEFT_CLAW_POS);
+        rightClawServo.setPosition(STARTING_RIGHT_CLAW_POS);
     }
     private void waitAndMoveArmAndResetDistance() {
         sleep(1000);
@@ -235,21 +251,21 @@ public class TeleOpDrive extends XBotOpMode {
         resetDistanceSensor();
     }
     private void pickPixels() {
-        leftClawServo.setPosition(CLAW_CLOSE_POSITION);
-        rightClawServo.setPosition(CLAW_CLOSE_POSITION);
+        leftClawServo.setPosition(LEFT_CLAW_CLOSE_POSITION);
+        rightClawServo.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
         rightPixelInClaw = true;
         waitAndMoveArmAndResetDistance();
     }
     private void pickLeftPixel() {
-        leftClawServo.setPosition(CLAW_CLOSE_POSITION);
+        leftClawServo.setPosition(LEFT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
         if (rightPixelInClaw) {
             waitAndMoveArmAndResetDistance();
         }
     }
     private void pickRightPixel() {
-        rightClawServo.setPosition(CLAW_CLOSE_POSITION);
+        rightClawServo.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         rightPixelInClaw = true;
         if (leftPixelInClaw) {
             waitAndMoveArmAndResetDistance();
@@ -266,8 +282,8 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private void dropPixels() {
-        leftClawServo.setPosition(CLAW_OPEN_POSITION);
-        rightClawServo.setPosition(CLAW_OPEN_POSITION);
+        leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+        rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
         sleep(1000);
         leftPixelInClaw = false;
         rightPixelInClaw = false;
@@ -284,8 +300,8 @@ public class TeleOpDrive extends XBotOpMode {
         return moveArmToPosition(ARM_POSITION_HIGH);
     }
     private void setClawsToPixelPickPosition() {
-        leftClawServo.setPosition(CLAW_OPEN_POSITION);
-        rightClawServo.setPosition(CLAW_OPEN_POSITION);
+        leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+        rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
     }
 
     private int moveArmToPosition(int armPosition) {
@@ -312,11 +328,8 @@ public class TeleOpDrive extends XBotOpMode {
             telemetry.update();
         }
 
-        leftArmMotor.setPower(0);
-        rightArmMotor.setPower(0);
-
-        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftArmMotor.setPower(ARM_HOLD_SPEED);
+        rightArmMotor.setPower(ARM_HOLD_SPEED);
         
         return armPosition;
     }
@@ -335,7 +348,7 @@ public class TeleOpDrive extends XBotOpMode {
                 return WRIST_PICK_POSITION;
             } else if (isArmFacingBack(armPosition)) {
                 int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return (150 - (0.383 * angleA)) / 100;
+                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
             } else {
                 return wristPosition;
             }
@@ -345,7 +358,7 @@ public class TeleOpDrive extends XBotOpMode {
             //Calculate claw position based on arm position
             if (isArmFacingBack(armPosition)) {
                 int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return (150 - (0.383 * angleA)) / 100;
+                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
             } else {
                 return wristPosition;
             }
@@ -356,7 +369,7 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private boolean isArmFacingBack(double armPosition) {
-        return armPosition > 380;
+        return armPosition > 1000;
     }
 
     private boolean isCloseToGround(double armPosition) {

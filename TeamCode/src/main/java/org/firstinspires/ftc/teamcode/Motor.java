@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
@@ -65,11 +66,11 @@ public class Motor extends LinearOpMode {
 
 //            moveRobot(drive, turn, strafe);
 
-            int moveArmBy = (int) -(gamepad2.left_stick_y * 22);
+            int moveArmBy = (int) -(gamepad2.left_stick_y * 120);
             if (moveArmBy != 0) {
                 armPosition += moveArmBy;
-//                armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
-//                armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
+                armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
+                armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
                 moveArmToPosition(armPosition);
             }
 
@@ -82,6 +83,7 @@ public class Motor extends LinearOpMode {
             telemetry.addData("Arm: Position", armPosition);
             telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
             telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+            telemetry.addData("MoveArmBy", moveArmBy);
             telemetry.update();
         }
     }
@@ -132,11 +134,8 @@ public class Motor extends LinearOpMode {
             telemetry.update();
         }
 
-        leftArmMotor.setPower(0);
-        rightArmMotor.setPower(0);
-        
-        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftArmMotor.setPower(ARM_HOLD_SPEED);
+        rightArmMotor.setPower(ARM_HOLD_SPEED);
 
         return armPosition;
     }

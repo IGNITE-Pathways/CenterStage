@@ -2,24 +2,29 @@ package org.firstinspires.ftc.teamcode;
 
 public class XBot {
     // ARM
-    static final int FULL_CIRCLE = 3896; //3895.9 for 43RPM
+    static final int FULL_CIRCLE = 1425; //3895.9 for 43RPM, 1425.1 for 117 RPM
     static final int ARM_MOTOR_GEAR_RATIO = 2;
     static final int MIN_ARM_POSITION = 0;
     static final int MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 70/100; //70%
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO /100;; //Robot must move slow
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION; //Robot must move slow
     static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4/100;; // 4% //Robot running across field
-    static final double ARM_SPEED = 1;
+    static final double ARM_SPEED = 0.3;
+    static final double ARM_HOLD_SPEED = 0.05;
 
     // WRIST
-    static final double MAX_WRIST_POS = 0.95;     // Maximum rotational position
-    static final double MIN_WRIST_POS = 0.27;     // Minimum rotational position
+    static final double MAX_WRIST_POS = 0.65;     // Maximum rotational position
+    static final double MIN_WRIST_POS = 0.12;     // Minimum rotational position
     static final double STARTING_WRIST_POSITION = MIN_WRIST_POS;
     static final double WRIST_PICK_POSITION = MIN_WRIST_POS;
 
     //CLAW
-    static final double CLAW_OPEN_POSITION = 0.63;
-    static final double CLAW_CLOSE_POSITION = 0.70;
-    static final double STARTING_CLAW_POS = CLAW_OPEN_POSITION;
+    static final double LEFT_CLAW_OPEN_POSITION = 0.68;
+    static final double LEFT_CLAW_CLOSE_POSITION = 0.74;
+    static final double STARTING_LEFT_CLAW_POS = LEFT_CLAW_OPEN_POSITION;
+
+    static final double RIGHT_CLAW_OPEN_POSITION = 0.71;
+    static final double RIGHT_CLAW_CLOSE_POSITION = 0.77;
+    static final double STARTING_RIGHT_CLAW_POS = RIGHT_CLAW_OPEN_POSITION;
 
     //DRIVE
     static final double MAX_SPEED = 1.0; //Increase as operator gets better
