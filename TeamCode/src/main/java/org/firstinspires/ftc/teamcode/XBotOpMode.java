@@ -192,4 +192,30 @@ public abstract class XBotOpMode extends LinearOpMode {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+    void openLeftClaw() {
+        leftClawServo.setPosition(XBot.LEFT_CLAW_OPEN_POSITION);
+    }
+
+    void openRightClaw() {
+        rightClawServo.setPosition(XBot.RIGHT_CLAW_OPEN_POSITION);
+    }
+
+    void closeLeftClaw() {
+        leftClawServo.setPosition(XBot.LEFT_CLAW_CLOSE_POSITION);
+    }
+
+    void closeRightClaw() {
+        rightClawServo.setPosition(XBot.RIGHT_CLAW_CLOSE_POSITION);
+    }
+
+    void openBothClaws() {
+        openLeftClaw();
+        openRightClaw();
+    }
+
+    void closeBothClaws() {
+        closeLeftClaw();
+        closeRightClaw();
+    }
 }
