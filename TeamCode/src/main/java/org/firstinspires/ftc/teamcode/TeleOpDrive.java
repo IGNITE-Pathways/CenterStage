@@ -41,6 +41,7 @@ public class TeleOpDrive extends XBotOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
     double calculatedDistance = DistanceSensor.distanceOutOfRange;
+    boolean autoDrive = false;
 
     @Override
     public void runOpMode() {
@@ -48,7 +49,6 @@ public class TeleOpDrive extends XBotOpMode {
         // Initialize April Tag Variables
         boolean aprilTagFound = false;
         boolean lookForAprilTag = false;
-        boolean autoDrive;
 
         // Initialize all motors and sensors
         initialize();
@@ -140,27 +140,28 @@ public class TeleOpDrive extends XBotOpMode {
                         if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                         break;
                     case APRIL_TAG_NAVIGATION:
-                        if (aprilTagFound && lookForAprilTag) {
+//                        if (aprilTagFound && lookForAprilTag) {
                             driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
                             if (gameModeChanged) {
                                 gameModeChanged = Boolean.FALSE;
                             }
                             updateDistance();
                             aprilTagFound = detectAprilTags();
-                            double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                            double headingError = desiredTag.ftcPose.bearing;
-                            double yawError = desiredTag.ftcPose.yaw;
+                            if (aprilTagFound && lookForAprilTag) {
+                                double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                                double headingError = desiredTag.ftcPose.bearing;
+                                double yawError = desiredTag.ftcPose.yaw;
 
-                            // Use the speed and turn "gains" to calculate how we want the robot to move.
-                            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                                drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                                turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
-                            //Y Button = Manual override only required if April Tag Nav doesn't work
-                            if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
-                                changeGameMode(GameMode.DROPPING_PIXELS);
+                                //Y Button = Manual override only required if April Tag Nav doesn't work
+                                if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
+                                    changeGameMode(GameMode.DROPPING_PIXELS);
+                                }
                             }
-                        }
                         break;
                     case DROPPING_PIXELS:
                         // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
@@ -203,6 +204,8 @@ public class TeleOpDrive extends XBotOpMode {
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
                 telemetry.addData("GameMode", gameMode);
+                telemetry.addData("AprilTag Nav: ", aprilTagFound + " " + lookForAprilTag);
+
                 if (autoDrive) {
                     telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
                 } else {
@@ -228,12 +231,12 @@ public class TeleOpDrive extends XBotOpMode {
 
     private boolean isRightPixelInReach() {
         //return rightClawTouchSensor.isPressed();
-        return (rightClawDistance.getDistance(DistanceUnit.MM) < 20);
+        return (rightClawDistance.getDistance(DistanceUnit.MM) < 30);
     }
 
     private boolean isLeftPixelInReach() {
         //return leftClawTouchSensor.isPressed()
-        return (leftClawDistance.getDistance(DistanceUnit.MM) < 20);
+        return (leftClawDistance.getDistance(DistanceUnit.MM) < 30);
     }
 
     private void resetWristAndClawPosition() {
@@ -407,11 +410,19 @@ public class TeleOpDrive extends XBotOpMode {
             rightBackPower /= max;
         }
 
-        // Send powers to the wheels.
-        leftFront.setPower(leftFrontPower);
-        rightFront.setPower(rightFrontPower);
-        leftBack.setPower(leftBackPower);
-        rightBack.setPower(rightBackPower);
+        if (autoDrive) {
+            //Drive in reverse
+            rightBack.setPower(leftFrontPower);
+            leftBack.setPower(rightFrontPower);
+            rightFront.setPower(leftBackPower);
+            leftFront.setPower(rightBackPower);
+        } else {
+            // Send powers to the wheels.
+            leftFront.setPower(leftFrontPower);
+            rightFront.setPower(rightFrontPower);
+            leftBack.setPower(leftBackPower);
+            rightBack.setPower(rightBackPower);
+        }
     }
 
     private void addNewDistanceValue(double distance) {

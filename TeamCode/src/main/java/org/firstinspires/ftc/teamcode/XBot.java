@@ -5,8 +5,8 @@ public class XBot {
     static final int FULL_CIRCLE = 1425; //3895.9 for 43RPM, 1425.1 for 117 RPM
     static final int ARM_MOTOR_GEAR_RATIO = 2;
     static final int MIN_ARM_POSITION = 0;
-    static final int MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 70/100; //70%
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION; //Robot must move slow
+    static final int MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 50/100; //70%
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 1; //Robot must move slow
     static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4/100;; // 4% //Robot running across field
     static final double ARM_SPEED = 0.3;
     static final double ARM_HOLD_SPEED = 0.05;
@@ -37,8 +37,8 @@ public class XBot {
     static final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     static final double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     static final double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
-    static final double DESIRED_DISTANCE = 7.0; //  this is how close the camera should get to the target (inches)
-    static final double SPEED_GAIN = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+    static final double DESIRED_DISTANCE = 20.0; //  this is how close the camera should get to the target (inches)
+    static final double SPEED_GAIN = 0.1;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     static final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     static final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 }
