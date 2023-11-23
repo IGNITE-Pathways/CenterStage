@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "Manual Drive", group = "Concept")
 public class TeleOpDrive extends XBotOpMode {
 
-    double wristPosition = STARTING_WRIST_POSITION;
     double leftClawPosition = STARTING_LEFT_CLAW_POS;
     double rightClawPosition = STARTING_RIGHT_CLAW_POS;
     int armPosition = 0;
@@ -307,7 +306,7 @@ public class TeleOpDrive extends XBotOpMode {
         rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
     }
 
-    private int moveArmToPosition(int armPosition) {
+    int moveArmToPosition(int armPosition) {
         int savePos = armPosition;
         // set motors to run forward for 5000 encoder counts.
         leftArmMotor.setTargetPosition(armPosition);
@@ -335,48 +334,6 @@ public class TeleOpDrive extends XBotOpMode {
         rightArmMotor.setPower(ARM_HOLD_SPEED);
         
         return armPosition;
-    }
-
-    private void setWristPosition(double wristPosition) {
-        wristPosition = Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, wristPosition));
-        wristServo.setPosition(wristPosition);
-    }
-
-    //calculate wrist position based on armPosition and pick or drop intent
-    private double getWristPosition(int armPosition) {
-        if ((gameMode == GameMode.GOING_TO_PICK_PIXELS)
-                || (gameMode == GameMode.PICKING_PIXELS)) {
-            if (isCloseToGround(armPosition)) {
-                //Claw needs to face the ground
-                return WRIST_PICK_POSITION;
-            } else if (isArmFacingBack(armPosition)) {
-                int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
-            } else {
-                return wristPosition;
-            }
-        } else if ((gameMode == GameMode.GOING_TO_DROP_PIXELS)
-                || (gameMode == GameMode.APRIL_TAG_NAVIGATION)
-                || (gameMode == GameMode.DROPPING_PIXELS)) {
-            //Calculate claw position based on arm position
-            if (isArmFacingBack(armPosition)) {
-                int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
-            } else {
-                return wristPosition;
-            }
-        } else {
-            //HOME
-            return MIN_WRIST_POS;
-        }
-    }
-
-    private boolean isArmFacingBack(double armPosition) {
-        return armPosition > 1000;
-    }
-
-    private boolean isCloseToGround(double armPosition) {
-        return armPosition < 20;
     }
 
     public void moveRobotBack() {

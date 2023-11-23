@@ -61,5 +61,6 @@ public enum GameMode {
     // ENTER MODE = AUTO -- right after Robot ARM reaches the right height and angle
     // EXIT MODE == AUTO
     // Operators = NONE
-    HANGING
+    HANGING,
+    AUTO_OP_MODE
 }

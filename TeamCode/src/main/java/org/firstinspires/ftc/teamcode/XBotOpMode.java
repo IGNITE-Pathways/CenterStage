@@ -1,16 +1,28 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
+import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
+import static org.firstinspires.ftc.teamcode.XBot.STARTING_WRIST_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_PICK_POSITION;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +36,9 @@ public abstract class XBotOpMode extends LinearOpMode {
     DistanceSensor leftClawDistance, rightClawDistance = null;
     TouchSensor leftClawTouchSensor, rightClawTouchSensor = null;
     boolean leftPixelInClaw, rightPixelInClaw = false;
+    WebcamName webcam1, webcam2;
+    TfodProcessor tfod;
+
     VisionPortal visionPortal;               // Used to manage the video source.
     AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
 
@@ -33,6 +48,10 @@ public abstract class XBotOpMode extends LinearOpMode {
     //Game Mode
     GameMode gameMode = GameMode.NONE;
     Boolean gameModeChanged = Boolean.FALSE;
+    private static final String TFOD_MODEL_ASSET = "TeaXProp_TFOD.tflite";
+    private static final String[] LABELS = {"X"};
+
+    double wristPosition = STARTING_WRIST_POSITION;
 
     void initialize() {
         gameMode = GameMode.INIT;
@@ -54,14 +73,44 @@ public abstract class XBotOpMode extends LinearOpMode {
         leftClawTouchSensor = hardwareMap.get(TouchSensor.class, "leftClawTouch");
         rightClawTouchSensor = hardwareMap.get(TouchSensor.class, "rightClawTouch");
 
+        webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+        CameraName switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
+
         // Initialize April Tag
+        //AutoOpMode
+        // Create the TensorFlow processor by using a builder.
+        tfod = new TfodProcessor.Builder()
+                .setModelAssetName(TFOD_MODEL_ASSET)
+                .setModelLabels(LABELS)
+                //.setIsModelTensorFlow2(true)
+                //.setIsModelQuantized(true)
+                //.setModelInputSize(300)
+                //.setModelAspectRatio(16.0 / 9.0)
+                .build();
+        // Set confidence threshold for TFOD recognitions, at any time.
+        tfod.setMinResultConfidence(0.75f);
+//        visionPortal = new VisionPortal.Builder()
+//                .setCamera(switchableCamera)
+//                .setAutoStopLiveView(false)
+//                .setCameraResolution(new Size(640, 480))
+//                .enableLiveView(true)
+//                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+//                .addProcessor(tfod)
+//                .build();
+//        setManualExposure(6, 250, "TFOD Cam");  // Use low exposure time to reduce motion blur
         aprilTag = new AprilTagProcessor.Builder().build();
         visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .addProcessor(aprilTag)
+                .setCamera(switchableCamera)
+                .addProcessors(aprilTag, tfod)
                 .build();
-        setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
-
+//        setManualExposure(6, 250, "AprilTag Cam");  // Use low exposure time to reduce motion blur
+        if (this instanceof AutoOpMode) {
+            switchToTFODCamera();
+        } else {
+            switchToAprilTagCamera();
+        }
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -86,6 +135,20 @@ public abstract class XBotOpMode extends LinearOpMode {
         resetArmEncoders();
     }
 
+    void switchToAprilTagCamera() {
+        visionPortal.setProcessorEnabled(tfod, false);
+        visionPortal.setProcessorEnabled(aprilTag, true);
+        setManualExposure(XBot.EXPOSURE, 250, "AprilTag Cam");  // Use low exposure time to reduce motion blur
+        visionPortal.setActiveCamera(webcam1);
+    }
+
+    void switchToTFODCamera() {
+        visionPortal.setProcessorEnabled(tfod, true);
+        visionPortal.setProcessorEnabled(aprilTag, false);
+        setManualExposure(XBot.EXPOSURE, 250, "TFOD Cam");  // Use low exposure time to reduce motion blur
+        visionPortal.setActiveCamera(webcam2);
+    }
+
     void initDriveMotorsToUseEncoders() {
         //Using Encoders
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -94,7 +157,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    void setManualExposure(int exposureMS, int gain) {
+    void setManualExposure(int exposureMS, int gain, String cam) {
         // Wait for the camera to be open, then use the controls
 
         if (visionPortal == null) {
@@ -103,12 +166,12 @@ public abstract class XBotOpMode extends LinearOpMode {
 
         // Make sure camera is streaming before we try to set the exposure controls
         if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
+            telemetry.addData(cam, "Waiting");
             telemetry.update();
             while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
                 sleep(20);
             }
-            telemetry.addData("Camera", "Ready");
+            telemetry.addData(cam, "Ready");
             telemetry.update();
         }
 
@@ -122,8 +185,10 @@ public abstract class XBotOpMode extends LinearOpMode {
             exposureControl.setExposure(exposureMS, TimeUnit.MILLISECONDS);
             sleep(20);
             GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
+            if (gainControl != null) {
+                gainControl.setGain(gain);
+                sleep(20);
+            }
         }
     }
 
@@ -217,5 +282,83 @@ public abstract class XBotOpMode extends LinearOpMode {
     void closeBothClaws() {
         closeLeftClaw();
         closeRightClaw();
+    }
+
+    int moveArmToPosition(int armPosition) {
+        int savePos = armPosition;
+        // set motors to run forward for 5000 encoder counts.
+        leftArmMotor.setTargetPosition(armPosition);
+        rightArmMotor.setTargetPosition(armPosition);
+
+        // set motors to run to target encoder position and stop with brakes on.
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftArmMotor.setPower(ARM_SPEED);
+        rightArmMotor.setPower(ARM_SPEED);
+
+        while (opModeIsActive() && rightArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
+        {
+            armPosition = leftArmMotor.getCurrentPosition();
+            wristPosition = getWristPosition(armPosition);
+            setWristPosition(wristPosition);
+            telemetry.addData("Arm: Target", savePos);
+            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+            telemetry.update();
+        }
+
+        leftArmMotor.setPower(ARM_HOLD_SPEED);
+        rightArmMotor.setPower(ARM_HOLD_SPEED);
+
+        return armPosition;
+    }
+
+    void setWristPosition(double wristPosition) {
+        wristPosition = Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, wristPosition));
+        wristServo.setPosition(wristPosition);
+    }
+
+    //calculate wrist position based on armPosition and pick or drop intent
+    double getWristPosition(int armPosition) {
+        if ((gameMode == GameMode.GOING_TO_PICK_PIXELS)
+                || (gameMode == GameMode.PICKING_PIXELS)) {
+            if (isCloseToGround(armPosition)) {
+                //Claw needs to face the ground
+                return WRIST_PICK_POSITION;
+            } else if (isArmFacingBack(armPosition)) {
+                int angleA = ((armPosition * 360) / FULL_CIRCLE);
+                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
+            } else {
+                return wristPosition;
+            }
+        } else if ((gameMode == GameMode.GOING_TO_DROP_PIXELS)
+                || (gameMode == GameMode.APRIL_TAG_NAVIGATION)
+                || (gameMode == GameMode.DROPPING_PIXELS)) {
+            //Calculate claw position based on arm position
+            if (isArmFacingBack(armPosition)) {
+                int angleA = ((armPosition * 360) / FULL_CIRCLE);
+                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
+            } else {
+                return wristPosition;
+            }
+        } else if ((gameMode == GameMode.AUTO_OP_MODE)) {
+            if (armPosition > 1500) {
+                return MAX_WRIST_POS;
+            } else {
+                return MIN_WRIST_POS;
+            }
+        } else {
+            //HOME
+            return MIN_WRIST_POS;
+        }
+    }
+
+    private boolean isArmFacingBack(double armPosition) {
+        return armPosition > 1000;
+    }
+
+    private boolean isCloseToGround(double armPosition) {
+        return armPosition < 20;
     }
 }
