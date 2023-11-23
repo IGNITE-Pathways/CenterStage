@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.MoveRobot.BACKWARD;
+import static org.firstinspires.ftc.teamcode.MoveRobot.FORWARD;
+import static org.firstinspires.ftc.teamcode.MoveRobot.STRAFE_LEFT;
+import static org.firstinspires.ftc.teamcode.MoveRobot.STRAFE_RIGHT;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
@@ -66,26 +70,26 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
                     telemetry.update();
 
                     if (!spikeMarkPixelDropped) {
-                        driveBackwardForDistance(400);
+                        moveRobot(400, BACKWARD);
                         moveArmToPosition(ARM_POSITION_UP);
 
                         switch (spikeMark) {
                             case LEFT:
-                                driveForwardForDistance(350);
-                                strafeRightForDistance(660);
+                                moveRobot(350, FORWARD);
+                                moveRobot(660, STRAFE_RIGHT);
                                 moveArmToPosition(1800);
-                                driveBackwardForDistance(150);
+                                moveRobot(150, BACKWARD);
                                 openLeftClaw();
                                 break;
                             case RIGHT:
-                                driveForwardForDistance(350);
-                                strafeLeftForDistance(600);
+                                moveRobot(350, FORWARD);
+                                moveRobot(600, STRAFE_LEFT);
                                 moveArmToPosition(1800);
-                                driveBackwardForDistance(150);
+                                moveRobot(150, BACKWARD);
                                 openLeftClaw();
                                 break;
                             case CENTER:
-                                strafeRightForDistance(300);
+                                moveRobot(300, STRAFE_RIGHT);
                                 openLeftClaw();
                         }
                         spikeMarkPixelDropped = true;
@@ -136,47 +140,50 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
         return foundX;
     }   // end method telemetryTfod()
 
-    private void driveForwardForDistance(int distance) {
+    private void moveRobot(int distance, MoveRobot moveRobot) {
         // Reset encoders
         resetDriveEncoders();
 
         // Set target position for the motors
-        leftFront.setTargetPosition(distance);
-        rightFront.setTargetPosition(distance);
-        leftBack.setTargetPosition(distance);
-        rightBack.setTargetPosition(distance);
-
-        // Set motors to run to position
-        setDriveRunToPosition();
-
-        // Set motors power
-        setDriveMotorsPower(AUTONOMOUS_SPEED);
-
-        // Wait for motors to reach target position
-        while (opModeIsActive() && areDriveMotorsBusy()) {
-            // Additional actions or checks can be added here
-            telemetry.addData("Status", "Driving forward...");
-            telemetry.update();
-            idle();
+        switch (moveRobot) {
+            case STRAFE_RIGHT:
+                leftFront.setTargetPosition(distance);
+                rightFront.setTargetPosition(-distance);
+                leftBack.setTargetPosition(-distance);
+                rightBack.setTargetPosition(distance);
+                break;
+            case STRAFE_LEFT:
+                leftFront.setTargetPosition(-distance);
+                rightFront.setTargetPosition(distance);
+                leftBack.setTargetPosition(distance);
+                rightBack.setTargetPosition(-distance);
+                break;
+            case FORWARD:
+                leftFront.setTargetPosition(distance);
+                rightFront.setTargetPosition(distance);
+                leftBack.setTargetPosition(distance);
+                rightBack.setTargetPosition(distance);
+                break;
+            case BACKWARD:
+                leftFront.setTargetPosition(-distance);
+                rightFront.setTargetPosition(-distance);
+                leftBack.setTargetPosition(-distance);
+                rightBack.setTargetPosition(-distance);
+                break;
+            case TANK_TURN_LEFT:
+                leftFront.setTargetPosition(distance);
+                rightFront.setTargetPosition(-distance);
+                leftBack.setTargetPosition(distance);
+                rightBack.setTargetPosition(-distance);
+                break;
+            case TANK_TURN_RIGHT:
+                leftFront.setTargetPosition(-distance);
+                rightFront.setTargetPosition(distance);
+                leftBack.setTargetPosition(-distance);
+                rightBack.setTargetPosition(distance);
+                break;
         }
 
-        // Stop the motors
-        stopDriveMotors();
-
-        // Set motors back to normal mode
-        stopDriveRunUsingEncoder();
-    }
-
-    private void driveBackwardForDistance(int distance) {
-        // Reset encoders
-        resetDriveEncoders();
-
-        // Set target position for the motors
-        leftFront.setTargetPosition(-distance);
-        rightFront.setTargetPosition(-distance);
-        leftBack.setTargetPosition(-distance);
-        rightBack.setTargetPosition(-distance);
-
         // Set motors to run to position
         setDriveRunToPosition();
 
@@ -186,69 +193,7 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
         // Wait for motors to reach target position
         while (opModeIsActive() && areDriveMotorsBusy()) {
             // Additional actions or checks can be added here
-            telemetry.addData("Status", "Driving backward...");
-            telemetry.update();
-            idle();
-        }
-
-        // Stop the motors
-        stopDriveMotors();
-
-        // Set motors back to normal mode
-        stopDriveRunUsingEncoder();
-    }
-
-    private void strafeLeftForDistance(int distance) {
-        // Reset encoders
-        resetDriveEncoders();
-
-        // Set target position for the motors
-        leftFront.setTargetPosition(-distance);
-        rightFront.setTargetPosition(distance);
-        leftBack.setTargetPosition(distance);
-        rightBack.setTargetPosition(-distance);
-
-        // Set motors to run to position
-        setDriveRunToPosition();
-
-        // Set motors power
-        setDriveMotorsPower(AUTONOMOUS_SPEED);
-
-        // Wait for motors to reach target position
-        while (opModeIsActive() && areDriveMotorsBusy()) {
-            // Additional actions or checks can be added here
-            telemetry.addData("Status", "Driving backward...");
-            telemetry.update();
-            idle();
-        }
-
-        // Stop the motors
-        stopDriveMotors();
-
-        // Set motors back to normal mode
-        stopDriveRunUsingEncoder();
-    }
-
-    private void strafeRightForDistance(int distance) {
-        // Reset encoders
-        resetDriveEncoders();
-
-        // Set target position for the motors
-        leftFront.setTargetPosition(distance);
-        rightFront.setTargetPosition(-distance);
-        leftBack.setTargetPosition(-distance);
-        rightBack.setTargetPosition(distance);
-
-        // Set motors to run to position
-        setDriveRunToPosition();
-
-        // Set motors power
-        setDriveMotorsPower(AUTONOMOUS_SPEED);
-
-        // Wait for motors to reach target position
-        while (opModeIsActive() && areDriveMotorsBusy()) {
-            // Additional actions or checks can be added here
-            telemetry.addData("Status", "Driving backward...");
+            telemetry.addData("Status", moveRobot);
             telemetry.update();
             idle();
         }
