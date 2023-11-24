@@ -197,7 +197,6 @@ public class TeleOpDrive extends XBotOpMode {
                         break;
                 }
 
-
                 moveRobot(drive * driveSpeed, turn * driveSpeed, strafe * driveSpeed);
 
                 // Show the elapsed game time and wheel power.

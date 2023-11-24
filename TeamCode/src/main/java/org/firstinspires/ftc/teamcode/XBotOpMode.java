@@ -8,9 +8,11 @@ import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_WRIST_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_PICK_POSITION;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -19,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -36,6 +40,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     DistanceSensor leftClawDistance, rightClawDistance = null;
     TouchSensor leftClawTouchSensor, rightClawTouchSensor = null;
     boolean leftPixelInClaw, rightPixelInClaw = false;
+    private IMU imu = null;      // Control/Expansion Hub IMU
     WebcamName webcam1, webcam2;
     TfodProcessor tfod;
 
@@ -52,6 +57,15 @@ public abstract class XBotOpMode extends LinearOpMode {
     private static final String[] LABELS = {"X"};
 
     double wristPosition = STARTING_WRIST_POSITION;
+
+    void initializeIMU() {
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu.resetYaw();
+    }
 
     void initialize() {
         gameMode = GameMode.INIT;
@@ -233,6 +247,10 @@ public abstract class XBotOpMode extends LinearOpMode {
     }
 
     public void stopDriveMotors() {
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         setDriveMotorsPower(0);
     }
 
@@ -361,4 +379,10 @@ public abstract class XBotOpMode extends LinearOpMode {
     private boolean isCloseToGround(double armPosition) {
         return armPosition < 20;
     }
+
+    public double getHeading() {
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        return orientation.getYaw(AngleUnit.DEGREES);
+    }
+
 }
