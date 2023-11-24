@@ -40,7 +40,6 @@ public class TeleOpDrive extends XBotOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
     double calculatedDistance = DistanceSensor.distanceOutOfRange;
-    boolean autoDrive = false;
 
     @Override
     public void runOpMode() {
@@ -75,10 +74,10 @@ public class TeleOpDrive extends XBotOpMode {
                     rightPixelInClaw = false;
                 }
 
-                // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+                // POV Mode uses left joystick to go forward & yawTurn, and right joystick to rotate.
                 double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-                double turn = -gamepad1.left_stick_x;
-                double strafe = -gamepad1.right_stick_x;
+                double strafe = -gamepad1.left_stick_x;
+                double yawTurn = -gamepad1.right_stick_x;
 
                 switch (gameMode) {
                     case GOING_TO_PICK_PIXELS:
@@ -123,8 +122,8 @@ public class TeleOpDrive extends XBotOpMode {
                         lookForAprilTag = true;
                         // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                         drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-                        strafe = -gamepad1.left_stick_x / 2.0;  // Reduce strafe rate to 50%.
-                        turn = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+                        strafe = -gamepad1.left_stick_x / 2.0;  // Reduce yawTurn rate to 50%.
+                        yawTurn = -gamepad1.right_stick_x / 3.0;  // Reduce strafe rate to 33%.
 
                         //Look for April Tag(s)
                         aprilTagFound = detectAprilTags();
@@ -151,10 +150,10 @@ public class TeleOpDrive extends XBotOpMode {
                                 double headingError = desiredTag.ftcPose.bearing;
                                 double yawError = desiredTag.ftcPose.yaw;
 
-                                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                                // Use the speed and strafe "gains" to calculate how we want the robot to move.
                                 drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                                turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                                strafe = Range.clip( headingError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                                yawTurn = Range.clip(-yawError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
 
                                 //Y Button = Manual override only required if April Tag Nav doesn't work
                                 if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
@@ -165,7 +164,7 @@ public class TeleOpDrive extends XBotOpMode {
                     case DROPPING_PIXELS:
                         // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
                         lookForAprilTag = false;
-                        driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except strafe if needed
+                        driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except yawTurn if needed
                         updateDistance();
 
                         if (gameModeChanged) {
@@ -197,7 +196,7 @@ public class TeleOpDrive extends XBotOpMode {
                         break;
                 }
 
-                moveRobot(drive * driveSpeed, turn * driveSpeed, strafe * driveSpeed);
+                moveRobot(drive * driveSpeed, strafe * driveSpeed, yawTurn * driveSpeed);
 
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -205,9 +204,9 @@ public class TeleOpDrive extends XBotOpMode {
                 telemetry.addData("AprilTag Nav: ", aprilTagFound + " " + lookForAprilTag);
 
                 if (autoDrive) {
-                    telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                    telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, yawTurn, strafe);
                 } else {
-                    telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                    telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, yawTurn, strafe);
                 }
                 telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
                 telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
@@ -345,40 +344,6 @@ public class TeleOpDrive extends XBotOpMode {
         rightFront.setPower(0);
         leftBack.setPower(0);
         rightBack.setPower(0);
-    }
-
-    public void moveRobot(double x, double y, double yaw) {
-        // Calculate wheel powers.
-        double leftFrontPower = x - y - yaw;
-        double rightFrontPower = x + y + yaw;
-        double leftBackPower = x + y - yaw;
-        double rightBackPower = x - y + yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        if (autoDrive) {
-            //Drive in reverse
-            rightBack.setPower(leftFrontPower);
-            leftBack.setPower(rightFrontPower);
-            rightFront.setPower(leftBackPower);
-            leftFront.setPower(rightBackPower);
-        } else {
-            // Send powers to the wheels.
-            leftFront.setPower(leftFrontPower);
-            rightFront.setPower(rightFrontPower);
-            leftBack.setPower(leftBackPower);
-            rightBack.setPower(rightBackPower);
-        }
     }
 
     private void addNewDistanceValue(double distance) {

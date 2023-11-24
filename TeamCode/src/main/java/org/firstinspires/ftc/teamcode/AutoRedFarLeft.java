@@ -4,8 +4,17 @@ import static org.firstinspires.ftc.teamcode.MoveRobot.BACKWARD;
 import static org.firstinspires.ftc.teamcode.MoveRobot.FORWARD;
 import static org.firstinspires.ftc.teamcode.MoveRobot.STRAFE_LEFT;
 import static org.firstinspires.ftc.teamcode.MoveRobot.STRAFE_RIGHT;
+import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_LEFT;
 import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_RIGHT;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
+import static org.firstinspires.ftc.teamcode.XBot.DESIRED_DISTANCE;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_TURN;
+import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
+import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
+import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -37,19 +46,17 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
     static final double P_TURN_GAIN = 0.02;     // Larger is more responsive, but also less stable
     static final double P_DRIVE_GAIN = 0.03;     // Larger is more responsive, but also less stable
     // Constants for autonomous movement
-    private static final double AUTONOMOUS_SPEED = 0.4;  // Adjust as needed
-    boolean DEBUG = true;
-    private double targetHeading = 0;
-    private double headingError = 0;
-    private double turnSpeed = 0;
-
+    private static final double AUTONOMOUS_SPEED = 0.6;  // Adjust as needed
+    boolean DEBUG = false;
     @Override
     public void runOpMode() {
         // Initialize hardware
         initialize();
         initializeIMU();
         initDriveMotorsToUseEncoders();
-        detectTeamPropMultipleTries();
+        if (!DEBUG) {
+            detectTeamPropMultipleTries();
+        }
         gameMode = GameMode.AUTO_OP_MODE;
 
         closeBothClaws();
@@ -68,10 +75,13 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
             while (opModeIsActive()) {
                 if (DEBUG) {
                     //Debug
-                    moveRobot(1000, BACKWARD);
-                    moveRobot(1000, FORWARD);
-                    moveRobot(1000, STRAFE_RIGHT);
-                    moveRobot(1000, STRAFE_LEFT);
+                    moveArmToPosition(ARM_POSITION_HIGH);
+                    moveRobot(1025, TANK_TURN_LEFT);
+//                    moveRobot(2000, STRAFE_LEFT);
+//                    moveRobot(3000, BACKWARD);
+//                    moveRobot(2000, STRAFE_RIGHT);
+                    moveRobot(1025, TANK_TURN_RIGHT);
+                    fixRobotYaw(0);
                     continue;
                 }
 
@@ -174,74 +184,65 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
     }   // end method telemetryTfod()
 
     private void moveRobot(int distance, MoveRobot moveRobot) {
+        moveRobot(distance, moveRobot, AUTONOMOUS_SPEED);
+    }
+
+    private void moveRobot(int distance, MoveRobot moveRobot, double speed) {
         // Reset encoders
         resetDriveEncoders();
-        double heading = 0;
-        // Set target position for the motors
+        double heading;
+        int lfDirection = 1;
+        int rfDirection = 1;
+        int lbDirection = 1;
+        int rbDirection = 1;
         switch (moveRobot) {
             case STRAFE_RIGHT:
                 heading = 0;
-                leftFront.setTargetPosition(distance);
-                rightFront.setTargetPosition(-distance);
-                leftBack.setTargetPosition(-distance);
-                rightBack.setTargetPosition(distance);
+                lbDirection = -1;
+                rfDirection = -1;
                 break;
             case STRAFE_LEFT:
                 heading = 0;
-                leftFront.setTargetPosition(-distance);
-                rightFront.setTargetPosition(distance);
-                leftBack.setTargetPosition(distance);
-                rightBack.setTargetPosition(-distance);
+                lfDirection = -1;
+                rbDirection = -1;
                 break;
             case FORWARD:
                 heading = 0;
-                leftFront.setTargetPosition(distance);
-                rightFront.setTargetPosition(distance);
-                leftBack.setTargetPosition(distance);
-                rightBack.setTargetPosition(distance);
                 break;
             case BACKWARD:
-                heading = 180;
-                leftFront.setTargetPosition(-distance);
-                rightFront.setTargetPosition(-distance);
-                leftBack.setTargetPosition(-distance);
-                rightBack.setTargetPosition(-distance);
+                heading = 0;
+                lfDirection = -1;
+                lbDirection = -1;
+                rfDirection = -1;
+                rbDirection = -1;
                 break;
             case TANK_TURN_LEFT:
                 heading = -90;
-                leftFront.setTargetPosition(-distance);
-                rightFront.setTargetPosition(distance);
-                leftBack.setTargetPosition(-distance);
-                rightBack.setTargetPosition(distance);
+                lfDirection = -1;
+                lbDirection = -1;
                 break;
             case TANK_TURN_RIGHT:
                 heading = 90;
-                leftFront.setTargetPosition(distance);
-                rightFront.setTargetPosition(-distance);
-                leftBack.setTargetPosition(distance);
-                rightBack.setTargetPosition(-distance);
+                rfDirection = -1;
+                rbDirection = -1;
                 break;
+            default:
+                heading = 0;
         }
+        leftFront.setTargetPosition(distance * lfDirection);
+        rightFront.setTargetPosition(distance * rfDirection);
+        leftBack.setTargetPosition(distance * lbDirection);
+        rightBack.setTargetPosition(distance * rbDirection);
 
         // Set motors to run to position
         setDriveRunToPosition();
-
         // Set motors power
-        setDriveMotorsPower(AUTONOMOUS_SPEED);
+        setDriveMotorsPower(speed);
 
         // Wait for motors to reach target position
         while (opModeIsActive() && areDriveMotorsBusy()) {
-            // Additional actions or checks can be added here
-            turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-            // if driving in reverse, the motor correction also needs to be reversed
-            if (distance < 0)
-                turnSpeed *= -1.0;
-
             telemetry.addData("Status", moveRobot);
-            telemetry.addData("Heading- Target : Current", "%5.2f : %5.0f", targetHeading, getHeading());
-            telemetry.addData("Error  : Steer Pwr", "%5.1f : %5.1f", headingError, turnSpeed);
-
+            telemetry.addData("Heading- Target : Current", "%5.3f : %5.3f", heading, getHeading());
             telemetry.addData("Distance to go", distance);
             telemetry.addData("Left Front Motor", leftFront.getCurrentPosition() + "  busy=" + leftFront.isBusy());
             telemetry.addData("Left Back Motor", leftBack.getCurrentPosition() + "  busy=" + leftBack.isBusy());
@@ -251,11 +252,23 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
             idle();
         }
 
+        setDriveMotorsPower(.05);
+
         // Stop the motors
         stopDriveMotors();
 
-        // Set motors back to normal mode
+//        // Set motors back to normal mode
         stopDriveRunUsingEncoder();
+    }
+
+    void fixRobotYaw(double heading) {
+        if (Math.abs(heading - getHeading()) > 1) {
+            //Fix
+            if (heading < getHeading())
+                moveRobot(60, TANK_TURN_RIGHT, AUTONOMOUS_SPEED/2);
+            else
+                moveRobot(60, TANK_TURN_LEFT, AUTONOMOUS_SPEED/2);
+        }
     }
 
     // Other autonomous actions and methods can be added here
@@ -264,20 +277,5 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
         stopDriveMotors();
         // Save more CPU resources when camera is no longer needed.
         visionPortal.close();
-    }
-
-
-    public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
-        targetHeading = desiredHeading;  // Save for telemetry
-
-        // Determine the heading current error
-        headingError = targetHeading - getHeading();
-
-        // Normalize the error to be within +/- 180 degrees
-        while (headingError > 180) headingError -= 360;
-        while (headingError <= -180) headingError += 360;
-
-        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
-        return Range.clip(headingError * proportionalGain, -1, 1);
     }
 }

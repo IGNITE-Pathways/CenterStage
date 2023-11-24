@@ -57,6 +57,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     private static final String[] LABELS = {"X"};
 
     double wristPosition = STARTING_WRIST_POSITION;
+    boolean autoDrive = false;
 
     void initializeIMU() {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
@@ -236,14 +237,63 @@ public abstract class XBotOpMode extends LinearOpMode {
     }
 
     boolean areDriveMotorsBusy() {
-        return leftFront.isBusy() || leftBack.isBusy() || rightFront.isBusy() || rightBack.isBusy();
+        return leftBack.isBusy();// || leftFront.isBusy() || rightFront.isBusy() || rightBack.isBusy();
+    }
+    void setDriveMotorsPower(double speed) {
+        setDriveMotorsPower(speed, speed, speed, speed);
     }
 
-    void setDriveMotorsPower(double speed) {
-        leftFront.setPower(speed);
-        rightFront.setPower(speed);
-        leftBack.setPower(speed);
-        rightBack.setPower(speed);
+    void setDriveMotorsPower(double lfspeed, double lbspeed, double rfspeed, double rbspeed) {
+
+        double max = Math.max(Math.abs(lfspeed), Math.abs(rfspeed));
+        max = Math.max(max, Math.max(Math.abs(lbspeed), Math.abs(rbspeed)));
+        if (max > 1.0)
+        {
+            lfspeed /= max;
+            lbspeed /= max;
+            rfspeed /= max;
+            rbspeed /= max;
+        }
+
+        leftFront.setPower(lfspeed);
+        rightFront.setPower(rfspeed);
+        leftBack.setPower(lbspeed);
+        rightBack.setPower(rbspeed);
+    }
+
+    //x=drive, y=strafe, yaw=tanTurn Yaw
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower = x - y - yaw;
+        double rightFrontPower = x + y + yaw;
+        double leftBackPower = x + y - yaw;
+        double rightBackPower = x - y + yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        if (autoDrive) {
+            //Drive in reverse
+            rightBack.setPower(leftFrontPower);
+            leftBack.setPower(rightFrontPower);
+            rightFront.setPower(leftBackPower);
+            leftFront.setPower(rightBackPower);
+        } else {
+            // Send powers to the wheels.
+            leftFront.setPower(leftFrontPower);
+            rightFront.setPower(rightFrontPower);
+            leftBack.setPower(leftBackPower);
+            rightBack.setPower(rightBackPower);
+        }
     }
 
     public void stopDriveMotors() {
@@ -251,7 +301,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        setDriveMotorsPower(0);
+        setDriveMotorsPower(0,0,0,0);
     }
 
     public void setDriveRunToPosition() {
