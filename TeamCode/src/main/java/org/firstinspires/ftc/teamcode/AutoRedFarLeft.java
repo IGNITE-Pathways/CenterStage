@@ -12,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.XBot.DESIRED_DISTANCE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_TURN;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
@@ -87,7 +88,7 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
 
                 if (!teamPropDetectionCompleted) {
                     teamPropDetectionCompleted = detectTeamProp();
-                    if ((runtime.milliseconds() > 3000) && (!teamPropDetectionCompleted)) {
+                    if ((runtime.milliseconds() > 1500) && (!teamPropDetectionCompleted)) {
                         //Give up -- assume RIGHT
                         teamPropDetectionCompleted = true;
                         spikeMark = SpikeMark.RIGHT;
@@ -111,29 +112,54 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
                         switch (spikeMark) {
                             case LEFT:
                                 moveRobot(350, FORWARD);
-                                moveRobot(660, STRAFE_RIGHT);
-                                moveArmToPosition(1800);
-                                moveRobot(150, BACKWARD);
+                                fixRobotYaw(0);
+                                moveRobot(710, STRAFE_RIGHT);
+                                fixRobotYaw(0);
+                                moveArmToPosition(1770);
+                                moveRobot(170, BACKWARD);
                                 openLeftClaw();
+                                sleep(100);
                                 moveArmToPosition(ARM_POSITION_UP);
-                                moveRobot(1050, TANK_TURN_RIGHT);
+                                moveRobot(1030, TANK_TURN_RIGHT);
+                                moveRobot(140, STRAFE_LEFT);
+                                moveArmToPosition(200);
+                                fixRobotYaw(-90);
+                                moveRobot(3000, BACKWARD);
                                 break;
                             case RIGHT:
-                                moveRobot(350, FORWARD);
-                                moveRobot(600, STRAFE_LEFT);
-                                moveArmToPosition(1800);
+                                moveRobot(400, FORWARD);
+                                moveRobot(520, STRAFE_LEFT);
+                                fixRobotYaw(0);
+//                                moveRobot(100, FORWARD);
+                                moveArmToPosition(1770);
                                 moveRobot(150, BACKWARD);
                                 openLeftClaw();
+                                sleep(100);
                                 moveArmToPosition(ARM_POSITION_UP);
-                                moveRobot(1050, TANK_TURN_RIGHT);
+                                moveRobot(550, STRAFE_RIGHT);
+                                fixRobotYaw(0);
+                                moveRobot(1025, TANK_TURN_RIGHT);
+                                moveRobot(175, STRAFE_LEFT);
+                                fixRobotYaw(-90);
+                                moveArmToPosition(200);
+                                moveRobot(2000, BACKWARD);
                                 break;
                             case CENTER:
-                                moveRobot(300, STRAFE_RIGHT);
-                                moveArmToPosition(1800);
-                                moveRobot(250, BACKWARD);
+                                moveRobot(400, STRAFE_RIGHT);
+                                fixRobotYaw(0);
+                                moveArmToPosition(1770);
+                                wristPosition = MAX_WRIST_POS;
+                                setWristPosition(wristPosition);
+                                moveRobot(260, BACKWARD);
+                                stopDriveMotors();
                                 openLeftClaw();
-                                moveArmToPosition(ARM_POSITION_UP);
-                                moveRobot(1050, TANK_TURN_RIGHT);
+                                sleep(100);
+                                moveArmToPosition(200);
+                                moveRobot(1025, TANK_TURN_RIGHT);
+                                fixRobotYaw(-90);
+                                moveRobot(620, STRAFE_LEFT);
+                                fixRobotYaw(-90);
+                                moveRobot(2000, BACKWARD);
                         }
                         spikeMarkPixelDropped = true;
                     }
@@ -262,12 +288,14 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
     }
 
     void fixRobotYaw(double heading) {
-        if (Math.abs(heading - getHeading()) > 1) {
+        int tries = 5;
+        while((Math.abs(heading - getHeading()) > 1.5) && (tries > 0)) {
             //Fix
             if (heading < getHeading())
-                moveRobot(60, TANK_TURN_RIGHT, AUTONOMOUS_SPEED/2);
+                moveRobot(40, TANK_TURN_RIGHT, AUTONOMOUS_SPEED/2);
             else
-                moveRobot(60, TANK_TURN_LEFT, AUTONOMOUS_SPEED/2);
+                moveRobot(40, TANK_TURN_LEFT, AUTONOMOUS_SPEED/2);
+            tries -= 1;
         }
     }
 
