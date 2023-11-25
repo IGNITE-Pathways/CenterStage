@@ -37,7 +37,6 @@ public class TeleOpDrive extends XBotOpMode {
     double driveSpeed = MAX_SPEED;
 
     // Declare OpMode members for each of the 4 motors.
-    private final ElapsedTime runtime = new ElapsedTime();
     Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
     double calculatedDistance = DistanceSensor.distanceOutOfRange;
 

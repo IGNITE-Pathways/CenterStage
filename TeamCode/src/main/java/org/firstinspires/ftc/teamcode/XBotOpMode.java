@@ -1,6 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.MoveRobot.BACKWARD;
+import static org.firstinspires.ftc.teamcode.MoveRobot.FORWARD;
+import static org.firstinspires.ftc.teamcode.MoveRobot.STRAFE_LEFT;
+import static org.firstinspires.ftc.teamcode.MoveRobot.STRAFE_RIGHT;
+import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_LEFT;
+import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_RIGHT;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
@@ -15,6 +22,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
@@ -23,6 +31,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -32,36 +41,38 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public abstract class XBotOpMode extends LinearOpMode {
+    static final double AUTONOMOUS_SPEED = 0.6;  // Adjust as needed
+    final ElapsedTime runtime = new ElapsedTime();
     //Define motors and sensors
-    DcMotor rightFront, leftFront, rightBack, leftBack = null;
-    DcMotor leftArmMotor, rightArmMotor = null;
-    Servo wristServo, leftClawServo, rightClawServo = null;
+    DcMotor rightFront = null, leftFront = null, rightBack = null, leftBack = null;
+    DcMotor leftArmMotor = null, rightArmMotor = null;
     DistanceSensor sensorDistance = null;
-    DistanceSensor leftClawDistance, rightClawDistance = null;
-    TouchSensor leftClawTouchSensor, rightClawTouchSensor = null;
-    boolean leftPixelInClaw, rightPixelInClaw = false;
+    Servo wristServo = null, leftClawServo = null, rightClawServo = null;
+    DistanceSensor leftClawDistance = null, rightClawDistance = null;
+    TouchSensor leftClawTouchSensor = null, rightClawTouchSensor = null;
     private IMU imu = null;      // Control/Expansion Hub IMU
     WebcamName webcam1, webcam2;
     TfodProcessor tfod;
-
     VisionPortal visionPortal;               // Used to manage the video source.
     AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
 
     //Desired April Tag
     AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
-
     //Game Mode
     GameMode gameMode = GameMode.NONE;
     Boolean gameModeChanged = Boolean.FALSE;
     private static final String TFOD_MODEL_ASSET = "TeaXProp_TFOD.tflite";
     private static final String[] LABELS = {"X"};
-
     double wristPosition = STARTING_WRIST_POSITION;
     boolean autoDrive = false;
+    boolean leftPixelInClaw = false, rightPixelInClaw = false;
+    SpikeMark spikeMark = SpikeMark.RIGHT; //Default
+    float detectionConfidence = 0;
+    boolean teamPropDetectionCompleted = false;
 
     void initializeIMU() {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
@@ -174,11 +185,9 @@ public abstract class XBotOpMode extends LinearOpMode {
 
     void setManualExposure(int exposureMS, int gain, String cam) {
         // Wait for the camera to be open, then use the controls
-
         if (visionPortal == null) {
             return;
         }
-
         // Make sure camera is streaming before we try to set the exposure controls
         if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
             telemetry.addData(cam, "Waiting");
@@ -433,6 +442,248 @@ public abstract class XBotOpMode extends LinearOpMode {
     public double getHeading() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return orientation.getYaw(AngleUnit.DEGREES);
+    }
+
+    void initializeAuto(boolean debug) {
+        initialize();
+        initializeIMU();
+        initDriveMotorsToUseEncoders();
+        closeBothClaws();
+        gameMode = GameMode.AUTO_OP_MODE;
+        if (!debug) {
+            detectTeamPropMultipleTries();
+        }
+        telemetry.addData("Status", "Initialized");
+        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+        telemetry.addData(">", "Touch Play to start OpMode");
+        telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
+        telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
+        telemetry.update();
+    }
+
+    private void detectTeamPropMultipleTries() {
+        int tries = 400;
+        while (!detectTeamProp() && (tries > 0)) {
+            sleep(10);
+            tries -= 1;
+        }
+    }
+
+    boolean detectTeamProp() {
+        boolean foundX = false;
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitions) {
+            //If multiple detections for any reason -- use the one with highest
+            if (recognition.getConfidence() > detectionConfidence) {
+                if (recognition.getLeft() < 100) {
+                    spikeMark = SpikeMark.LEFT;
+                } else {
+                    spikeMark = SpikeMark.CENTER;
+                }
+                foundX = true;
+                detectionConfidence = recognition.getConfidence();
+
+                telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+                telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+                telemetry.addData("SpikeMark", spikeMark);
+            }
+        }   // end for() loop
+        return foundX;
+    } //detectTeamProp
+
+    void detectTeamPropAndSwitchCameraToAprilTag() {
+        teamPropDetectionCompleted = detectTeamProp();
+        if ((runtime.milliseconds() > 1500) && (!teamPropDetectionCompleted)) {
+            //Give up -- assume RIGHT
+            teamPropDetectionCompleted = true;
+            spikeMark = SpikeMark.RIGHT;
+        }
+        if (teamPropDetectionCompleted) {
+            switchToAprilTagCamera();
+            // Save CPU resources; can resume streaming when needed.
+            visionPortal.stopStreaming(); //Stop until we are ready
+        }
+    } //detectTeamPropAndSwitchCameraToAprilTag
+
+    void fixRobotYaw(double heading) {
+        int tries = 5;
+        while ((Math.abs(heading - getHeading()) > 1.5) && (tries > 0)) {
+            //Fix
+            if (heading < getHeading())
+                moveRobot(40, TANK_TURN_RIGHT, AUTONOMOUS_SPEED / 2);
+            else
+                moveRobot(40, TANK_TURN_LEFT, AUTONOMOUS_SPEED / 2);
+            tries -= 1;
+        }
+    }
+
+    void moveRobot(int distance, MoveRobot moveRobot) {
+        moveRobot(distance, moveRobot, AUTONOMOUS_SPEED);
+    }
+
+    void moveRobot(int distance, MoveRobot moveRobot, double speed) {
+        // Reset encoders
+        resetDriveEncoders();
+        double heading;
+        int lfDirection = 1;
+        int rfDirection = 1;
+        int lbDirection = 1;
+        int rbDirection = 1;
+        switch (moveRobot) {
+            case STRAFE_RIGHT:
+                heading = 0;
+                lbDirection = -1;
+                rfDirection = -1;
+                break;
+            case STRAFE_LEFT:
+                heading = 0;
+                lfDirection = -1;
+                rbDirection = -1;
+                break;
+            case FORWARD:
+                heading = 0;
+                break;
+            case BACKWARD:
+                heading = 0;
+                lfDirection = -1;
+                lbDirection = -1;
+                rfDirection = -1;
+                rbDirection = -1;
+                break;
+            case TANK_TURN_LEFT:
+                heading = -90;
+                lfDirection = -1;
+                lbDirection = -1;
+                break;
+            case TANK_TURN_RIGHT:
+                heading = 90;
+                rfDirection = -1;
+                rbDirection = -1;
+                break;
+            default:
+                heading = 0;
+        }
+        leftFront.setTargetPosition(distance * lfDirection);
+        rightFront.setTargetPosition(distance * rfDirection);
+        leftBack.setTargetPosition(distance * lbDirection);
+        rightBack.setTargetPosition(distance * rbDirection);
+
+        // Set motors to run to position
+        setDriveRunToPosition();
+        // Set motors power
+        setDriveMotorsPower(AUTONOMOUS_SPEED);
+
+        // Wait for motors to reach target position
+        while (opModeIsActive() && areDriveMotorsBusy()) {
+            telemetry.addData("Status", moveRobot);
+            telemetry.addData("Heading- Target : Current", "%5.3f : %5.3f", heading, getHeading());
+            telemetry.addData("Distance to go", distance);
+            telemetry.addData("Left Front Motor", leftFront.getCurrentPosition() + "  busy=" + leftFront.isBusy());
+            telemetry.addData("Left Back Motor", leftBack.getCurrentPosition() + "  busy=" + leftBack.isBusy());
+            telemetry.addData("Right Front Motor", rightFront.getCurrentPosition() + "  busy=" + rightFront.isBusy());
+            telemetry.addData("Right Back Motor", rightBack.getCurrentPosition() + "  busy=" + rightBack.isBusy());
+            telemetry.update();
+            idle();
+        }
+
+        setDriveMotorsPower(.05);
+        // Stop the motors
+        stopDriveMotors();
+        // Set motors back to normal mode
+        stopDriveRunUsingEncoder();
+    }
+
+    void stopRobot() {
+        stopDriveMotors();
+        // Save more CPU resources when camera is no longer needed.
+        visionPortal.close();
+    }
+
+    void leftSpikeMark(DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+        moveRobot(350, FORWARD);
+        fixRobotYaw(0);
+        moveRobot(710, STRAFE_RIGHT);
+        fixRobotYaw(0);
+        moveArmToPosition(1770);
+        moveRobot(170, BACKWARD);
+        openLeftClaw();
+        sleep(100);
+        moveArmToPosition(ARM_POSITION_UP);
+        moveRobot(1030, TANK_TURN_RIGHT);
+        moveRobot(140, STRAFE_LEFT);
+        moveArmToPosition(200);
+        fixRobotYaw(-90);
+        if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+            moveRobot(3000, BACKWARD);
+        } else {
+            moveRobot(100, BACKWARD);
+        }
+
+        //Parking
+        if (parking == Parking.LEFT) {
+
+        } else {
+
+        }
+    }
+
+    void rightSpikeMark(DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+        moveRobot(400, FORWARD);
+        moveRobot(520, STRAFE_LEFT);
+        fixRobotYaw(0);
+        moveArmToPosition(1770);
+        moveRobot(150, BACKWARD);
+        openLeftClaw();
+        sleep(100);
+        moveArmToPosition(ARM_POSITION_UP);
+        moveRobot(550, STRAFE_RIGHT);
+        fixRobotYaw(0);
+        moveRobot(1025, TANK_TURN_RIGHT);
+        moveRobot(175, STRAFE_LEFT);
+        fixRobotYaw(-90);
+        moveArmToPosition(200);
+        if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+            moveRobot(2000, BACKWARD);
+        } else {
+            moveRobot(100, BACKWARD);
+        }
+
+        //Parking
+        if (parking == Parking.LEFT) {
+
+        } else {
+
+        }
+    }
+
+    void centerSpikeMark(DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+        moveRobot(400, STRAFE_RIGHT);
+        fixRobotYaw(0);
+        moveArmToPosition(1770);
+        wristPosition = MAX_WRIST_POS;
+        setWristPosition(wristPosition);
+        moveRobot(260, BACKWARD);
+        stopDriveMotors();
+        openLeftClaw();
+        sleep(100);
+        moveArmToPosition(200);
+        moveRobot(1025, TANK_TURN_RIGHT);
+        fixRobotYaw(-90);
+        moveRobot(620, STRAFE_LEFT);
+        fixRobotYaw(-90);
+        if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+            moveRobot(2000, BACKWARD);
+        } else {
+            moveRobot(100, BACKWARD);
+        }
+
+        //Parking
+        if (parking == Parking.LEFT) {
+
+        } else {
+
+        }
     }
 
 }

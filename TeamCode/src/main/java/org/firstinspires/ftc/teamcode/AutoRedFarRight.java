@@ -8,11 +8,11 @@ import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Auto Red Far Left", group = "Concept")
-public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
+@Autonomous(name = "Auto Red Far Right", group = "Concept")
+public class AutoRedFarRight extends XBotOpMode implements AutoOpMode {
     Alliance alliance = Alliance.RED;
     DistanceFromBackdrop distanceFromBackdrop = DistanceFromBackdrop.FAR;
-    Parking parking = Parking.LEFT;
+    Parking parking = Parking.RIGHT;
     boolean spikeMarkPixelDropped = false;
     boolean aTagPixelDropped = false;
     @Override

@@ -8,13 +8,14 @@ import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Auto Red Far Left", group = "Concept")
-public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
+@Autonomous(name = "Auto Red Near Left", group = "Concept")
+public class AutoRedNearLeft extends XBotOpMode implements AutoOpMode {
     Alliance alliance = Alliance.RED;
-    DistanceFromBackdrop distanceFromBackdrop = DistanceFromBackdrop.FAR;
+    DistanceFromBackdrop distanceFromBackdrop = DistanceFromBackdrop.NEAR;
     Parking parking = Parking.LEFT;
     boolean spikeMarkPixelDropped = false;
     boolean aTagPixelDropped = false;
+
     @Override
     public void runOpMode() {
         // Initialize hardware
@@ -34,14 +35,12 @@ public class AutoRedFarLeft extends XBotOpMode implements AutoOpMode {
                     fixRobotYaw(0);
                     continue;
                 }
-
                 if (!teamPropDetectionCompleted) {
                     detectTeamPropAndSwitchCameraToAprilTag();
                 } else {
                     telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
                     telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
                     telemetry.update();
-
                     if (!spikeMarkPixelDropped) {
                         moveRobot(400, BACKWARD);
                         moveArmToPosition(ARM_POSITION_UP);
