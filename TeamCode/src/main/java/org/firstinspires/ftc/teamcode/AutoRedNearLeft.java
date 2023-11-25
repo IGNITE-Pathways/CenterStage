@@ -27,14 +27,6 @@ public class AutoRedNearLeft extends XBotOpMode implements AutoOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                if (DEBUG) {
-                    //Debug
-                    moveArmToPosition(ARM_POSITION_HIGH);
-                    moveRobot(1025, TANK_TURN_LEFT);
-                    moveRobot(1025, TANK_TURN_RIGHT);
-                    fixRobotYaw(0);
-                    continue;
-                }
                 if (!teamPropDetectionCompleted) {
                     detectTeamPropAndSwitchCameraToAprilTag();
                 } else {
@@ -47,13 +39,13 @@ public class AutoRedNearLeft extends XBotOpMode implements AutoOpMode {
 
                         switch (spikeMark) {
                             case LEFT:
-                                leftSpikeMark(distanceFromBackdrop, parking);
+                                leftSpikeMark(alliance, distanceFromBackdrop, parking);
                                 break;
                             case RIGHT:
-                                rightSpikeMark(distanceFromBackdrop, parking);
+                                rightSpikeMark(alliance, distanceFromBackdrop, parking);
                                 break;
                             case CENTER:
-                                centerSpikeMark(distanceFromBackdrop, parking);
+                                centerSpikeMark(alliance, distanceFromBackdrop, parking);
                         }
                         spikeMarkPixelDropped = true;
                     }

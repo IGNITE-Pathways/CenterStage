@@ -600,7 +600,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         visionPortal.close();
     }
 
-    void leftSpikeMark(DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void leftSpikeMark(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(350, FORWARD);
         fixRobotYaw(0);
         moveRobot(710, STRAFE_RIGHT);
@@ -610,25 +610,32 @@ public abstract class XBotOpMode extends LinearOpMode {
         openLeftClaw();
         sleep(100);
         moveArmToPosition(ARM_POSITION_UP);
-        moveRobot(1030, TANK_TURN_RIGHT);
-        moveRobot(140, STRAFE_LEFT);
+        if (alliance == Alliance.RED) {
+            moveRobot(1030, TANK_TURN_RIGHT);
+            moveRobot(140, STRAFE_LEFT);
+            fixRobotYaw(-90);
+        } else {
+            moveRobot(1030, TANK_TURN_LEFT);
+            moveRobot(140, STRAFE_RIGHT);
+            fixRobotYaw(90);
+        }
         moveArmToPosition(200);
-        fixRobotYaw(-90);
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
             moveRobot(3000, BACKWARD);
         } else {
             moveRobot(100, BACKWARD);
         }
+        //April Tag Nav
 
         //Parking
         if (parking == Parking.LEFT) {
-
+            moveRobot(400, STRAFE_RIGHT);
         } else {
-
+            moveRobot(400, STRAFE_LEFT);
         }
     }
 
-    void rightSpikeMark(DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void rightSpikeMark(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(400, FORWARD);
         moveRobot(520, STRAFE_LEFT);
         fixRobotYaw(0);
@@ -639,25 +646,32 @@ public abstract class XBotOpMode extends LinearOpMode {
         moveArmToPosition(ARM_POSITION_UP);
         moveRobot(550, STRAFE_RIGHT);
         fixRobotYaw(0);
-        moveRobot(1025, TANK_TURN_RIGHT);
-        moveRobot(175, STRAFE_LEFT);
-        fixRobotYaw(-90);
+        if (alliance == Alliance.RED) {
+            moveRobot(1025, TANK_TURN_RIGHT);
+            moveRobot(175, STRAFE_LEFT);
+            fixRobotYaw(-90);
+        } else {
+            moveRobot(1025, TANK_TURN_LEFT);
+            moveRobot(175, STRAFE_RIGHT);
+            fixRobotYaw(90);
+        }
         moveArmToPosition(200);
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
             moveRobot(2000, BACKWARD);
         } else {
             moveRobot(100, BACKWARD);
         }
+        //April Tag Nav
 
         //Parking
         if (parking == Parking.LEFT) {
-
+            moveRobot(400, STRAFE_RIGHT);
         } else {
-
+            moveRobot(400, STRAFE_LEFT);
         }
     }
 
-    void centerSpikeMark(DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void centerSpikeMark(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(400, STRAFE_RIGHT);
         fixRobotYaw(0);
         moveArmToPosition(1770);
@@ -680,9 +694,9 @@ public abstract class XBotOpMode extends LinearOpMode {
 
         //Parking
         if (parking == Parking.LEFT) {
-
+            moveRobot(400, STRAFE_RIGHT);
         } else {
-
+            moveRobot(400, STRAFE_LEFT);
         }
     }
 
