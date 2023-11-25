@@ -39,13 +39,13 @@ public class AutoRedNearLeft extends XBotOpMode implements AutoOpMode {
 
                         switch (spikeMark) {
                             case LEFT:
-                                leftSpikeMark(alliance, distanceFromBackdrop, parking);
+                                leftSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
                                 break;
                             case RIGHT:
-                                rightSpikeMark(alliance, distanceFromBackdrop, parking);
+                                rightSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
                                 break;
                             case CENTER:
-                                centerSpikeMark(alliance, distanceFromBackdrop, parking);
+                                centerSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
                         }
                         spikeMarkPixelDropped = true;
                     }

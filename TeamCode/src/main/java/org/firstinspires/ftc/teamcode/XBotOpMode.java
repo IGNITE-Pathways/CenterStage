@@ -600,7 +600,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         visionPortal.close();
     }
 
-    void leftSpikeMark(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(350, FORWARD);
         fixRobotYaw(0);
         moveRobot(710, STRAFE_RIGHT);
@@ -625,6 +625,11 @@ public abstract class XBotOpMode extends LinearOpMode {
         } else {
             moveRobot(100, BACKWARD);
         }
+        if (alliance == Alliance.RED) {
+            moveRobot(1000, TANK_TURN_RIGHT);
+        } else {
+            moveRobot(1000, TANK_TURN_LEFT);
+        }
         //April Tag Nav
 
         //Parking
@@ -635,7 +640,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         }
     }
 
-    void rightSpikeMark(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(400, FORWARD);
         moveRobot(520, STRAFE_LEFT);
         fixRobotYaw(0);
@@ -661,6 +666,11 @@ public abstract class XBotOpMode extends LinearOpMode {
         } else {
             moveRobot(100, BACKWARD);
         }
+        if (alliance == Alliance.RED) {
+            moveRobot(1000, TANK_TURN_RIGHT);
+        } else {
+            moveRobot(1000, TANK_TURN_LEFT);
+        }
         //April Tag Nav
 
         //Parking
@@ -671,7 +681,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         }
     }
 
-    void centerSpikeMark(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(400, STRAFE_RIGHT);
         fixRobotYaw(0);
         moveArmToPosition(1770);
@@ -682,15 +692,26 @@ public abstract class XBotOpMode extends LinearOpMode {
         openLeftClaw();
         sleep(100);
         moveArmToPosition(200);
-        moveRobot(1025, TANK_TURN_RIGHT);
-        fixRobotYaw(-90);
-        moveRobot(620, STRAFE_LEFT);
-        fixRobotYaw(-90);
+        if (alliance == Alliance.RED) {
+            moveRobot(1025, TANK_TURN_RIGHT);
+            moveRobot(620, STRAFE_LEFT);
+            fixRobotYaw(-90);
+        } else {
+            moveRobot(1025, TANK_TURN_LEFT);
+            moveRobot(620, STRAFE_RIGHT);
+            fixRobotYaw(90);
+        }
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
             moveRobot(2000, BACKWARD);
         } else {
             moveRobot(100, BACKWARD);
         }
+        if (alliance == Alliance.RED) {
+            moveRobot(1000, TANK_TURN_RIGHT);
+        } else {
+            moveRobot(1000, TANK_TURN_LEFT);
+        }
+        //April Tag Nav
 
         //Parking
         if (parking == Parking.LEFT) {
