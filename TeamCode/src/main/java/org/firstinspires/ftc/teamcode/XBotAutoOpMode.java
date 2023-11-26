@@ -30,7 +30,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     //Define motors and sensors
     int desiredTagId = -1;                  // change based on spikeMark identification
     //Game Mode
-    GameMode gameMode = GameMode.AUTO_OP_MODE;
     SpikeMark spikeMark = SpikeMark.RIGHT; //Default
     float detectionConfidence = 0;
     boolean teamPropDetectionCompleted = false;
@@ -374,6 +373,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                     telemetry.addData("Arrived", "Dropping Pixel now");
                     dropYellowPixel();
                     //Park Now
+                    telemetry.addData("Parking", "");
                     parkRobot(alliance, parking, spikeMark);
                 }
             }
@@ -384,10 +384,10 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     void fixRobotYaw(double heading) {
         int tries = 5;
         double error = Math.abs(heading - getHeading());
-        while ((error > 2) && (tries > 0)) {
+        while ((error > 1) && (tries > 0)) {
             //Fix
             double speed = Range.clip(error, 0, AUTONOMOUS_SPEED);
-            int distanceTicks = (int)Range.scale(error, 0, 5, 0, 30);
+            int distanceTicks = (int)Range.scale(error, 0, 5, 0, 20);
             if (heading < getHeading())
                 moveRobot(distanceTicks, TANK_TURN_RIGHT, speed, true);
             else
