@@ -34,9 +34,6 @@ public class AutoRedFarRight extends XBotOpMode implements AutoOpMode {
                     telemetry.update();
 
                     if (!spikeMarkPixelDropped) {
-                        moveRobot(400, BACKWARD);
-                        moveArmToPosition(ARM_POSITION_UP);
-
                         switch (spikeMark) {
                             case LEFT:
                                 leftSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);

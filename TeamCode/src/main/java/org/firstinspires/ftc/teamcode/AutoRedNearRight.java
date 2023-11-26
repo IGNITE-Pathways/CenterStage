@@ -34,9 +34,6 @@ public class AutoRedNearRight extends XBotOpMode implements AutoOpMode {
                     telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
                     telemetry.update();
                     if (!spikeMarkPixelDropped) {
-                        moveRobot(400, BACKWARD);
-                        moveArmToPosition(ARM_POSITION_UP);
-
                         switch (spikeMark) {
                             case LEFT:
                                 leftSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);

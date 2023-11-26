@@ -3,7 +3,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name="Test Encoder", group="Concept")
 @Disabled
-public class Encoder extends LinearOpMode
+public class TestEncoder extends LinearOpMode
 {
     DcMotor leftArmMotor;
     DcMotor rightArmMotor;

@@ -50,14 +50,15 @@ public abstract class XBotOpMode extends LinearOpMode {
     Servo wristServo = null, leftClawServo = null, rightClawServo = null;
     DistanceSensor leftClawDistance = null, rightClawDistance = null;
     TouchSensor leftClawTouchSensor = null, rightClawTouchSensor = null;
-    private IMU imu = null;      // Control/Expansion Hub IMU
+    private IMU imu = null;      // Control Hub IMU
     WebcamName webcam1, webcam2;
     TfodProcessor tfod;
     VisionPortal visionPortal;               // Used to manage the video source.
     AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
 
     //Desired April Tag
-    AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
+    AprilTagDetection desiredTagDetectionObj = null;     // Used to hold the data for a detected AprilTag
+    int desiredTagId = -1;                  // change based on spikeMark identification
     //Game Mode
     GameMode gameMode = GameMode.NONE;
     Boolean gameModeChanged = Boolean.FALSE;
@@ -125,13 +126,11 @@ public abstract class XBotOpMode extends LinearOpMode {
 //                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
 //                .addProcessor(tfod)
 //                .build();
-//        setManualExposure(6, 250, "TFOD Cam");  // Use low exposure time to reduce motion blur
         aprilTag = new AprilTagProcessor.Builder().build();
         visionPortal = new VisionPortal.Builder()
                 .setCamera(switchableCamera)
                 .addProcessors(aprilTag, tfod)
                 .build();
-//        setManualExposure(6, 250, "AprilTag Cam");  // Use low exposure time to reduce motion blur
         if (this instanceof AutoOpMode) {
             switchToTFODCamera();
         } else {
@@ -216,7 +215,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         }
     }
 
-    boolean detectAprilTags() {
+    boolean detectAnyAprilTag() {
         boolean aprilTagFound = false;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
@@ -225,7 +224,22 @@ public abstract class XBotOpMode extends LinearOpMode {
                 aprilTagFound = true;
                 //We found April Tag, change game mode to APRIL TAG NAV
                 changeGameMode(GameMode.APRIL_TAG_NAVIGATION);
-                desiredTag = detection;
+                desiredTagDetectionObj = detection;
+                break;  // don't look any further.
+            } else {
+                telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
+            }
+        }
+        return aprilTagFound;
+    }
+
+    boolean detectDesiredAprilTag(int tagId) {
+        boolean aprilTagFound = false;
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == tagId)) {
+                aprilTagFound = true;
+                desiredTagDetectionObj = detection;
                 break;  // don't look any further.
             } else {
                 telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
@@ -292,10 +306,14 @@ public abstract class XBotOpMode extends LinearOpMode {
 
         if (autoDrive) {
             //Drive in reverse
-            rightBack.setPower(leftFrontPower);
-            leftBack.setPower(rightFrontPower);
-            rightFront.setPower(leftBackPower);
-            leftFront.setPower(rightBackPower);
+//            rightBack.setPower(leftFrontPower);
+//            leftBack.setPower(rightFrontPower);
+//            rightFront.setPower(leftBackPower);
+//            leftFront.setPower(rightBackPower);
+            leftFront.setPower(-leftFrontPower);
+            rightFront.setPower(-rightFrontPower);
+            leftBack.setPower(-leftBackPower);
+            rightBack.setPower(-rightBackPower);
         } else {
             // Send powers to the wheels.
             leftFront.setPower(leftFrontPower);
@@ -422,6 +440,9 @@ public abstract class XBotOpMode extends LinearOpMode {
         } else if ((gameMode == GameMode.AUTO_OP_MODE)) {
             if (armPosition > 1500) {
                 return MAX_WRIST_POS;
+            } else if (isArmFacingBack(armPosition)) {
+                int angleA = ((armPosition * 360) / FULL_CIRCLE);
+                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
             } else {
                 return MIN_WRIST_POS;
             }
@@ -507,13 +528,13 @@ public abstract class XBotOpMode extends LinearOpMode {
     } //detectTeamPropAndSwitchCameraToAprilTag
 
     void fixRobotYaw(double heading) {
-        int tries = 5;
-        while ((Math.abs(heading - getHeading()) > 1.5) && (tries > 0)) {
+        int tries = 4;
+        while ((Math.abs(heading - getHeading()) > 2) && (tries > 0)) {
             //Fix
             if (heading < getHeading())
-                moveRobot(40, TANK_TURN_RIGHT, AUTONOMOUS_SPEED / 2);
+                moveRobot(10, TANK_TURN_RIGHT, AUTONOMOUS_SPEED / 2, true);
             else
-                moveRobot(40, TANK_TURN_LEFT, AUTONOMOUS_SPEED / 2);
+                moveRobot(10, TANK_TURN_LEFT, AUTONOMOUS_SPEED / 2, true);
             tries -= 1;
         }
     }
@@ -521,8 +542,10 @@ public abstract class XBotOpMode extends LinearOpMode {
     void moveRobot(int distance, MoveRobot moveRobot) {
         moveRobot(distance, moveRobot, AUTONOMOUS_SPEED);
     }
-
     void moveRobot(int distance, MoveRobot moveRobot, double speed) {
+        moveRobot(distance, moveRobot, speed, false);
+    }
+    void moveRobot(int distance, MoveRobot moveRobot, double speed, boolean yawfix) {
         // Reset encoders
         resetDriveEncoders();
         double heading;
@@ -572,26 +595,29 @@ public abstract class XBotOpMode extends LinearOpMode {
         // Set motors to run to position
         setDriveRunToPosition();
         // Set motors power
-        setDriveMotorsPower(AUTONOMOUS_SPEED);
+        setDriveMotorsPower(speed);
 
         // Wait for motors to reach target position
         while (opModeIsActive() && areDriveMotorsBusy()) {
-            telemetry.addData("Status", moveRobot);
-            telemetry.addData("Heading- Target : Current", "%5.3f : %5.3f", heading, getHeading());
-            telemetry.addData("Distance to go", distance);
-            telemetry.addData("Left Front Motor", leftFront.getCurrentPosition() + "  busy=" + leftFront.isBusy());
-            telemetry.addData("Left Back Motor", leftBack.getCurrentPosition() + "  busy=" + leftBack.isBusy());
-            telemetry.addData("Right Front Motor", rightFront.getCurrentPosition() + "  busy=" + rightFront.isBusy());
-            telemetry.addData("Right Back Motor", rightBack.getCurrentPosition() + "  busy=" + rightBack.isBusy());
-            telemetry.update();
+            if (!yawfix) {
+                telemetry.addData("Status", moveRobot);
+                telemetry.addData("Heading- Target : Current", "%5.3f : %5.3f", heading, getHeading());
+                telemetry.addData("Distance to go", distance);
+                telemetry.addData("Left Front Motor", leftFront.getCurrentPosition() + "  busy=" + leftFront.isBusy());
+                telemetry.addData("Left Back Motor", leftBack.getCurrentPosition() + "  busy=" + leftBack.isBusy());
+                telemetry.addData("Right Front Motor", rightFront.getCurrentPosition() + "  busy=" + rightFront.isBusy());
+                telemetry.addData("Right Back Motor", rightBack.getCurrentPosition() + "  busy=" + rightBack.isBusy());
+                telemetry.update();
+            }
             idle();
         }
 
         setDriveMotorsPower(.05);
         // Stop the motors
         stopDriveMotors();
-        // Set motors back to normal mode
-        stopDriveRunUsingEncoder();
+//        // Set motors back to normal mode
+//        stopDriveRunUsingEncoder();
+
     }
 
     void stopRobot() {
@@ -601,13 +627,20 @@ public abstract class XBotOpMode extends LinearOpMode {
     }
 
     void leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+        moveRobot(400, BACKWARD);
+        moveArmToPosition(ARM_POSITION_UP);
+
         moveRobot(350, FORWARD);
         fixRobotYaw(0);
         moveRobot(710, STRAFE_RIGHT);
         fixRobotYaw(0);
         moveArmToPosition(1770);
         moveRobot(170, BACKWARD);
-        openLeftClaw();
+        if (alliance == Alliance.RED) {
+            openLeftClaw();
+        } else {
+            openRightClaw();
+        }
         sleep(100);
         moveArmToPosition(ARM_POSITION_UP);
         if (alliance == Alliance.RED) {
@@ -626,27 +659,32 @@ public abstract class XBotOpMode extends LinearOpMode {
             moveRobot(100, BACKWARD);
         }
         if (alliance == Alliance.RED) {
-            moveRobot(1000, TANK_TURN_RIGHT);
+            moveRobot(1000, STRAFE_RIGHT);
         } else {
-            moveRobot(1000, TANK_TURN_LEFT);
+            moveRobot(1000, STRAFE_LEFT);
         }
         //April Tag Nav
-
-        //Parking
-        if (parking == Parking.LEFT) {
-            moveRobot(400, STRAFE_RIGHT);
+        if (alliance == Alliance.RED) {
+            desiredTagId = 4;
         } else {
-            moveRobot(400, STRAFE_LEFT);
+            desiredTagId = 1;
         }
     }
 
     void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+        moveRobot(400, BACKWARD);
+        moveArmToPosition(ARM_POSITION_UP);
+
         moveRobot(400, FORWARD);
         moveRobot(520, STRAFE_LEFT);
         fixRobotYaw(0);
         moveArmToPosition(1770);
         moveRobot(150, BACKWARD);
-        openLeftClaw();
+        if (alliance == Alliance.RED) {
+            openLeftClaw();
+        } else {
+            openRightClaw();
+        }
         sleep(100);
         moveArmToPosition(ARM_POSITION_UP);
         moveRobot(550, STRAFE_RIGHT);
@@ -662,63 +700,89 @@ public abstract class XBotOpMode extends LinearOpMode {
         }
         moveArmToPosition(200);
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-            moveRobot(2000, BACKWARD);
+            moveRobot(3000, BACKWARD);
         } else {
             moveRobot(100, BACKWARD);
         }
         if (alliance == Alliance.RED) {
-            moveRobot(1000, TANK_TURN_RIGHT);
+            moveRobot(1000, STRAFE_RIGHT);
         } else {
-            moveRobot(1000, TANK_TURN_LEFT);
+            moveRobot(1000, STRAFE_LEFT);
         }
         //April Tag Nav
-
-        //Parking
-        if (parking == Parking.LEFT) {
-            moveRobot(400, STRAFE_RIGHT);
+        if (alliance == Alliance.RED) {
+            desiredTagId = 6;
         } else {
-            moveRobot(400, STRAFE_LEFT);
+            desiredTagId = 3;
         }
     }
 
     void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
-        moveRobot(400, STRAFE_RIGHT);
+        if (alliance == Alliance.RED) {
+            moveRobot(400, BACKWARD);
+            moveArmToPosition(ARM_POSITION_UP);
+            fixRobotYaw(0);
+            moveRobot(400, STRAFE_RIGHT);
+        } else {
+            moveRobot(380, BACKWARD);
+            moveArmToPosition(ARM_POSITION_UP);
+            fixRobotYaw(0);
+            moveRobot(400, STRAFE_LEFT);
+        }
         fixRobotYaw(0);
         moveArmToPosition(1770);
         wristPosition = MAX_WRIST_POS;
         setWristPosition(wristPosition);
-        moveRobot(260, BACKWARD);
+        moveRobot(250, BACKWARD);
         stopDriveMotors();
-        openLeftClaw();
+        if (alliance == Alliance.RED) {
+            openLeftClaw();
+        } else {
+            openRightClaw();
+        }
         sleep(100);
         moveArmToPosition(200);
         if (alliance == Alliance.RED) {
-            moveRobot(1025, TANK_TURN_RIGHT);
+            moveRobot(1030, TANK_TURN_RIGHT);
             moveRobot(620, STRAFE_LEFT);
             fixRobotYaw(-90);
         } else {
-            moveRobot(1025, TANK_TURN_LEFT);
-            moveRobot(620, STRAFE_RIGHT);
+            moveRobot(1030, TANK_TURN_LEFT);
+            moveRobot(700, STRAFE_RIGHT);
             fixRobotYaw(90);
         }
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-            moveRobot(2000, BACKWARD);
+            moveRobot(3300, BACKWARD);
         } else {
             moveRobot(100, BACKWARD);
         }
         if (alliance == Alliance.RED) {
-            moveRobot(1000, TANK_TURN_RIGHT);
+            moveRobot(800, STRAFE_RIGHT);
         } else {
-            moveRobot(1000, TANK_TURN_LEFT);
+            moveRobot(800, STRAFE_LEFT);
         }
         //April Tag Nav
-
-        //Parking
-        if (parking == Parking.LEFT) {
-            moveRobot(400, STRAFE_RIGHT);
+        if (alliance == Alliance.RED) {
+            desiredTagId = 5;
         } else {
-            moveRobot(400, STRAFE_LEFT);
+            desiredTagId = 2;
         }
+        //Parking
+//        if (parking == Parking.LEFT) {
+//            moveRobot(400, STRAFE_RIGHT);
+//        } else {
+//            moveRobot(400, STRAFE_LEFT);
+//        }
     }
 
+    void setAprilTagDecimation() {
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        aprilTag.setDecimation(2);
+    }
 }
