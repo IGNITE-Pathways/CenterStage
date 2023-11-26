@@ -362,10 +362,10 @@ public abstract class XBotOpMode extends LinearOpMode {
             armPosition = leftArmMotor.getCurrentPosition();
             wristPosition = getWristPosition(armPosition);
             setWristPosition(wristPosition);
-            telemetry.addData("Arm: Target", savePos);
-            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-            telemetry.update();
+//            telemetry.addData("Arm: Target", savePos);
+//            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+//            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+//            telemetry.update();
         }
 
         leftArmMotor.setPower(ARM_HOLD_SPEED);

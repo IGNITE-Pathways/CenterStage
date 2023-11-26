@@ -50,6 +50,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
             }
         }
+        if (!aprilTagFound) telemetry.addData("April Tag not found", tagId);
         return aprilTagFound;
     }
 
@@ -350,7 +351,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
-            telemetry.update();
 
             if (!spikeMarkPixelDropped) {
                 switch (spikeMark) {
@@ -363,30 +363,35 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                     case CENTER:
                         centerSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
                 }
+                telemetry.addData("Back Side", "Ready for April Tag Nav");
                 spikeMarkPixelDroppedGetReadyForATagNav();
             }
             if (!aTagPixelDropped) {
                 if (!arrivedAtBackDropTagPosition) {
+                    telemetry.addData("Looking for April Tag", desiredTagId);
                     aprilTagNavMoveToDesiredTagPosition(alliance);
                 } else {
-                    telemetry.addData("Arrived", "Dropping Pixel");
-                    telemetry.update();
+                    telemetry.addData("Arrived", "Dropping Pixel now");
                     dropYellowPixel();
                     //Park Now
                     parkRobot(alliance, parking, spikeMark);
                 }
             }
+            telemetry.update();
         }
     }
 
     void fixRobotYaw(double heading) {
-        int tries = 4;
-        while ((Math.abs(heading - getHeading()) > 2) && (tries > 0)) {
+        int tries = 5;
+        double error = Math.abs(heading - getHeading());
+        while ((error > 2) && (tries > 0)) {
             //Fix
+            double speed = Range.clip(error, 0, AUTONOMOUS_SPEED);
+            int distanceTicks = (int)Range.scale(error, 0, 5, 0, 30);
             if (heading < getHeading())
-                moveRobot(10, TANK_TURN_RIGHT, AUTONOMOUS_SPEED / 2, true);
+                moveRobot(distanceTicks, TANK_TURN_RIGHT, speed, true);
             else
-                moveRobot(10, TANK_TURN_LEFT, AUTONOMOUS_SPEED / 2, true);
+                moveRobot(distanceTicks, TANK_TURN_LEFT, speed, true);
             tries -= 1;
         }
     }
