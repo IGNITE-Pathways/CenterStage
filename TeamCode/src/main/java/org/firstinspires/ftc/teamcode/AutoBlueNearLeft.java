@@ -1,21 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.MoveRobot.BACKWARD;
-import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Auto Blue Near Left", group = "Concept")
-public class AutoBlueNearLeft extends XBotOpMode implements AutoOpMode {
-    Alliance alliance = Alliance.BLUE;
-    DistanceFromBackdrop distanceFromBackdrop = DistanceFromBackdrop.NEAR;
-    Parking parking = Parking.LEFT;
-    boolean spikeMarkPixelDropped = false;
-    boolean aTagPixelDropped = false;
+public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
     @Override
     public void runOpMode() {
         // Initialize hardware
-        initializeAuto(DEBUG);
+        initializeAuto();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -23,28 +15,8 @@ public class AutoBlueNearLeft extends XBotOpMode implements AutoOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                if (!teamPropDetectionCompleted) {
-                    detectTeamPropAndSwitchCameraToAprilTag();
-                } else {
-                    telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-                    telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
-                    telemetry.update();
-
-                    if (!spikeMarkPixelDropped) {
-                        switch (spikeMark) {
-                            case LEFT:
-                                leftSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
-                                break;
-                            case RIGHT:
-                                rightSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
-                                break;
-                            case CENTER:
-                                centerSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
-                        }
-                        spikeMarkPixelDropped = true;
-                    }
-                }
-                sleep(20);
+                autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.LEFT);
+                sleep(10);
             }
         }
         stopRobot();
