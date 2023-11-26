@@ -169,7 +169,11 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         moveArmToPosition(ARM_POSITION_UP);
 
         moveRobot(400, FORWARD);
-        moveRobot(520, STRAFE_LEFT);
+        if (alliance == Alliance.RED) {
+            moveRobot(520, STRAFE_LEFT);
+        } else {
+            moveRobot(640, STRAFE_LEFT);
+        }
         fixRobotYaw(0);
         moveArmToPosition(1770);
         moveRobot(150, BACKWARD);
@@ -181,7 +185,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         sleep(100);
         moveArmToPosition(ARM_POSITION_UP);
         moveRobot(550, STRAFE_RIGHT);
-        fixRobotYaw(0);
+//        fixRobotYaw(0);
         if (alliance == Alliance.RED) {
             moveRobot(1025, TANK_TURN_RIGHT);
             moveRobot(175, STRAFE_LEFT);
@@ -200,7 +204,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         if (alliance == Alliance.RED) {
             moveRobot(1000, STRAFE_RIGHT);
         } else {
-            moveRobot(1000, STRAFE_LEFT);
+            moveRobot(1250, STRAFE_LEFT);
         }
         //April Tag Nav
         if (alliance == Alliance.RED) {
@@ -271,7 +275,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     }
 
     void aprilTagNavMoveToDesiredTagPosition(Alliance alliance) {
-        int yellowPixelOffset = (alliance == Alliance.BLUE) ? 5 : -5;
+        int yellowPixelOffset = (alliance == Alliance.BLUE) ? 8 : -8;
         //Robot should be in front on the board to start AprilTag Nav
         boolean targetFound = detectDesiredAprilTag(desiredTagId);
 
