@@ -5,13 +5,15 @@ import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Test Motors", group = "Concept")
-public class Motor extends LinearOpMode {
+@Disabled
+public class TestMotor extends LinearOpMode {
 
     DcMotor rightFront = null;
     DcMotor leftFront = null;
