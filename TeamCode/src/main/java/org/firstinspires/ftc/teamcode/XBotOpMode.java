@@ -102,7 +102,7 @@ public abstract class XBotOpMode extends LinearOpMode {
                 .build();
 
         // Set confidence threshold for TFOD recognitions, at any time.
-        tfod.setMinResultConfidence(0.75f);
+        tfod.setMinResultConfidence(0.80f);
 
         aprilTag = new AprilTagProcessor.Builder().build();
 
@@ -319,11 +319,15 @@ public abstract class XBotOpMode extends LinearOpMode {
     }
 
     void openLeftClaw() {
+        sleep(100);
         leftClawServo.setPosition(XBot.LEFT_CLAW_OPEN_POSITION);
+        sleep(100);
     }
 
     void openRightClaw() {
+        sleep(100);
         rightClawServo.setPosition(XBot.RIGHT_CLAW_OPEN_POSITION);
+        sleep(100);
     }
 
     void closeLeftClaw() {
@@ -390,7 +394,7 @@ public abstract class XBotOpMode extends LinearOpMode {
                 int angleA = ((armPosition * 360) / FULL_CIRCLE);
                 return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
             } else {
-                return wristPosition;
+                return MIN_WRIST_POS; //return existing position
             }
         } else if ((gameMode == GameMode.GOING_TO_DROP_PIXELS)
                 || (gameMode == GameMode.APRIL_TAG_NAVIGATION)
@@ -400,7 +404,7 @@ public abstract class XBotOpMode extends LinearOpMode {
                 int angleA = ((armPosition * 360) / FULL_CIRCLE);
                 return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
             } else {
-                return wristPosition;
+                return wristPosition; //return existing position
             }
         } else if ((gameMode == GameMode.AUTO_OP_MODE)) {
             if (armPosition > 1500) {

@@ -74,7 +74,7 @@ public class TeleOpDrive extends XBotOpMode {
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                autoDrive = aprilTagFound && lookForAprilTag;
+                autoDrive = aprilTagFound && lookForAprilTag && gamepad1.left_bumper;
                 if (gamepad2.x) {
                     changeGameMode(GameMode.PICKING_PIXELS);
                     leftPixelInClaw = false;
@@ -145,14 +145,13 @@ public class TeleOpDrive extends XBotOpMode {
                         if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                         break;
                     case APRIL_TAG_NAVIGATION:
-//                        if (aprilTagFound && lookForAprilTag) {
-                            driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
                             if (gameModeChanged) {
                                 gameModeChanged = Boolean.FALSE;
                             }
                             updateDistance();
                             aprilTagFound = detectAnyAprilTag();
-                            if (aprilTagFound && lookForAprilTag) {
+                            if (aprilTagFound && lookForAprilTag && gamepad1.left_bumper) {
+                                driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
                                 double rangeError = (desiredTagDetectionObj.ftcPose.range - DESIRED_DISTANCE);
                                 double headingError = desiredTagDetectionObj.ftcPose.bearing;
                                 double yawError = desiredTagDetectionObj.ftcPose.yaw;
@@ -163,10 +162,12 @@ public class TeleOpDrive extends XBotOpMode {
                                 yawTurn = Range.clip(-yawError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
 
                                 //Y Button = Manual override only required if April Tag Nav doesn't work
-                                if (((rangeError < 0.02) && (rangeError > -0.02)) || gamepad2.y) {
+                                if (((rangeError < 0.1) && (rangeError > -0.1)) || gamepad2.y) {
                                     changeGameMode(GameMode.DROPPING_PIXELS);
                                 }
                             }
+                            //break out of april tag nav if Y is pressed
+                            if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                         break;
                     case DROPPING_PIXELS:
                         // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
@@ -179,12 +180,12 @@ public class TeleOpDrive extends XBotOpMode {
                             // Move Arm to back board -- only once
                             armPosition = MAX_ARM_POSITION;
                             moveArmToPosition(armPosition);
-                            sleep(400);
+                            sleep(200);
                         }
                         //User Action :: Press O (or if distance sensor is close) to drop pixels
                         if (gamepad2.circle || isDistanceSensorClose()) {
                             dropPixels();
-                            sleep(400);
+                            sleep(200);
 
                             // Move robot back a bit
                             moveRobotBack();
@@ -235,12 +236,12 @@ public class TeleOpDrive extends XBotOpMode {
 
     private boolean isRightPixelInReach() {
         //return rightClawTouchSensor.isPressed();
-        return (rightClawDistance.getDistance(DistanceUnit.MM) < 30);
+        return (rightClawDistance.getDistance(DistanceUnit.MM) < 24);
     }
 
     private boolean isLeftPixelInReach() {
         //return leftClawTouchSensor.isPressed()
-        return (leftClawDistance.getDistance(DistanceUnit.MM) < 30);
+        return (leftClawDistance.getDistance(DistanceUnit.MM) < 24);
     }
 
     private void resetWristAndClawPosition() {
@@ -250,7 +251,7 @@ public class TeleOpDrive extends XBotOpMode {
         rightClawServo.setPosition(STARTING_RIGHT_CLAW_POS);
     }
     private void waitAndMoveArmAndResetDistance() {
-        sleep(1000);
+        sleep(500);
         // Move Arm up to remove friction and get clearance the ground
         armPosition = ARM_POSITION_HIGH + 50;
         moveArmToPosition(armPosition);
@@ -291,7 +292,7 @@ public class TeleOpDrive extends XBotOpMode {
     private void dropPixels() {
         leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
         rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
-        sleep(1000);
+        sleep(500);
         leftPixelInClaw = false;
         rightPixelInClaw = false;
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
@@ -346,7 +347,7 @@ public class TeleOpDrive extends XBotOpMode {
         rightFront.setPower(0.2);
         leftBack.setPower(0.2);
         rightBack.setPower(0.2);
-        sleep(1000);
+        sleep(500);
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftBack.setPower(0);

@@ -122,10 +122,12 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     void leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(400, BACKWARD);
         moveArmToPosition(ARM_POSITION_UP);
-
         moveRobot(350, FORWARD);
-        fixRobotYaw(0);
-        moveRobot(710, STRAFE_RIGHT);
+        if (alliance == Alliance.RED) {
+            moveRobot(710, STRAFE_RIGHT);
+        } else {
+            moveRobot(590, STRAFE_RIGHT);
+        }
         fixRobotYaw(0);
         moveArmToPosition(1770);
         moveRobot(170, BACKWARD);
@@ -134,8 +136,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             openRightClaw();
         }
-        sleep(100);
         moveArmToPosition(ARM_POSITION_UP);
+        moveRobot(550, STRAFE_LEFT);
         if (alliance == Alliance.RED) {
             moveRobot(1030, TANK_TURN_RIGHT);
             moveRobot(140, STRAFE_LEFT);
@@ -167,7 +169,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         moveRobot(400, BACKWARD);
         moveArmToPosition(ARM_POSITION_UP);
-
         moveRobot(400, FORWARD);
         if (alliance == Alliance.RED) {
             moveRobot(520, STRAFE_LEFT);
@@ -182,10 +183,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             openRightClaw();
         }
-        sleep(100);
         moveArmToPosition(ARM_POSITION_UP);
         moveRobot(550, STRAFE_RIGHT);
-//        fixRobotYaw(0);
         if (alliance == Alliance.RED) {
             moveRobot(1025, TANK_TURN_RIGHT);
             moveRobot(175, STRAFE_LEFT);
@@ -334,17 +333,17 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             switch (spikeMark) {
                 case LEFT:
-                    moveRobot(1050, STRAFE_LEFT);
+                    moveRobot(1150, STRAFE_LEFT);
                     break;
                 case CENTER:
-                    moveRobot(900, STRAFE_LEFT);
+                    moveRobot(1000, STRAFE_LEFT);
                     break;
                 case RIGHT:
-                    moveRobot(750, STRAFE_LEFT);
+                    moveRobot(850, STRAFE_LEFT);
                     break;
             }
         }
-        moveRobot(100, BACKWARD);
+        moveRobot(300, BACKWARD);
         moveArmToPosition(MIN_ARM_POSITION);
     }
 
@@ -390,6 +389,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         double error = Math.abs(heading - getHeading());
         while ((error > 1) && (tries > 0)) {
             //Fix
+            error = Math.abs(heading - getHeading());
             double speed = Range.clip(error, 0, AUTONOMOUS_SPEED);
             int distanceTicks = (int)Range.scale(error, 0, 5, 0, 20);
             if (heading < getHeading())
