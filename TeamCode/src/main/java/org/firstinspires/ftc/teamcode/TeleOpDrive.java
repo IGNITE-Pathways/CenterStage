@@ -81,6 +81,22 @@ public class TeleOpDrive extends XBotOpMode {
                     rightPixelInClaw = false;
                 }
 
+                if (gamepad2.left_bumper) {
+                    //OPEN LEFT CLAW
+                    openLeftClaw();
+                    leftPixelInClaw = false;
+                } else if (gamepad2.left_trigger > 0.1) {
+                    pickLeftPixel();
+                }
+
+                if (gamepad2.right_bumper) {
+                    //OPEN RIGHT CLAW
+                    openRightClaw();
+                    rightPixelInClaw = false;
+                } else if (gamepad2.right_trigger > 0.1) {
+                    pickRightPixel();
+                }
+
                 // POV Mode uses left joystick to go forward & yawTurn, and right joystick to rotate.
                 double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
                 double strafe = -gamepad1.left_stick_x;
