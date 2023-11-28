@@ -6,10 +6,11 @@ public class XBot {
     static final int ARM_MOTOR_GEAR_RATIO = 2;
     static final int MIN_ARM_POSITION = 0;
     static final int MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 50/100; //50%
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 2; //Robot must move slow
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 3; //Robot must move slow
     static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4/100;; // 4% //Robot running across field
     static final int ARM_POSITION_UP = 800;
     static final double ARM_SPEED = 0.3;
+
     static final double ARM_HOLD_SPEED = 0.05;
 
     // WRIST
@@ -19,16 +20,16 @@ public class XBot {
     static final double WRIST_PICK_POSITION = MIN_WRIST_POS;
 
     //CLAW
-    static final double LEFT_CLAW_OPEN_POSITION = 0.68;
-    static final double LEFT_CLAW_CLOSE_POSITION = 0.74;
+    static final double LEFT_CLAW_OPEN_POSITION = 0.71;
+    static final double LEFT_CLAW_CLOSE_POSITION = 0.77;
     static final double STARTING_LEFT_CLAW_POS = LEFT_CLAW_OPEN_POSITION;
 
-    static final double RIGHT_CLAW_OPEN_POSITION = 0.71;
-    static final double RIGHT_CLAW_CLOSE_POSITION = 0.77;
+    static final double RIGHT_CLAW_OPEN_POSITION = 0.65;
+    static final double RIGHT_CLAW_CLOSE_POSITION = 0.71;
     static final double STARTING_RIGHT_CLAW_POS = RIGHT_CLAW_OPEN_POSITION;
 
     //DRIVE
-    static final double MAX_SPEED = 0.9; //Increase as operator gets better
+    static final double MAX_SPEED = 1.0; //Increase as operator gets better
     static final double SPEED_WHEN_PICKING_PIXELS = 0.3; //gameMode = PICKING_PIXELS
     static final double SPEED_WHEN_DROPPING_PIXELS = 0.3; //gameMode = DROPPING_PIXELS
     static final double SPEED_WHEN_ON_APRIL_TAG_NAV = 0.5; //gameMode = APRIL_TAG_NAVIGATION

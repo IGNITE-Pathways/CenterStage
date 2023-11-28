@@ -97,6 +97,14 @@ public class TeleOpDrive extends XBotOpMode {
                     pickRightPixel();
                 }
 
+                int moveArmBy = (int) -(gamepad2.left_stick_y * 40);
+                if (moveArmBy != 0) {
+                    armPosition += moveArmBy;
+                    armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
+                    armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
+                    moveArmToPosition(armPosition);
+                }
+
                 // POV Mode uses left joystick to go forward & yawTurn, and right joystick to rotate.
                 double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
                 double strafe = -gamepad1.left_stick_x;
@@ -129,24 +137,20 @@ public class TeleOpDrive extends XBotOpMode {
                         driveSpeed = MAX_SPEED; //Full speed from front to back
 
                         // Manual Arm Movement is allowed, but not required
-                        int moveArmBy = (int) -(gamepad2.left_stick_y * 40);
-                        if (moveArmBy != 0) {
-                            armPosition += moveArmBy;
-                            armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
-                            armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
-                            moveArmToPosition(armPosition);
-                        }
-
-//                        //Debug
-//                        wristPosition += gamepad2.right_stick_y / 100;
-//                        setWristPosition(wristPosition);
+//                        int moveArmBy = (int) -(gamepad2.left_stick_y * 40);
+//                        if (moveArmBy != 0) {
+//                            armPosition += moveArmBy;
+//                            armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
+//                            armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
+//                            moveArmToPosition(armPosition);
+//                        }
 
                         // Robot will be looking for april tag and will switch mode automatically once found
                         lookForAprilTag = true;
                         // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                        drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-                        strafe = -gamepad1.left_stick_x / 2.0;  // Reduce yawTurn rate to 50%.
-                        yawTurn = -gamepad1.right_stick_x / 3.0;  // Reduce strafe rate to 33%.
+//                        drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
+//                        strafe = -gamepad1.left_stick_x / 2.0;  // Reduce yawTurn rate to 50%.
+//                        yawTurn = -gamepad1.right_stick_x / 3.0;  // Reduce strafe rate to 33%.
 
                         //Look for April Tag(s)
                         aprilTagFound = detectAnyAprilTag();
