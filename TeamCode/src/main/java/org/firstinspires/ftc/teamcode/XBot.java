@@ -24,8 +24,8 @@ public class XBot {
     static final double LEFT_CLAW_CLOSE_POSITION = 0.77;
     static final double STARTING_LEFT_CLAW_POS = LEFT_CLAW_OPEN_POSITION;
 
-    static final double RIGHT_CLAW_OPEN_POSITION = 0.65;
-    static final double RIGHT_CLAW_CLOSE_POSITION = 0.71;
+    static final double RIGHT_CLAW_OPEN_POSITION = 0.61;
+    static final double RIGHT_CLAW_CLOSE_POSITION = 0.67;
     static final double STARTING_RIGHT_CLAW_POS = RIGHT_CLAW_OPEN_POSITION;
 
     //DRIVE
@@ -36,10 +36,11 @@ public class XBot {
 
     //APRIL TAG
     static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
-    static final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    static final double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+    static final double MAX_AUTO_SPEED = 0.4;   //  Clip the approach speed to this max value (adjust for your robot)
+    static final double MAX_AUTO_STRAFE = 0.4;   //  Clip the approach speed to this max value (adjust for your robot)
     static final double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
-    static final double DESIRED_DISTANCE = 13; //  this is how close the camera should get to the target (inches)
+    static final double TELEOP_DESIRED_DISTANCE = 13; //  this is how close the camera should get to the target (inches)
+    static final double AUTOOP_DESIRED_DISTANCE = 11.5; //  this is how close the camera should get to the target (inches)
     static final double SPEED_GAIN = 0.1;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     static final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     static final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)

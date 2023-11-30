@@ -114,7 +114,7 @@ public class TestAprilTag extends XBotOpMode
             if (gamepad1.left_bumper && targetFound) {
 
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-                double  rangeError      = (desiredTagDetectionObj.ftcPose.range - XBot.DESIRED_DISTANCE);
+                double  rangeError      = (desiredTagDetectionObj.ftcPose.range - XBot.TELEOP_DESIRED_DISTANCE);
                 double  headingError    = desiredTagDetectionObj.ftcPose.bearing;
                 double  yawError        = desiredTagDetectionObj.ftcPose.yaw;
 

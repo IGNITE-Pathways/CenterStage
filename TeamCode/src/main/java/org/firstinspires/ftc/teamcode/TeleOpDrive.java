@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
-import static org.firstinspires.ftc.teamcode.XBot.DESIRED_DISTANCE;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_CLOSE_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_OPEN_POSITION;
@@ -24,6 +23,7 @@ import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_WRIST_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
+import static org.firstinspires.ftc.teamcode.XBot.TELEOP_DESIRED_DISTANCE;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -172,7 +172,7 @@ public class TeleOpDrive extends XBotOpMode {
                             aprilTagFound = detectAnyAprilTag();
                             if (aprilTagFound && lookForAprilTag && gamepad1.left_bumper) {
                                 driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
-                                double rangeError = (desiredTagDetectionObj.ftcPose.range - DESIRED_DISTANCE);
+                                double rangeError = (desiredTagDetectionObj.ftcPose.range - TELEOP_DESIRED_DISTANCE);
                                 double headingError = desiredTagDetectionObj.ftcPose.bearing;
                                 double yawError = desiredTagDetectionObj.ftcPose.yaw;
 

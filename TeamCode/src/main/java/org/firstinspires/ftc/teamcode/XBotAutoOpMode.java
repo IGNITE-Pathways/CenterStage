@@ -215,12 +215,12 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
         if (alliance == Alliance.RED) {
-            moveRobot(400, BACKWARD);
+            moveRobot(420, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             moveRobot(400, STRAFE_RIGHT);
         } else {
-            moveRobot(380, BACKWARD);
+            moveRobot(400, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             moveRobot(400, STRAFE_LEFT);
@@ -237,27 +237,36 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             openRightClaw();
         }
         sleep(100);
+
+        //Move arm lower to be able to go under the truss
         moveArmToPosition(200);
+
+        //Turn back (camera side) towards back board and strafe to get ready to go under the truss
         if (alliance == Alliance.RED) {
             moveRobot(1030, TANK_TURN_RIGHT);
             moveRobot(620, STRAFE_LEFT);
             fixRobotYaw(-90);
         } else {
             moveRobot(1030, TANK_TURN_LEFT);
-            moveRobot(700, STRAFE_RIGHT);
+            moveRobot(720, STRAFE_RIGHT);
             fixRobotYaw(90);
         }
+
+        //drive towards back side
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-            moveRobot(3300, BACKWARD);
+            moveRobot(3250, BACKWARD);
         } else {
             moveRobot(100, BACKWARD);
         }
+
+        //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             moveRobot(800, STRAFE_RIGHT);
         } else {
-            moveRobot(800, STRAFE_LEFT);
+            moveRobot(890, STRAFE_LEFT);
         }
-        //April Tag Nav
+
+        //Set the desired April Tag Id
         if (alliance == Alliance.RED) {
             desiredTagId = 5;
         } else {
@@ -287,7 +296,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
             // Navigate using April Tag
             // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-            double rangeError = (desiredTagDetectionObj.ftcPose.range - XBot.DESIRED_DISTANCE);
+            double rangeError = (desiredTagDetectionObj.ftcPose.range - XBot.AUTOOP_DESIRED_DISTANCE);
             double headingError = desiredTagDetectionObj.ftcPose.bearing + yellowPixelOffset;
             double yawError = desiredTagDetectionObj.ftcPose.yaw;
 
@@ -321,13 +330,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         if (parking == Parking.LEFT) {
             switch (spikeMark) {
                 case LEFT:
-                    moveRobot(750, STRAFE_RIGHT);
-                    break;
-                case CENTER:
                     moveRobot(900, STRAFE_RIGHT);
                     break;
+                case CENTER:
+                    moveRobot(1000,
+                            STRAFE_RIGHT);
+                    break;
                 case RIGHT:
-                    moveRobot(1050, STRAFE_RIGHT);
+                    moveRobot(1100, STRAFE_RIGHT);
                     break;
             }
         } else {
