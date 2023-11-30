@@ -58,6 +58,7 @@ public class TeleOpDrive extends XBotOpMode {
 
         // Initialize all motors and sensors
         initialize();
+        setArmPickPosition();
         resetWristAndClawPosition();
 
         // Wait for the game to start (driver presses PLAY)
@@ -236,7 +237,7 @@ public class TeleOpDrive extends XBotOpMode {
                         }
                         if (gamepad2.dpad_down) {
                             //Hang the Robot
-                            armPosition = ARM_POSITION_HIGH;
+                            armPosition = 300;
                             moveArmToPosition(armPosition);
                         }
                         break;

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -537,5 +539,19 @@ public abstract class XBotOpMode extends LinearOpMode {
         while(ref.get() != null) {
             System.gc();
         }
+    }
+
+    void setArmPickPosition() {
+        double distanceFromGround = 200;
+        int tries = 30;
+        int armPosition = 60; //Starting point
+        while (tries > 0) {
+            moveArmToPosition(armPosition);
+            distanceFromGround = sensorDistance.getDistance(DistanceUnit.MM);
+            if (distanceFromGround < 15) break;
+            armPosition -= 2;
+            tries--;
+        }
+        ARM_PICK_POSITION = armPosition;
     }
 }

@@ -218,12 +218,20 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             moveRobot(420, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
-            moveRobot(400, STRAFE_RIGHT);
+            if (distanceFromBackdrop == DistanceFromBackdrop.NEAR) {
+                moveRobot(400, STRAFE_LEFT);
+            } else {
+                moveRobot(400, STRAFE_RIGHT);
+            }
         } else {
             moveRobot(400, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
-            moveRobot(400, STRAFE_LEFT);
+            if (distanceFromBackdrop == DistanceFromBackdrop.NEAR) {
+                moveRobot(400, STRAFE_RIGHT);
+            } else {
+                moveRobot(400, STRAFE_LEFT);
+            }
         }
         fixRobotYaw(0);
         moveArmToPosition(1770);
