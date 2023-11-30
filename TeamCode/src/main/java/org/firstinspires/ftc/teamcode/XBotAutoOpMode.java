@@ -36,6 +36,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean spikeMarkPixelDropped = false; //Purple
     boolean aTagPixelDropped = false; //Yellow
     boolean arrivedAtBackDropTagPosition = false;
+    boolean targetFoundAtLeastOnce = false;
 
     boolean detectDesiredAprilTag(int tagId) {
         boolean aprilTagFound = false;
@@ -131,11 +132,22 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         fixRobotYaw(0);
         moveArmToPosition(1770);
         moveRobot(170, BACKWARD);
+
+        //Drop Purple Pixel
         if (alliance == Alliance.RED) {
-            openLeftClaw();
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openLeftClaw();
+            } else {
+                openRightClaw();
+            }
         } else {
-            openRightClaw();
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openRightClaw();
+            } else {
+                openLeftClaw();
+            }
         }
+
         moveArmToPosition(ARM_POSITION_UP);
         moveRobot(550, STRAFE_LEFT);
         if (alliance == Alliance.RED) {
@@ -164,6 +176,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             desiredTagId = 1;
         }
+
     }
 
     void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
@@ -178,11 +191,22 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         fixRobotYaw(0);
         moveArmToPosition(1770);
         moveRobot(150, BACKWARD);
+
+        //Drop Purple Pixel
         if (alliance == Alliance.RED) {
-            openLeftClaw();
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openLeftClaw();
+            } else {
+                openRightClaw();
+            }
         } else {
-            openRightClaw();
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openRightClaw();
+            } else {
+                openLeftClaw();
+            }
         }
+
         moveArmToPosition(ARM_POSITION_UP);
         moveRobot(550, STRAFE_RIGHT);
         if (alliance == Alliance.RED) {
@@ -211,6 +235,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             desiredTagId = 3;
         }
+
     }
 
     void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
@@ -221,14 +246,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             if (distanceFromBackdrop == DistanceFromBackdrop.NEAR) {
                 moveRobot(400, STRAFE_LEFT);
             } else {
-                moveRobot(400, STRAFE_RIGHT);
+                moveRobot(350, STRAFE_RIGHT);
             }
         } else {
-            moveRobot(400, BACKWARD);
+            moveRobot(420, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.NEAR) {
-                moveRobot(400, STRAFE_RIGHT);
+                moveRobot(350, STRAFE_RIGHT);
             } else {
                 moveRobot(400, STRAFE_LEFT);
             }
@@ -239,12 +264,21 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         setWristPosition(wristPosition);
         moveRobot(250, BACKWARD);
         stopDriveMotors();
+
+        //Drop Purple Pixel
         if (alliance == Alliance.RED) {
-            openLeftClaw();
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openLeftClaw();
+            } else {
+                openRightClaw();
+            }
         } else {
-            openRightClaw();
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openRightClaw();
+            } else {
+                openLeftClaw();
+            }
         }
-        sleep(100);
 
         //Move arm lower to be able to go under the truss
         moveArmToPosition(200);
@@ -252,26 +286,38 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         //Turn back (camera side) towards back board and strafe to get ready to go under the truss
         if (alliance == Alliance.RED) {
             moveRobot(1030, TANK_TURN_RIGHT);
-            moveRobot(620, STRAFE_LEFT);
+            //Strafe so we can go under the truss
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                moveRobot(620, STRAFE_LEFT);
+            }
             fixRobotYaw(-90);
         } else {
             moveRobot(1030, TANK_TURN_LEFT);
-            moveRobot(720, STRAFE_RIGHT);
-            fixRobotYaw(90);
+            //Strafe so we can go under the truss
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                moveRobot(720, STRAFE_RIGHT);
+                fixRobotYaw(90);
+            }
         }
 
         //drive towards back side
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
             moveRobot(3250, BACKWARD);
-        } else {
-            moveRobot(100, BACKWARD);
+//        } else {
+//            moveRobot(100, BACKWARD);
         }
 
         //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             moveRobot(800, STRAFE_RIGHT);
         } else {
-            moveRobot(890, STRAFE_LEFT);
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                moveRobot(890, STRAFE_LEFT);
+            } else {
+                //TBD
+                moveRobot(300, STRAFE_LEFT);
+            }
+            fixRobotYaw(90);
         }
 
         //Set the desired April Tag Id
@@ -280,6 +326,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             desiredTagId = 2;
         }
+
     }
 
     void spikeMarkPixelDroppedGetReadyForATagNav() {
@@ -288,14 +335,18 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         stopDriveMotors();
         stopDriveRunUsingEncoder();
         autoDrive = true; //drive in reverse
+        targetFoundAtLeastOnce = false;
     }
 
-    void aprilTagNavMoveToDesiredTagPosition(Alliance alliance) {
-        int yellowPixelOffset = (alliance == Alliance.BLUE) ? 8 : -8;
+    void aprilTagNavMoveToDesiredTagPosition(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop) {
+        int yellowPixelOffset = (alliance == Alliance.BLUE)
+                ? ((distanceFromBackdrop == DistanceFromBackdrop.FAR) ? 8 : -8)
+                : ((distanceFromBackdrop == DistanceFromBackdrop.FAR) ? -8 : 8);
+
         //Robot should be in front on the board to start AprilTag Nav
         boolean targetFound = detectDesiredAprilTag(desiredTagId);
-
         if (targetFound) {
+            targetFoundAtLeastOnce = true;
             telemetry.addData("Found", "ID %d (%s)", desiredTagDetectionObj.id, desiredTagDetectionObj.metadata.name);
             telemetry.addData("Range", "%5.1f inches", desiredTagDetectionObj.ftcPose.range);
             telemetry.addData("Bearing", "%3.0f degrees", desiredTagDetectionObj.ftcPose.bearing);
@@ -315,26 +366,50 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
             moveRobot(drive, strafe, yawTurn);
 
-            if ((rangeError < 0.5) && (rangeError > -0.5)) {
+            if ((rangeError < 0.1) && (rangeError > -0.1)) {
                 arrivedAtBackDropTagPosition = true;
                 visionPortal.close();
                 stopDriveMotors();
             }
         } else {
-            telemetry.addData("Looking for Tag", desiredTagId + "\n");
+            telemetry.addData("Didn't find Desired Tag", desiredTagId + "\n");
             telemetry.update();
+            //Reasons for not able to find -- exposure or not in-front of aTags
+            //@TODO: Should we give one more try?
+            if (targetFoundAtLeastOnce) {
+                arrivedAtBackDropTagPosition = true;
+                visionPortal.close();
+                stopDriveMotors();
+            }
         }
     }
 
-    void dropYellowPixel() {
+    void dropYellowPixel(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop) {
         moveArmToPosition(MAX_ARM_POSITION);
-        openLeftClaw();
+        if (alliance == Alliance.RED) {
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openRightClaw();
+            } else {
+                openLeftClaw();
+            }
+        } else {
+            if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                openLeftClaw();
+            } else {
+                openRightClaw();
+            }
+        }
         sleep(100);
         moveArmToPosition(200);
         aTagPixelDropped = true;
     }
 
-    void parkRobot(Alliance alliance, Parking parking, SpikeMark spikeMark) {
+    void parkRobot(Alliance alliance, Parking parking, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
+        if (alliance == Alliance.RED) {
+            fixRobotYaw(-90);
+        } else {
+            fixRobotYaw(90);
+        }
         if (parking == Parking.LEFT) {
             switch (spikeMark) {
                 case LEFT:
@@ -354,7 +429,13 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                     moveRobot(1150, STRAFE_LEFT);
                     break;
                 case CENTER:
-                    moveRobot(1000, STRAFE_LEFT);
+                    if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                        //yellow pixel on right so the robot has to strafe less, so strafe back less
+                        moveRobot(1000, STRAFE_LEFT);
+                    } else {
+                        //yellow pixel on left so the robot has to strafe more, so strafe back more
+                        moveRobot(1100, STRAFE_LEFT);
+                    }
                     break;
                 case RIGHT:
                     moveRobot(850, STRAFE_LEFT);
@@ -389,13 +470,13 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             if (!aTagPixelDropped) {
                 if (!arrivedAtBackDropTagPosition) {
                     telemetry.addData("Looking for April Tag", desiredTagId);
-                    aprilTagNavMoveToDesiredTagPosition(alliance);
+                    aprilTagNavMoveToDesiredTagPosition(alliance, distanceFromBackdrop);
                 } else {
                     telemetry.addData("Arrived", "Dropping Pixel now");
-                    dropYellowPixel();
+                    dropYellowPixel(alliance, distanceFromBackdrop);
                     //Park Now
                     telemetry.addData("Parking", "");
-                    parkRobot(alliance, parking, spikeMark);
+                    parkRobot(alliance, parking, spikeMark, distanceFromBackdrop);
                 }
             }
             telemetry.update();

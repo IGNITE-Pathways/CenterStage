@@ -59,6 +59,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     double wristPosition = STARTING_WRIST_POSITION;
     boolean autoDrive = false;
     boolean leftPixelInClaw = false, rightPixelInClaw = false;
+    double previousLeftFrontPower, previousLeftBackPower, previousRightFrontPower, previousRightBackPower;
 
     void initializeIMU() {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
@@ -188,6 +189,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         // Set camera controls unless we are stopping.
         if (!isStopRequested()) {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+//            exposureControl.setMode(ExposureControl.Mode.Auto);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
                 exposureControl.setMode(ExposureControl.Mode.Manual);
                 sleep(50);
@@ -275,6 +277,11 @@ public abstract class XBotOpMode extends LinearOpMode {
             leftBackPower /= max;
             rightBackPower /= max;
         }
+
+//        if (Math.abs(previousLeftBackPower - leftBackPower) > 0.2) {
+//            leftBackPower = previousLeftBackPower + (leftBackPower - previousLeftBackPower)*0.2; //20% increments
+//            previousLeftBackPower = leftBackPower;
+//        }
 
         if (autoDrive) {
             //Drive in reverse
