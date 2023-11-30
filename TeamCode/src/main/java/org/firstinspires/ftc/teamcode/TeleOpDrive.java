@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_ROBOT_HANGING;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_CLOSE_POSITION;
@@ -103,6 +104,11 @@ public class TeleOpDrive extends XBotOpMode {
                     armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
                     armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
                     moveArmToPosition(armPosition);
+                }
+
+                //Hanging mode
+                if (gamepad2.dpad_up) {
+                    changeGameMode(GameMode.HANGING);
                 }
 
                 // POV Mode uses left joystick to go forward & yawTurn, and right joystick to rotate.
@@ -221,6 +227,18 @@ public class TeleOpDrive extends XBotOpMode {
                         break;
                     case HANGING:
                         // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
+                        //Move Arm to perfect position
+                        if (gameModeChanged) {
+                            gameModeChanged = Boolean.FALSE;
+                            armPosition = ARM_POSITION_ROBOT_HANGING;
+                            moveArmToPosition(armPosition);
+                            sleep(200);
+                        }
+                        if (gamepad2.dpad_down) {
+                            //Hang the Robot
+                            armPosition = ARM_POSITION_HIGH;
+                            moveArmToPosition(armPosition);
+                        }
                         break;
                 }
 

@@ -6,9 +6,10 @@ public class XBot {
     static final int ARM_MOTOR_GEAR_RATIO = 2;
     static final int MIN_ARM_POSITION = 0;
     static final int MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 50/100; //50%
-    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 3; //Robot must move slow
+    static final int ARM_PICK_POSITION = MIN_ARM_POSITION + 4; //Robot must move slow
     static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4/100;; // 4% //Robot running across field
     static final int ARM_POSITION_UP = 800;
+    static final int ARM_POSITION_ROBOT_HANGING = 730;
     static final double ARM_SPEED = 0.3;
 
     static final double ARM_HOLD_SPEED = 0.05;
@@ -45,5 +46,5 @@ public class XBot {
     static final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     static final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
     static final int APRIL_TAG_CAM_EXPOSURE = 3; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
-    static final int TFOD_CAM_EXPOSURE = 3; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
+    static final int TFOD_CAM_EXPOSURE = 4; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
 }
