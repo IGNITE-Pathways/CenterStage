@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
@@ -539,15 +540,6 @@ public abstract class XBotOpMode extends LinearOpMode {
         aprilTag.setDecimation(2);
     }
 
-    public static void gc() {
-        Object obj = new Object();
-        WeakReference ref = new WeakReference<Object>(obj);
-        obj = null;
-        while(ref.get() != null) {
-            System.gc();
-        }
-    }
-
     void setArmPickPosition() {
         double distanceFromGround = 200;
         int tries = 30;
@@ -559,6 +551,6 @@ public abstract class XBotOpMode extends LinearOpMode {
             armPosition -= 2;
             tries--;
         }
-        ARM_PICK_POSITION = armPosition;
+        ARM_PICK_POSITION = Math.max(armPosition, ARM_PICK_POSITION);
     }
 }
