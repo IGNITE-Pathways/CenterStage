@@ -125,12 +125,15 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         if (alliance == Alliance.RED) {
             //RED ALLIANCE
             moveRobot(200, BACKWARD);
+            sleep(100);
             moveArmToPosition(ARM_POSITION_UP);
-            fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(710, STRAFE_RIGHT);
             } else {
-                moveRobot(520, STRAFE_LEFT);
+                //Close to truss -- use different strategy
+                //close to truss, so we move forward
+                moveRobot(980, BACKWARD);
             }
         } else {
             //BLUE ALLIANCE
@@ -138,35 +141,46 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(520, STRAFE_LEFT);
+                //@TODO: Needs testing
+                //CLOSE to truss
+                moveRobot(980, BACKWARD);
             } else {
                 moveRobot(520, STRAFE_RIGHT);
             }
         }
 
         fixRobotYaw(0);
-//        moveArmToPosition(1770);
-//        wristPosition = MAX_WRIST_POS;
-//        setWristPosition(wristPosition);
-//        moveRobot(250, BACKWARD);
-//        stopDriveMotors();
 
         if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
-            //Close to Truss
-            moveRobot(1030, TANK_TURN_LEFT);
-            moveArmToPosition(ARM_PICK_POSITION+4);
-            wristPosition = WRIST_PICK_POSITION;
-            setWristPosition(wristPosition);
-            sleep(100);
-            moveRobot(220, FORWARD);
-            fixRobotYaw(90);
+            //CLOSE to truss
+            if (alliance == Alliance.BLUE) {
+                //distance = FAR
+                moveRobot(1030, TANK_TURN_LEFT);
+                moveArmToPosition(1770);
+                wristPosition = MAX_WRIST_POS;
+                setWristPosition(wristPosition);
+                sleep(100);
+                //@TODO: Testing for FAR
+                moveRobot(220, FORWARD);
+                fixRobotYaw(-90);
+            } else {
+                //distance = NEAR, alliance = RED
+                moveRobot(1030, TANK_TURN_RIGHT);
+                moveArmToPosition(ARM_PICK_POSITION+4);
+                wristPosition = WRIST_PICK_POSITION;
+                setWristPosition(wristPosition);
+                sleep(100);
+                moveRobot(220, FORWARD);
+                fixRobotYaw(90);
+            }
         } else {
             //Away from Truss
             moveArmToPosition(1770);
             wristPosition = MAX_WRIST_POS;
             setWristPosition(wristPosition);
             sleep(100);
+            //@TODO: Test for FAR, RED (BLUE, NEAR works)
             moveRobot(250, BACKWARD);
         }
 
@@ -185,63 +199,50 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
-        if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
-                ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
-            //Move Arm up before we turn Robot 90 degrees
-            moveArmToPosition(ARM_POSITION_UP);
-
-            //Strafe back towards center of the tile
-            moveRobot(550, STRAFE_LEFT);
-        }
-
         //Move arm lower to be able to go under the truss
         moveArmToPosition(200);
 
         //Turn back (camera side) towards back board and strafe to get ready to go under the truss
         if (alliance == Alliance.RED) {
-            moveRobot(1030, TANK_TURN_RIGHT);
-            //Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Test
+                moveRobot(1030, TANK_TURN_RIGHT);
+                //Strafe so we can go under the truss
                 moveRobot(175, STRAFE_LEFT);
+            } else {
+                //Close to truss -- use different strategy
+                moveRobot(850, BACKWARD);
             }
             fixRobotYaw(-90);
         } else {
-            moveRobot(1030, TANK_TURN_LEFT);
             //Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(175, STRAFE_RIGHT);
+                //@TODO: Needs testing
+                moveRobot(500, STRAFE_RIGHT);
+            } else {
+                moveRobot(1030, TANK_TURN_LEFT);
             }
             fixRobotYaw(90);
         }
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+            //@TODO: Test
             moveRobot(3000, BACKWARD);
-//        } else {
-//            moveRobot(100, BACKWARD);
         }
 
         //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(890, STRAFE_RIGHT);
-            } else {
-                moveRobot(300, STRAFE_RIGHT);
+                fixRobotYaw(-90);
             }
-            fixRobotYaw(-90);
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(890, STRAFE_LEFT);
-            } else {
-                moveRobot(500, STRAFE_LEFT);
+                fixRobotYaw(90);
             }
-            fixRobotYaw(90);
         }
 
-//        if (alliance == Alliance.RED) {
-//            moveRobot(1000, STRAFE_RIGHT);
-//        } else {
-//            moveRobot(1000, STRAFE_LEFT);
-//        }
         //April Tag Nav
         if (alliance == Alliance.RED) {
             desiredTagId = 4;
@@ -254,23 +255,28 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
-            moveRobot(400, BACKWARD);
+            //RED ALLIANCE
+            moveRobot(200, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
-            moveRobot(400, FORWARD);
+            fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(450, STRAFE_LEFT);
+                //@TODO: Needs testing
+                //CLOSE to truss
+                moveRobot(980, BACKWARD);
             } else {
-                moveRobot(520, STRAFE_RIGHT);
+                moveRobot(520, STRAFE_LEFT);
             }
         } else {
+            //BLUE ALLIANCE
             moveRobot(200, BACKWARD);
             sleep(100);
             moveArmToPosition(ARM_POSITION_UP);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 //Away from truss
-                moveRobot(520, STRAFE_RIGHT);
+                moveRobot(710, STRAFE_LEFT);
             } else {
-                //close to truss, so we move forward
+                //CLOSE to truss
                 moveRobot(980, BACKWARD);
             }
         }
@@ -284,16 +290,30 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             wristPosition = MAX_WRIST_POS;
             setWristPosition(wristPosition);
             sleep(100);
-            moveRobot(150, BACKWARD);
+            //@TODO: Test for FAR, BLUE (RED, NEAR works)
+            moveRobot(150, BACKWARD); //250 on Left blue near
         } else {
-            //Close to Truss
-            moveRobot(1030, TANK_TURN_LEFT);
-            moveArmToPosition(ARM_PICK_POSITION+4);
-            wristPosition = WRIST_PICK_POSITION;
-            setWristPosition(wristPosition);
-            sleep(100);
-            moveRobot(220, FORWARD);
-            fixRobotYaw(90);
+            //CLOSE to truss
+            if (alliance == Alliance.RED) {
+                //distance = FAR
+                moveRobot(1030, TANK_TURN_RIGHT);
+                moveArmToPosition(1770);
+                wristPosition = MAX_WRIST_POS;
+                setWristPosition(wristPosition);
+                sleep(100);
+                //@TODO: Testing for FAR
+                moveRobot(220, FORWARD);
+                fixRobotYaw(-90);
+            } else {
+                //distance = NEAR, alliance = BLUE
+                moveRobot(1030, TANK_TURN_LEFT);
+                moveArmToPosition(ARM_PICK_POSITION + 4);
+                wristPosition = WRIST_PICK_POSITION;
+                setWristPosition(wristPosition);
+                sleep(100);
+                moveRobot(220, FORWARD);
+                fixRobotYaw(90);
+            }
         }
 
         //Drop Purple Pixel
@@ -311,33 +331,29 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
-//        if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR)) ||
-//                ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.FAR))){
-//            //Move Arm up before we turn Robot 90 degrees
-//            moveArmToPosition(ARM_POSITION_UP);
-//
-//            //Strafe back towards center of the tile
-//            moveRobot(600, STRAFE_RIGHT);
-//        }
-
         //Move arm lower to be able to go under the truss
         moveArmToPosition(200);
 
         //Turn back (camera side) towards back board and strafe to get ready to go under the truss
         if (alliance == Alliance.RED) {
-            moveRobot(1030, TANK_TURN_RIGHT);
             //Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(175, STRAFE_LEFT);
+                //@TODO: Needs testing
+                moveRobot(500, STRAFE_LEFT);
+            } else {
+                //NEAR
+                moveRobot(1030, TANK_TURN_RIGHT);
             }
             fixRobotYaw(-90);
         } else {
+            //BLUE alliance
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(1030, TANK_TURN_LEFT);
                 //Strafe so we can go under the truss
                 moveRobot(175, STRAFE_RIGHT);
             } else {
-                //move forward toward april tag
+                //CLOSE to truss -- move forward toward april tag
                 moveRobot(850, BACKWARD);
             }
             fixRobotYaw(90);
@@ -350,14 +366,15 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
+                //Close to truss
                 moveRobot(890, STRAFE_RIGHT);
-            } else {
-                moveRobot(300, STRAFE_RIGHT);
+                fixRobotYaw(-90);
             }
-            fixRobotYaw(-90);
         } else {
             //BLUE
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(890, STRAFE_LEFT);
                 fixRobotYaw(90);
             }
@@ -379,18 +396,20 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(350, STRAFE_RIGHT);
+                //@TODO: Needs testing
+                moveRobot(350, STRAFE_RIGHT); //Robot away from truss, so strafe less
             } else {
-                moveRobot(400, STRAFE_LEFT);
+                moveRobot(400, STRAFE_LEFT); //Robot close to truss, so strafe more
             }
         } else {
             moveRobot(420, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(400, STRAFE_LEFT);
+                //@TODO: Needs testing
+                moveRobot(400, STRAFE_LEFT); //Robot close to truss, so strafe more
             } else {
-                moveRobot(350, STRAFE_RIGHT);
+                moveRobot(350, STRAFE_RIGHT); //Robot away from truss, so strafe less
             }
         }
         fixRobotYaw(0);
@@ -423,6 +442,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             moveRobot(1030, TANK_TURN_RIGHT);
             //Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(620, STRAFE_LEFT);
             }
             fixRobotYaw(-90);
@@ -430,6 +450,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             moveRobot(1030, TANK_TURN_LEFT);
             //Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(720, STRAFE_RIGHT);
             }
             fixRobotYaw(90);
@@ -437,14 +458,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
         //drive towards back side
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-            moveRobot(3250, BACKWARD);
-//        } else {
-//            moveRobot(100, BACKWARD);
+            //@TODO: Needs testing
+            moveRobot(3000, BACKWARD);
         }
 
         //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(890, STRAFE_RIGHT);
             } else {
                 moveRobot(300, STRAFE_RIGHT);
@@ -452,6 +473,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             fixRobotYaw(-90);
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+                //@TODO: Needs testing
                 moveRobot(890, STRAFE_LEFT);
             } else {
                 moveRobot(300, STRAFE_LEFT);
