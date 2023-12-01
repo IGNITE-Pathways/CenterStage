@@ -14,7 +14,6 @@ import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_TURN;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
-import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
@@ -30,9 +29,7 @@ import java.util.List;
 public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean DEBUG = false; //Use to test certain code / bypass some
     static final double AUTONOMOUS_SPEED = 0.6;  // Adjust as needed
-    //Define motors and sensors
     int desiredTagId = -1;                  // change based on spikeMark identification
-    //Game Mode
     SpikeMark spikeMark = SpikeMark.RIGHT; //Default
     float detectionConfidence = 0;
     boolean teamPropDetectionCompleted = false;
@@ -123,7 +120,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
     } //detectTeamPropAndSwitchCameraToAprilTag
 
-    void leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
             //RED ALLIANCE
@@ -148,11 +145,30 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
 
         fixRobotYaw(0);
-        moveArmToPosition(1770);
-        wristPosition = MAX_WRIST_POS;
-        setWristPosition(wristPosition);
-        moveRobot(250, BACKWARD);
-        stopDriveMotors();
+//        moveArmToPosition(1770);
+//        wristPosition = MAX_WRIST_POS;
+//        setWristPosition(wristPosition);
+//        moveRobot(250, BACKWARD);
+//        stopDriveMotors();
+
+        if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
+                ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
+            //Close to Truss
+            moveRobot(1030, TANK_TURN_LEFT);
+            moveArmToPosition(ARM_PICK_POSITION+4);
+            wristPosition = WRIST_PICK_POSITION;
+            setWristPosition(wristPosition);
+            sleep(100);
+            moveRobot(220, FORWARD);
+            fixRobotYaw(90);
+        } else {
+            //Away from Truss
+            moveArmToPosition(1770);
+            wristPosition = MAX_WRIST_POS;
+            setWristPosition(wristPosition);
+            sleep(100);
+            moveRobot(250, BACKWARD);
+        }
 
         //Drop Purple Pixel
         if (alliance == Alliance.RED) {
@@ -235,7 +251,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     }
 
-    void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
             moveRobot(400, BACKWARD);
@@ -356,7 +372,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     }
 
-    void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+    void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
             moveRobot(420, BACKWARD);
@@ -497,7 +513,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             telemetry.addData("Didn't find Desired Tag", desiredTagId + "\n");
             telemetry.update();
             //Reasons for not able to find -- exposure or not in-front of aTags
-            //@TODO: Should we give one more try?
             if (targetFoundAtLeastOnce) {
                 arrivedAtBackDropTagPosition = true;
                 visionPortal.close();
@@ -585,13 +600,13 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             if (!spikeMarkPixelDropped) {
                 switch (spikeMark) {
                     case LEFT:
-                        leftSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
+                        leftSpikeMark(alliance, spikeMark, distanceFromBackdrop);
                         break;
                     case RIGHT:
-                        rightSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
+                        rightSpikeMark(alliance, spikeMark, distanceFromBackdrop);
                         break;
                     case CENTER:
-                        centerSpikeMark(alliance, spikeMark, distanceFromBackdrop, parking);
+                        centerSpikeMark(alliance, spikeMark, distanceFromBackdrop);
                 }
                 telemetry.addData("Back Side", "Ready for April Tag Nav");
                 spikeMarkPixelDroppedGetReadyForATagNav();
