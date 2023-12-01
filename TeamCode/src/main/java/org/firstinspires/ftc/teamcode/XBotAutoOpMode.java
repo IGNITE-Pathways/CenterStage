@@ -133,7 +133,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             } else {
                 //Close to truss -- use different strategy
                 //close to truss, so we move forward
-                moveRobot(980, BACKWARD);
+                moveRobot(950, BACKWARD);
             }
         } else {
             //BLUE ALLIANCE
@@ -155,7 +155,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
             //CLOSE to truss
             if (alliance == Alliance.BLUE) {
-                //distance = FAR
+                //distance = FAR, alliance = BLUE
                 moveRobot(1030, TANK_TURN_LEFT);
                 moveArmToPosition(1770);
                 wristPosition = MAX_WRIST_POS;
@@ -163,7 +163,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 sleep(100);
                 //@TODO: Testing for FAR
                 moveRobot(220, FORWARD);
-                fixRobotYaw(-90);
+                fixRobotYaw(90);
             } else {
                 //distance = NEAR, alliance = RED
                 moveRobot(1030, TANK_TURN_RIGHT);
@@ -171,8 +171,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 wristPosition = WRIST_PICK_POSITION;
                 setWristPosition(wristPosition);
                 sleep(100);
-                moveRobot(220, FORWARD);
-                fixRobotYaw(90);
+                moveRobot(200, FORWARD); //Robot Start position is almost centered
+                fixRobotYaw(-90);
             }
         } else {
             //Away from Truss
@@ -204,6 +204,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
         //Turn back (camera side) towards back board and strafe to get ready to go under the truss
         if (alliance == Alliance.RED) {
+            //RED
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //@TODO: Test
                 moveRobot(1030, TANK_TURN_RIGHT);
@@ -211,18 +212,18 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 moveRobot(175, STRAFE_LEFT);
             } else {
                 //Close to truss -- use different strategy
-                moveRobot(850, BACKWARD);
+                moveRobot(850, BACKWARD); //Last Move
             }
-            fixRobotYaw(-90);
+            fixRobotYaw(-90); //RED
         } else {
-            //Strafe so we can go under the truss
+            //BLUE, Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //@TODO: Needs testing
                 moveRobot(500, STRAFE_RIGHT);
             } else {
                 moveRobot(1030, TANK_TURN_LEFT);
             }
-            fixRobotYaw(90);
+            fixRobotYaw(90); //BLUE
         }
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -239,8 +240,11 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(890, STRAFE_LEFT);
-                fixRobotYaw(90);
+            } else {
+                //BLUE, NEAR
+                moveRobot(350, STRAFE_LEFT); //Left April Tag Id 1 on left, strafe less
             }
+            fixRobotYaw(90);
         }
 
         //April Tag Nav
@@ -264,7 +268,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //CLOSE to truss
                 moveRobot(980, BACKWARD);
             } else {
-                moveRobot(520, STRAFE_LEFT);
+                moveRobot(580, STRAFE_LEFT);
             }
         } else {
             //BLUE ALLIANCE
@@ -291,7 +295,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             setWristPosition(wristPosition);
             sleep(100);
             //@TODO: Test for FAR, BLUE (RED, NEAR works)
-            moveRobot(150, BACKWARD); //250 on Left blue near
+            moveRobot(250, BACKWARD);
         } else {
             //CLOSE to truss
             if (alliance == Alliance.RED) {
@@ -369,8 +373,10 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //@TODO: Needs testing
                 //Close to truss
                 moveRobot(890, STRAFE_RIGHT);
-                fixRobotYaw(-90);
+            } else {
+                moveRobot(400, STRAFE_RIGHT);
             }
+            fixRobotYaw(-90);
         } else {
             //BLUE
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -445,7 +451,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //@TODO: Needs testing
                 moveRobot(620, STRAFE_LEFT);
             }
-            fixRobotYaw(-90);
+            fixRobotYaw(-90); //RED
         } else {
             moveRobot(1030, TANK_TURN_LEFT);
             //Strafe so we can go under the truss
@@ -453,7 +459,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //@TODO: Needs testing
                 moveRobot(720, STRAFE_RIGHT);
             }
-            fixRobotYaw(90);
+            fixRobotYaw(90); //BLUE
         }
 
         //drive towards back side
@@ -586,7 +592,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             //RIGHT SIDE PARKING
             switch (spikeMark) {
                 case LEFT:
-                    moveRobot(1150, STRAFE_LEFT);
+                    moveRobot(1250, STRAFE_LEFT);
                     break;
                 case CENTER:
                     if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -637,6 +643,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 if (!arrivedAtBackDropTagPosition) {
                     telemetry.addData("Looking for April Tag", desiredTagId);
                     aprilTagNavMoveToDesiredTagPosition(alliance, distanceFromBackdrop);
+                    fixRobotYaw(alliance == Alliance.RED ? -90 : 90);
                 } else {
                     telemetry.addData("Arrived", "Dropping Pixel now");
                     dropYellowPixel(alliance, distanceFromBackdrop);
