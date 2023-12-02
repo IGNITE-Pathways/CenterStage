@@ -282,7 +282,6 @@ public class TeleOpDrive extends XBotOpMode {
         return (leftClawDistance.getDistance(DistanceUnit.MM) < 20);
     }
 
-
     private void waitAndMoveArmAndResetDistance() {
         sleep(500);
         // Move Arm up to remove friction and get clearance the ground
