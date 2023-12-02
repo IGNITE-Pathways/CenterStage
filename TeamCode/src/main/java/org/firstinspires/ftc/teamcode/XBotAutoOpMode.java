@@ -122,7 +122,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
     } //detectTeamPropAndSwitchCameraToAprilTag
 
-    void leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
+    boolean leftSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
             //RED ALLIANCE
@@ -130,7 +130,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             sleep(100);
             moveArmToPosition(ARM_POSITION_UP);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 moveRobot(710, STRAFE_RIGHT);
             } else {
                 //Close to truss -- use different strategy
@@ -143,8 +142,9 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             moveArmToPosition(ARM_POSITION_UP);
             fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 //CLOSE to truss
+                moveRobot(600, STRAFE_LEFT); //Else the arm will hit the truss
+                fixRobotYaw(0);
                 moveRobot(980, BACKWARD);
             } else {
                 moveRobot(520, STRAFE_RIGHT);
@@ -163,8 +163,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 wristPosition = MAX_WRIST_POS;
                 setWristPosition(wristPosition);
                 sleep(100);
-                //@TODO: Testing for FAR
-                moveRobot(220, FORWARD);
+                moveRobot(420, BACKWARD);
                 fixRobotYaw(90);
             } else {
                 //distance = NEAR, alliance = RED
@@ -201,6 +200,10 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
+        if( (alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
+            moveRobot(420, FORWARD);
+        }
+
         //Move arm lower to be able to go under the truss
         moveArmToPosition(200);
 
@@ -220,7 +223,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             //BLUE, Strafe so we can go under the truss
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 moveRobot(500, STRAFE_RIGHT);
             } else {
                 moveRobot(1030, TANK_TURN_LEFT);
@@ -232,7 +234,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             if (alliance == Alliance.RED) {
                 moveRobot(3500, BACKWARD);
             } else {
-                moveRobot(3250, BACKWARD);
+                //BLUE
+//                moveRobot(3250, BACKWARD); //@TODO: Steps before this need calibration
             }
         }
 
@@ -244,7 +247,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                moveRobot(890, STRAFE_LEFT);
+//                moveRobot(890, STRAFE_LEFT); //@TODO: Steps before this need calibration
             } else {
                 //BLUE, NEAR
                 moveRobot(350, STRAFE_LEFT); //Left April Tag Id 1 on left, strafe less
@@ -259,9 +262,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             desiredTagId = 1;
         }
 
+        if ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
+            //Since we didn't go through truss, we return false
+            return false;
+        }
+        return true;
     }
 
-    void rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
+    boolean rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
             //RED ALLIANCE
@@ -282,9 +290,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             sleep(100);
             moveArmToPosition(ARM_POSITION_UP);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 //Away from truss
-                moveRobot(710, STRAFE_LEFT);
+                moveRobot(710, STRAFE_LEFT); //@TODO
             } else {
                 //CLOSE to truss
                 moveRobot(980, BACKWARD);
@@ -339,6 +346,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 openLeftClaw();
             }
         }
+
         if( (alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
             moveRobot(420, FORWARD);
         }
@@ -360,10 +368,9 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             //BLUE alliance
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 moveRobot(1030, TANK_TURN_LEFT);
                 //Strafe so we can go under the truss
-                moveRobot(175, STRAFE_RIGHT);
+                moveRobot(240, STRAFE_RIGHT); //@TODO
             } else {
                 //CLOSE to truss -- move forward toward april tag
                 moveRobot(850, BACKWARD);
@@ -373,7 +380,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
             if (alliance == Alliance.RED) {
-                moveRobot(4000, BACKWARD);
+//                moveRobot(4000, BACKWARD); //@TODO: Steps before this need calibration
             } else {
                 moveRobot(3250, BACKWARD);
             }
@@ -382,9 +389,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 //Close to truss
-                moveRobot(890, STRAFE_RIGHT);
+                //moveRobot(890, STRAFE_RIGHT); //@TODO: Steps before this need calibration
             } else {
                 moveRobot(400, STRAFE_RIGHT);
             }
@@ -393,7 +399,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             //BLUE
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //@TODO: Needs testing
-                moveRobot(890, STRAFE_LEFT);
+                moveRobot(1090, STRAFE_LEFT);
                 fixRobotYaw(90);
             }
         }
@@ -405,9 +411,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             desiredTagId = 3;
         }
 
+        if ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
+            //Since we didn't go through truss, we return false
+            return false;
+        }
+        return true;
     }
 
-    void centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
+    boolean centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
         if (alliance == Alliance.RED) {
             moveRobot(420, BACKWARD);
@@ -480,7 +491,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         //Strafe to be in front of april tag
         if (alliance == Alliance.RED) {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 moveRobot(890, STRAFE_RIGHT);
             } else {
                 moveRobot(300, STRAFE_RIGHT);
@@ -488,7 +498,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             fixRobotYaw(-90);
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-                //@TODO: Needs testing
                 moveRobot(890, STRAFE_LEFT);
             } else {
                 moveRobot(300, STRAFE_LEFT);
@@ -502,6 +511,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             desiredTagId = 2;
         }
+        return true;
     }
 
     void spikeMarkPixelDroppedGetReadyForATagNav() {
@@ -651,32 +661,35 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
+            boolean reachedAprilTag = false;
 
             if (!spikeMarkPixelDropped) {
                 switch (spikeMark) {
                     case LEFT:
-                        leftSpikeMark(alliance, spikeMark, distanceFromBackdrop);
+                        reachedAprilTag = leftSpikeMark(alliance, spikeMark, distanceFromBackdrop);
                         break;
                     case RIGHT:
-                        rightSpikeMark(alliance, spikeMark, distanceFromBackdrop);
+                        reachedAprilTag = rightSpikeMark(alliance, spikeMark, distanceFromBackdrop);
                         break;
                     case CENTER:
-                        centerSpikeMark(alliance, spikeMark, distanceFromBackdrop);
+                        reachedAprilTag = centerSpikeMark(alliance, spikeMark, distanceFromBackdrop);
                 }
                 telemetry.addData("Back Side", "Ready for April Tag Nav");
                 spikeMarkPixelDroppedGetReadyForATagNav();
             }
-            if (!aTagPixelDropped) {
-                if (!arrivedAtBackDropTagPosition) {
-                    telemetry.addData("Looking for April Tag", desiredTagId);
-                    aprilTagNavMoveToDesiredTagPosition(alliance, distanceFromBackdrop);
-                } else {
-                    telemetry.addData("Arrived", "Dropping Pixel now");
-                    fixRobotYaw(alliance == Alliance.RED ? -90 : 90);
-                    dropYellowPixel();
-                    //Park Now
-                    telemetry.addData("Parking", "");
-                    parkRobot(alliance, parking, spikeMark, distanceFromBackdrop);
+            if (reachedAprilTag) {
+                if (!aTagPixelDropped) {
+                    if (!arrivedAtBackDropTagPosition) {
+                        telemetry.addData("Looking for April Tag", desiredTagId);
+                        aprilTagNavMoveToDesiredTagPosition(alliance, distanceFromBackdrop);
+                    } else {
+                        telemetry.addData("Arrived", "Dropping Pixel now");
+                        fixRobotYaw(alliance == Alliance.RED ? -90 : 90);
+                        dropYellowPixel();
+                        //Park Now
+                        telemetry.addData("Parking", "");
+                        parkRobot(alliance, parking, spikeMark, distanceFromBackdrop);
+                    }
                 }
             }
             telemetry.update();
