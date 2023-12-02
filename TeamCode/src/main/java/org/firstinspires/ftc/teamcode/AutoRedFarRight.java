@@ -16,7 +16,7 @@ public class AutoRedFarRight extends XBotAutoOpMode implements AutoOpMode {
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 autonomousPlay(Alliance.RED, DistanceFromBackdrop.FAR, Parking.RIGHT);
-                sleep(10);
+                sleep(9);
             }
         }
         stopRobot();

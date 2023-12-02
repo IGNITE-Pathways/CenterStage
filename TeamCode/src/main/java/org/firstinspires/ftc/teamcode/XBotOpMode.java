@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
+import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
+import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_WRIST_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_PICK_POSITION;
 
@@ -171,7 +173,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    void makeSureCamIsReadyandExposureIsSet(int exposureMS, int gain, String cam) {
+    void makeSureCamIsReadyandExposureIsSet(long exposureMS, int gain, String cam) {
         // Wait for the camera to be open, then use the controls
         if (visionPortal == null) {
             return;
@@ -190,7 +192,6 @@ public abstract class XBotOpMode extends LinearOpMode {
         // Set camera controls unless we are stopping.
         if (!isStopRequested()) {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-//            exposureControl.setMode(ExposureControl.Mode.Auto);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
                 exposureControl.setMode(ExposureControl.Mode.Manual);
                 sleep(50);
@@ -203,6 +204,16 @@ public abstract class XBotOpMode extends LinearOpMode {
                 sleep(20);
             }
         }
+    }
+
+    long getExposure() {
+        ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+        return  exposureControl.getExposure(TimeUnit.MILLISECONDS);
+    }
+
+    int getGain() {
+        GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+        return  gainControl == null ? -1 : gainControl.getGain();
     }
 
     boolean detectAnyAprilTag() {
@@ -552,5 +563,12 @@ public abstract class XBotOpMode extends LinearOpMode {
             tries--;
         }
         ARM_PICK_POSITION = Math.max(armPosition, ARM_PICK_POSITION);
+    }
+
+    void resetWristAndClawPosition() {
+        wristPosition = STARTING_WRIST_POSITION;
+        setWristPosition(wristPosition);
+        leftClawServo.setPosition(STARTING_LEFT_CLAW_POS);
+        rightClawServo.setPosition(STARTING_RIGHT_CLAW_POS);
     }
 }

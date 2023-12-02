@@ -283,12 +283,7 @@ public class TeleOpDrive extends XBotOpMode {
         return (leftClawDistance.getDistance(DistanceUnit.MM) < 24);
     }
 
-    private void resetWristAndClawPosition() {
-        wristPosition = STARTING_WRIST_POSITION;
-        setWristPosition(wristPosition);
-        leftClawServo.setPosition(STARTING_LEFT_CLAW_POS);
-        rightClawServo.setPosition(STARTING_RIGHT_CLAW_POS);
-    }
+
     private void waitAndMoveArmAndResetDistance() {
         sleep(500);
         // Move Arm up to remove friction and get clearance the ground
