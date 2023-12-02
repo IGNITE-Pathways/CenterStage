@@ -551,18 +551,20 @@ public abstract class XBotOpMode extends LinearOpMode {
         aprilTag.setDecimation(2);
     }
 
-    void setArmPickPosition() {
+    int setArmPickPosition() {
         double distanceFromGround = 200;
         int tries = 30;
         int armPosition = 60; //Starting point
         while (tries > 0) {
             moveArmToPosition(armPosition);
             distanceFromGround = sensorDistance.getDistance(DistanceUnit.MM);
-            if (distanceFromGround < 15) break;
+            if (distanceFromGround < 20) break;
             armPosition -= 2;
             tries--;
+            sleep(10);
         }
         ARM_PICK_POSITION = Math.max(armPosition, ARM_PICK_POSITION);
+        return armPosition;
     }
 
     void resetWristAndClawPosition() {

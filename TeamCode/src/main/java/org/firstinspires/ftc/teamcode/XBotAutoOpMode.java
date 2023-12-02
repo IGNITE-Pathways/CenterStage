@@ -211,7 +211,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //@TODO: Test
                 moveRobot(1030, TANK_TURN_RIGHT);
                 //Strafe so we can go under the truss
-                moveRobot(175, STRAFE_LEFT);
+                moveRobot(240, STRAFE_LEFT);
             } else {
                 //Close to truss -- use different strategy
                 moveRobot(850, BACKWARD); //Last Move
@@ -230,7 +230,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
             //@TODO: Test
-            moveRobot(3000, BACKWARD);
+            moveRobot(3250, BACKWARD);
         }
 
         //Strafe to be in front of april tag
@@ -368,7 +368,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
-            moveRobot(3000, BACKWARD);
+            moveRobot(3250, BACKWARD);
         }
 
         //Strafe to be in front of april tag

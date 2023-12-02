@@ -43,7 +43,7 @@ import java.util.Queue;
 public class TeleOpDrive extends XBotOpMode {
     double leftClawPosition = STARTING_LEFT_CLAW_POS;
     double rightClawPosition = STARTING_RIGHT_CLAW_POS;
-    int armPosition = 0;
+    int armPosition = ARM_PICK_POSITION;
     //Robot Speed
     double driveSpeed = MAX_SPEED;
     // Declare OpMode members for each of the 4 motors.
@@ -58,7 +58,6 @@ public class TeleOpDrive extends XBotOpMode {
 
         // Initialize all motors and sensors
         initialize();
-        setArmPickPosition();
         resetWristAndClawPosition();
 
         // Wait for the game to start (driver presses PLAY)
@@ -275,12 +274,12 @@ public class TeleOpDrive extends XBotOpMode {
 
     private boolean isRightPixelInReach() {
         //return rightClawTouchSensor.isPressed();
-        return (rightClawDistance.getDistance(DistanceUnit.MM) < 24);
+        return (rightClawDistance.getDistance(DistanceUnit.MM) < 20);
     }
 
     private boolean isLeftPixelInReach() {
         //return leftClawTouchSensor.isPressed()
-        return (leftClawDistance.getDistance(DistanceUnit.MM) < 24);
+        return (leftClawDistance.getDistance(DistanceUnit.MM) < 20);
     }
 
 
