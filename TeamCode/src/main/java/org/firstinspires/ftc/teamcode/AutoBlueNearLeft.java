@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "Auto Blue Near Left", group = "Concept")
 public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {

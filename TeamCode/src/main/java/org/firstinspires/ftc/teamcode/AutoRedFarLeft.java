@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_RIGHT;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "Auto Red Far Left", group = "Concept")
 public class AutoRedFarLeft extends XBotAutoOpMode implements AutoOpMode {

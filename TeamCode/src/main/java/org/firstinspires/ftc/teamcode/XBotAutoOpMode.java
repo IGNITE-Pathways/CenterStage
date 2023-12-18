@@ -38,7 +38,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean spikeMarkPixelDropped = false; //Purple
     boolean aTagPixelDropped = false; //Yellow
     boolean arrivedAtBackDropTagPosition = false;
-    boolean targetFoundAtLeastOnce = false;
+    int timesTargetFound = 0;
+    boolean reachedAprilTag = false;
 
     boolean detectDesiredAprilTag(int tagId) {
         boolean aprilTagFound = false;
@@ -520,7 +521,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         stopDriveMotors();
         stopDriveRunUsingEncoder();
         autoDrive = true; //drive in reverse
-        targetFoundAtLeastOnce = false;
+        timesTargetFound = 0;
     }
 
     void aprilTagNavMoveToDesiredTagPosition(Alliance alliance, DistanceFromBackdrop distanceFromBackdrop) {
@@ -531,7 +532,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         //Robot should be in front on the board to start AprilTag Nav
         boolean targetFound = detectDesiredAprilTag(desiredTagId);
         if (targetFound) {
-            targetFoundAtLeastOnce = true;
+            timesTargetFound += 1;
             telemetry.addData("Found", "ID %d (%s)", desiredTagDetectionObj.id, desiredTagDetectionObj.metadata.name);
             telemetry.addData("Range", "%5.1f inches", desiredTagDetectionObj.ftcPose.range);
             telemetry.addData("Bearing", "%3.0f degrees", desiredTagDetectionObj.ftcPose.bearing);
@@ -560,7 +561,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             telemetry.addData("Didn't find Desired Tag", desiredTagId + "\n");
             telemetry.update();
             //Reasons for not able to find -- exposure or not in-front of aTags
-            if (targetFoundAtLeastOnce) {
+            if (timesTargetFound > 5) {
                 arrivedAtBackDropTagPosition = true;
                 visionPortal.close();
                 stopDriveMotors();
@@ -661,7 +662,6 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
-            boolean reachedAprilTag = false;
 
             if (!spikeMarkPixelDropped) {
                 switch (spikeMark) {
