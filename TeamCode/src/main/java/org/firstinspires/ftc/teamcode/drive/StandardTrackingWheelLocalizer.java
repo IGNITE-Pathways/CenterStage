@@ -39,7 +39,7 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     private List<Integer> lastEncPositions, lastEncVels;
 
     public static double X_MULTIPLIER = 90.0 / 90.5; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 90.0 / 89.9; // Multiplier in the Y direction
+    public static double Y_MULTIPLIER = 90.0 / 91.0; // Multiplier in the Y direction
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(

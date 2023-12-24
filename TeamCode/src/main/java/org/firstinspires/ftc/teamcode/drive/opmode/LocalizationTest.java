@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -16,15 +17,50 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 @TeleOp(group = "drive")
 public class LocalizationTest extends LinearOpMode {
+    Servo leftWrist = null;
+    Servo rightWrist = null;
+    Servo leftClaw = null;
+    Servo rightClaw = null;
+    static final double WRIST_FLAT_TO_GROUND = 0.95;     // Maximum rotational position
+    static final double CLAW_OPEN = 0.1272;     // Maximum rotational position
+    static final double CLAW_CLOSED = 0.5;     // Maximum rotational position
+
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        leftWrist = hardwareMap.get(Servo.class, "leftwrist");
+        rightWrist = hardwareMap.get(Servo.class, "rightwrist");
+        rightWrist.setDirection(Servo.Direction.REVERSE);
+        leftClaw = hardwareMap.get(Servo.class, "leftclaw");
+        rightClaw = hardwareMap.get(Servo.class, "rightclaw");
+        rightClaw.setDirection(Servo.Direction.REVERSE);
+
+        leftWrist.setPosition(WRIST_FLAT_TO_GROUND);
+        rightWrist.setPosition(WRIST_FLAT_TO_GROUND);
+        leftClaw.setPosition(CLAW_OPEN);
+        rightClaw.setPosition(CLAW_OPEN);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
 
         while (!isStopRequested()) {
+            if (gamepad1.left_trigger > 0.1) {
+                leftClaw.setPosition(CLAW_CLOSED);
+            }
+
+            if (gamepad1.right_trigger > 0.1) {
+                rightClaw.setPosition(CLAW_CLOSED);
+            }
+
+            if (gamepad1.left_bumper) {
+                leftClaw.setPosition(CLAW_OPEN);
+            }
+
+            if (gamepad1.right_bumper) {
+                rightClaw.setPosition(CLAW_OPEN);
+            }
+
             drive.setWeightedDrivePower(
                     new Pose2d(
                             -gamepad1.left_stick_y,
