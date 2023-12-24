@@ -25,7 +25,7 @@ public class AutoRedFarLeft extends XBotAutoOpMode implements AutoOpMode {
                     moveArmToPosition(ARM_POSITION_HIGH);
                     moveRobot(1025, TANK_TURN_LEFT);
                     moveRobot(1025, TANK_TURN_RIGHT);
-                    fixRobotYaw(0);
+//                    fixRobotYaw(0);
                     continue;
                 }
 

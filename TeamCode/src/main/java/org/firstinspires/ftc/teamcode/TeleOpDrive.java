@@ -22,17 +22,21 @@ import static org.firstinspires.ftc.teamcode.XBot.SPEED_WHEN_ON_APRIL_TAG_NAV;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_WHEN_PICKING_PIXELS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
-import static org.firstinspires.ftc.teamcode.XBot.STARTING_WRIST_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.TELEOP_DESIRED_DISTANCE;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_UPPER_DROP_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 import java.util.Queue;
 
@@ -60,12 +64,16 @@ public class TeleOpDrive extends XBotOpMode {
         initialize();
         resetWristAndClawPosition();
 
+        SampleMecanumDrive mecanumDrive = new SampleMecanumDrive(hardwareMap);
+        mecanumDrive.setPoseEstimate(new Pose2d(10, 10, Math.toRadians(90)));
+
+
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Arm: Target", armPosition);
         telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
         telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-        telemetry.addData("Wrist: Position", wristServo.getPosition());
+        telemetry.addData("Wrist: Position", leftWrist.getPosition() +" : " + rightWrist.getPosition());
         telemetry.update();
 
         waitForStart();
@@ -75,6 +83,11 @@ public class TeleOpDrive extends XBotOpMode {
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
         if (opModeIsActive()) {
             while (opModeIsActive()) {
+                mecanumDrive.update();
+
+                // Retrieve your pose
+                Pose2d myPose = mecanumDrive.getPoseEstimate();
+
                 autoDrive = aprilTagFound && lookForAprilTag && gamepad1.left_bumper;
                 if (gamepad2.x) {
                     changeGameMode(GameMode.PICKING_PIXELS);
@@ -122,7 +135,7 @@ public class TeleOpDrive extends XBotOpMode {
                         driveSpeed = MAX_SPEED;
                         if (gameModeChanged) {
                             armPosition = goToGoingToPickPixelPosition();
-                            wristServo.setPosition(STARTING_WRIST_POSITION);
+                            setWristPosition(WRIST_VERTICAL);
                             gameModeChanged = Boolean.FALSE;
                             resetDistanceSensor();
                         }
@@ -130,33 +143,17 @@ public class TeleOpDrive extends XBotOpMode {
                     case PICKING_PIXELS:
                         // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
                         if (gameModeChanged) {
-                            driveSpeed = SPEED_WHEN_PICKING_PIXELS; //Slow down, need precision to pick pixels
+//                            driveSpeed = SPEED_WHEN_PICKING_PIXELS; //Slow down, need precision to pick pixels
                             armPosition = goToPickPixelPosition();
                             gameModeChanged = Boolean.FALSE;
                         }
                         if (gamepad2.circle) pickPixels(); //Manual Grab
-                        if (isLeftPixelInReach()) pickLeftPixel(); //Auto Grab
-                        if (isRightPixelInReach()) pickRightPixel(); //Auto Grab
                         break;
                     case GOING_TO_DROP_PIXELS:
                         // WRIST = AUTO (also allows Manual), CLAW = CLOSE POSITION (holding pixels)
                         driveSpeed = MAX_SPEED; //Full speed from front to back
-
-                        // Manual Arm Movement is allowed, but not required
-//                        int moveArmBy = (int) -(gamepad2.left_stick_y * 40);
-//                        if (moveArmBy != 0) {
-//                            armPosition += moveArmBy;
-//                            armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
-//                            armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
-//                            moveArmToPosition(armPosition);
-//                        }
-
                         // Robot will be looking for april tag and will switch mode automatically once found
                         lookForAprilTag = true;
-                        // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-//                        drive = -gamepad1.left_stick_y / 2.0;  // Reduce drive rate to 50%.
-//                        strafe = -gamepad1.left_stick_x / 2.0;  // Reduce yawTurn rate to 50%.
-//                        yawTurn = -gamepad1.right_stick_x / 3.0;  // Reduce strafe rate to 33%.
 
                         //Look for April Tag(s)
                         aprilTagFound = detectAnyAprilTag();
@@ -165,7 +162,6 @@ public class TeleOpDrive extends XBotOpMode {
                             gameModeChanged = Boolean.FALSE;
                             resetDistanceSensor();
                         }
-                        updateDistance();
                         //Y Button = Manual override only required if April Tag Nav doesn't work
                         //Pressing Y Button will skill April Tag Navigation
                         if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
@@ -174,7 +170,6 @@ public class TeleOpDrive extends XBotOpMode {
                             if (gameModeChanged) {
                                 gameModeChanged = Boolean.FALSE;
                             }
-                            updateDistance();
                             aprilTagFound = detectAnyAprilTag();
                             if (aprilTagFound && lookForAprilTag && gamepad1.left_bumper) {
                                 driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
@@ -198,14 +193,15 @@ public class TeleOpDrive extends XBotOpMode {
                     case DROPPING_PIXELS:
                         // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
                         lookForAprilTag = false;
-                        driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except yawTurn if needed
-                        updateDistance();
+//                        driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except yawTurn if needed
+//                        updateDistance();
 
                         if (gameModeChanged) {
                             gameModeChanged = Boolean.FALSE;
                             // Move Arm to back board -- only once
                             armPosition = MAX_ARM_POSITION;
                             moveArmToPosition(armPosition);
+                            setWristPosition(WRIST_UPPER_DROP_POSITION);
                             sleep(200);
                         }
                         //User Action :: Press O (or if distance sensor is close) to drop pixels
@@ -262,9 +258,12 @@ public class TeleOpDrive extends XBotOpMode {
                 telemetry.addData("Wrist: Position", wristPosition);
                 telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
                 telemetry.addData("Touch: Left", leftPixelInClaw + " Right=" + rightPixelInClaw);
-                if (calculatedDistance != DistanceSensor.distanceOutOfRange) {
-                    telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
-                }
+//                if (calculatedDistance != DistanceSensor.distanceOutOfRange) {
+//                    telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
+//                }
+                telemetry.addData("x", myPose.getX());
+                telemetry.addData("y", myPose.getY());
+                telemetry.addData("heading", myPose.getHeading());
                 telemetry.update();
                 idle();
             }
@@ -272,40 +271,32 @@ public class TeleOpDrive extends XBotOpMode {
         visionPortal.close();
     }
 
-    private boolean isRightPixelInReach() {
-        //return rightClawTouchSensor.isPressed();
-        return (rightClawDistance.getDistance(DistanceUnit.MM) < 20);
-    }
-
-    private boolean isLeftPixelInReach() {
-        //return leftClawTouchSensor.isPressed()
-        return (leftClawDistance.getDistance(DistanceUnit.MM) < 20);
-    }
-
     private void waitAndMoveArmAndResetDistance() {
         sleep(500);
         // Move Arm up to remove friction and get clearance the ground
         armPosition = ARM_POSITION_HIGH + 50;
-        moveArmToPosition(armPosition);
         changeGameMode(GameMode.GOING_TO_DROP_PIXELS);
-        resetDistanceSensor();
+        moveArmToPosition(armPosition);
+        wristPosition = WRIST_VERTICAL;
+        setWristPosition(wristPosition);
+//        resetDistanceSensor();
     }
     private void pickPixels() {
-        leftClawServo.setPosition(LEFT_CLAW_CLOSE_POSITION);
-        rightClawServo.setPosition(RIGHT_CLAW_CLOSE_POSITION);
+        leftClaw.setPosition(LEFT_CLAW_CLOSE_POSITION);
+        rightClaw.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
         rightPixelInClaw = true;
         waitAndMoveArmAndResetDistance();
     }
     private void pickLeftPixel() {
-        leftClawServo.setPosition(LEFT_CLAW_CLOSE_POSITION);
+        leftClaw.setPosition(LEFT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
         if (rightPixelInClaw) {
             waitAndMoveArmAndResetDistance();
         }
     }
     private void pickRightPixel() {
-        rightClawServo.setPosition(RIGHT_CLAW_CLOSE_POSITION);
+        rightClaw.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         rightPixelInClaw = true;
         if (leftPixelInClaw) {
             waitAndMoveArmAndResetDistance();
@@ -322,8 +313,8 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private void dropPixels() {
-        leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
-        rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+        leftClaw.setPosition(LEFT_CLAW_OPEN_POSITION);
+        rightClaw.setPosition(RIGHT_CLAW_OPEN_POSITION);
         sleep(500);
         leftPixelInClaw = false;
         rightPixelInClaw = false;
@@ -332,16 +323,20 @@ public class TeleOpDrive extends XBotOpMode {
 
     private int goToPickPixelPosition() {
         setClawsToPixelPickPosition();
+        wristPosition = WRIST_FLAT_TO_GROUND;
+        setWristPosition(wristPosition);
         return moveArmToPosition(ARM_PICK_POSITION);
     }
 
     private int goToGoingToPickPixelPosition() {
         setClawsToPixelPickPosition();
+        wristPosition = WRIST_VERTICAL;
+        setWristPosition(wristPosition);
         return moveArmToPosition(ARM_POSITION_HIGH);
     }
     private void setClawsToPixelPickPosition() {
-        leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
-        rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+        leftClaw.setPosition(LEFT_CLAW_OPEN_POSITION);
+        rightClaw.setPosition(RIGHT_CLAW_OPEN_POSITION);
     }
 
     int moveArmToPosition(int armPosition) {
@@ -359,9 +354,9 @@ public class TeleOpDrive extends XBotOpMode {
 
         while (opModeIsActive() && rightArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
         {
-            armPosition = leftArmMotor.getCurrentPosition();
-            wristPosition = getWristPosition(armPosition);
-            setWristPosition(wristPosition);
+            leftArmMotor.getCurrentPosition();
+//            wristPosition = getWristPosition(armPosition);
+//            setWristPosition(wristPosition);
             telemetry.addData("Arm: Target", savePos);
             telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
             telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
@@ -390,22 +385,22 @@ public class TeleOpDrive extends XBotOpMode {
         distanceQueue.add(distance);
     }
 
-    private void updateDistance() {
-        double distance = sensorDistance.getDistance(DistanceUnit.MM);
-        if ((distance != DistanceSensor.distanceOutOfRange)) {
-            addNewDistanceValue(distance);
-        }
-        calculatedDistance = calculateDistance();
-    }
+//    private void updateDistance() {
+//        double distance = sensorDistance.getDistance(DistanceUnit.MM);
+//        if ((distance != DistanceSensor.distanceOutOfRange)) {
+//            addNewDistanceValue(distance);
+//        }
+//        calculatedDistance = calculateDistance();
+//    }
 
-    private Double calculateDistance() {
-        //Must have multiple entries
-        if (distanceQueue.size() < 2) return DistanceSensor.distanceOutOfRange;
-        Double total = 0.0;
-        for (Double d : distanceQueue) {
-            total += d;
-        }
-        return total/distanceQueue.size();
-    }
+//    private Double calculateDistance() {
+//        //Must have multiple entries
+//        if (distanceQueue.size() < 2) return DistanceSensor.distanceOutOfRange;
+//        Double total = 0.0;
+//        for (Double d : distanceQueue) {
+//            total += d;
+//        }
+//        return total/distanceQueue.size();
+//    }
 
 }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import android.os.Build;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -24,6 +26,7 @@ public class LocalizationTest extends LinearOpMode {
     static final double WRIST_FLAT_TO_GROUND = 0.95;     // Maximum rotational position
     static final double CLAW_OPEN = 0.1272;     // Maximum rotational position
     static final double CLAW_CLOSED = 0.5;     // Maximum rotational position
+    static final double WRIST_VERTICAL = 0.49;     // Maximum rotational position
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -45,20 +48,30 @@ public class LocalizationTest extends LinearOpMode {
         waitForStart();
 
         while (!isStopRequested()) {
-            if (gamepad1.left_trigger > 0.1) {
+            if (gamepad2.left_trigger > 0.1) {
                 leftClaw.setPosition(CLAW_CLOSED);
             }
 
-            if (gamepad1.right_trigger > 0.1) {
+            if (gamepad2.right_trigger > 0.1) {
                 rightClaw.setPosition(CLAW_CLOSED);
             }
 
-            if (gamepad1.left_bumper) {
+            if (gamepad2.left_bumper) {
                 leftClaw.setPosition(CLAW_OPEN);
             }
 
-            if (gamepad1.right_bumper) {
+            if (gamepad2.right_bumper) {
                 rightClaw.setPosition(CLAW_OPEN);
+            }
+
+            if (gamepad2.circle) {
+                leftWrist.setPosition(WRIST_VERTICAL);
+                rightWrist.setPosition(WRIST_VERTICAL);
+            }
+
+            if (gamepad2.square) {
+                leftWrist.setPosition(WRIST_FLAT_TO_GROUND);
+                rightWrist.setPosition(WRIST_FLAT_TO_GROUND);
             }
 
             drive.setWeightedDrivePower(

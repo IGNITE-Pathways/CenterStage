@@ -1,24 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
-import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
-import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
-import static org.firstinspires.ftc.teamcode.XBot.STARTING_WRIST_POSITION;
-import static org.firstinspires.ftc.teamcode.XBot.WRIST_PICK_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -26,15 +20,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,12 +33,14 @@ public abstract class XBotOpMode extends LinearOpMode {
     //Define motors and sensors
     DcMotor rightFront = null, leftFront = null, rightBack = null, leftBack = null;
     DcMotor leftArmMotor = null, rightArmMotor = null;
-    DistanceSensor sensorDistance = null;
-    Servo wristServo = null, leftClawServo = null, rightClawServo = null;
-    DistanceSensor leftClawDistance = null, rightClawDistance = null;
-    TouchSensor leftClawTouchSensor = null, rightClawTouchSensor = null;
-    private IMU imu = null;      // Control Hub IMU
-    WebcamName webcam1, webcam2;
+
+    Servo leftWrist = null;
+    Servo rightWrist = null;
+    Servo leftClaw = null;
+    Servo rightClaw = null;
+
+//    private IMU imu = null;      // Control Hub IMU
+    WebcamName webcam1;
     TfodProcessor tfod;
     VisionPortal visionPortal;               // Used to manage the video source.
     AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
@@ -59,19 +51,19 @@ public abstract class XBotOpMode extends LinearOpMode {
     Boolean gameModeChanged = Boolean.FALSE;
     private static final String TFOD_MODEL_ASSET = "TeaXProp_TFOD.tflite";
     private static final String[] LABELS = {"X"};
-    double wristPosition = STARTING_WRIST_POSITION;
+    double wristPosition = WRIST_FLAT_TO_GROUND;
     boolean autoDrive = false;
     boolean leftPixelInClaw = false, rightPixelInClaw = false;
     double previousLeftFrontPower, previousLeftBackPower, previousRightFrontPower, previousRightBackPower;
 
-    void initializeIMU() {
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu = hardwareMap.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        imu.resetYaw();
-    }
+//    void initializeIMU() {
+//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
+//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+//        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+//        imu = hardwareMap.get(IMU.class, "imu");
+//        imu.initialize(new IMU.Parameters(orientationOnRobot));
+//        imu.resetYaw();
+//    }
 
     void initialize() {
         gameMode = GameMode.INIT;
@@ -81,22 +73,29 @@ public abstract class XBotOpMode extends LinearOpMode {
         leftBack = hardwareMap.get(DcMotor.class, "leftback");
         rightFront = hardwareMap.get(DcMotor.class, "rightfront");
         rightBack = hardwareMap.get(DcMotor.class, "rightback");
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setDirection(DcMotor.Direction.FORWARD);
 
         // Initialize Motors
-        leftArmMotor = hardwareMap.get(DcMotor.class, "leftArmMotor");
-        rightArmMotor = hardwareMap.get(DcMotor.class, "rightArmMotor");
+        leftArmMotor = hardwareMap.get(DcMotor.class, "leftarm");
+        rightArmMotor = hardwareMap.get(DcMotor.class, "rightarm");
+        rightArmMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        // Initialize Rev 2M Distance sensor
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "distance");
-        leftClawDistance = hardwareMap.get(DistanceSensor.class, "leftClawDistance");
-        rightClawDistance = hardwareMap.get(DistanceSensor.class, "rightClawDistance");
-        leftClawTouchSensor = hardwareMap.get(TouchSensor.class, "leftClawTouch");
-        rightClawTouchSensor = hardwareMap.get(TouchSensor.class, "rightClawTouch");
+        leftWrist = hardwareMap.get(Servo.class, "leftwrist");
+        rightWrist = hardwareMap.get(Servo.class, "rightwrist");
+        rightWrist.setDirection(Servo.Direction.REVERSE);
 
+        leftClaw = hardwareMap.get(Servo.class, "leftclaw");
+        rightClaw = hardwareMap.get(Servo.class, "rightclaw");
+        rightClaw.setDirection(Servo.Direction.REVERSE);
+
+        //CAM
         webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
-        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+//        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
         CameraName switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
+                .getCameraManager().nameForSwitchableCamera(webcam1);
 
         // Create the TensorFlow processor by using a builder.
         tfod = new TfodProcessor.Builder()
@@ -127,25 +126,9 @@ public abstract class XBotOpMode extends LinearOpMode {
         } else {
             switchToAprilTagCamera();
         }
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
-
-        //Left Motor is in reverse
-        rightArmMotor.setDirection(DcMotor.Direction.REVERSE);
 
         leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        //Using Encoders
-        leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //Initialize Servo
-        wristServo = hardwareMap.get(Servo.class, "wrist");
-        leftClawServo = hardwareMap.get(Servo.class, "leftClaw");
-        rightClawServo = hardwareMap.get(Servo.class, "rightClaw");
 
         //Reset encoders -- making start position as zero
         resetArmEncoders();
@@ -155,14 +138,14 @@ public abstract class XBotOpMode extends LinearOpMode {
         visionPortal.setProcessorEnabled(tfod, false);
         visionPortal.setProcessorEnabled(aprilTag, true);
         makeSureCamIsReadyandExposureIsSet(XBot.APRIL_TAG_CAM_EXPOSURE, 250, "AprilTag Cam");  // Use low exposure time to reduce motion blur
-        visionPortal.setActiveCamera(webcam1);
+//        visionPortal.setActiveCamera(webcam1);
     }
 
     void switchToTFODCamera() {
         visionPortal.setProcessorEnabled(tfod, true);
         visionPortal.setProcessorEnabled(aprilTag, false);
         makeSureCamIsReadyandExposureIsSet(XBot.TFOD_CAM_EXPOSURE, 250, "TFOD Cam");  // Use low exposure time to reduce motion blur
-        visionPortal.setActiveCamera(webcam2);
+//        visionPortal.setActiveCamera(webcam2);
     }
 
     void initDriveMotorsToUseEncoders() {
@@ -342,22 +325,22 @@ public abstract class XBotOpMode extends LinearOpMode {
 
     void openLeftClaw() {
         sleep(100);
-        leftClawServo.setPosition(XBot.LEFT_CLAW_OPEN_POSITION);
+        leftClaw.setPosition(XBot.LEFT_CLAW_OPEN_POSITION);
         sleep(100);
     }
 
     void openRightClaw() {
         sleep(100);
-        rightClawServo.setPosition(XBot.RIGHT_CLAW_OPEN_POSITION);
+        rightClaw.setPosition(XBot.RIGHT_CLAW_OPEN_POSITION);
         sleep(100);
     }
 
     void closeLeftClaw() {
-        leftClawServo.setPosition(XBot.LEFT_CLAW_CLOSE_POSITION);
+        leftClaw.setPosition(XBot.LEFT_CLAW_CLOSE_POSITION);
     }
 
     void closeRightClaw() {
-        rightClawServo.setPosition(XBot.RIGHT_CLAW_CLOSE_POSITION);
+        rightClaw.setPosition(XBot.RIGHT_CLAW_CLOSE_POSITION);
     }
 
     void openBothClaws() {
@@ -401,36 +384,39 @@ public abstract class XBotOpMode extends LinearOpMode {
     }
 
     void setWristPosition(double wristPosition) {
-        wristPosition = Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, wristPosition));
-        wristServo.setPosition(wristPosition);
+        wristPosition = Math.min(MIN_WRIST_POS, Math.max(MAX_WRIST_POS, wristPosition));
+        leftWrist.setPosition(wristPosition);
+        rightWrist.setPosition(wristPosition);
     }
 
     //calculate wrist position based on armPosition and pick or drop intent
     double getWristPosition(int armPosition) {
-        if ((gameMode == GameMode.GOING_TO_PICK_PIXELS)
-                || (gameMode == GameMode.PICKING_PIXELS)) {
-            if (isCloseToGround(armPosition)) {
-                //Claw needs to face the ground
-                return WRIST_PICK_POSITION;
-            } else if (isArmFacingBack(armPosition)) {
-                int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
-            } else {
-                return MIN_WRIST_POS; //return existing position
-            }
-        } else if ((gameMode == GameMode.GOING_TO_DROP_PIXELS)
+        if ((gameMode == GameMode.GOING_TO_PICK_PIXELS)) {
+            return WRIST_VERTICAL;
+//            if (isCloseToGround(armPosition)) {
+//                return WRIST_FLAT_TO_GROUND;
+//            } else if (isArmFacingBack(armPosition)) {
+//                int angleA = ((armPosition * 360) / FULL_CIRCLE);
+//                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
+//            }
+        } if (gameMode == GameMode.PICKING_PIXELS) {
+            return WRIST_FLAT_TO_GROUND;
+        } else
+            if ((gameMode == GameMode.GOING_TO_DROP_PIXELS)
                 || (gameMode == GameMode.APRIL_TAG_NAVIGATION)
                 || (gameMode == GameMode.DROPPING_PIXELS)) {
-            //Calculate claw position based on arm position
-            if (isArmFacingBack(armPosition)) {
-                int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
-            } else {
-                return wristPosition; //return existing position
-            }
-        } else if ((gameMode == GameMode.AUTO_OP_MODE)) {
+//            //Calculate claw position based on arm position
+//            if (isArmFacingBack(armPosition)) {
+//                int angleA = ((armPosition * 360) / FULL_CIRCLE);
+//                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
+//            } else {
+//                return wristPosition; //return existing position
+//            }
+                return WRIST_VERTICAL;
+            } else
+        if ((gameMode == GameMode.AUTO_OP_MODE)) {
             if (armPosition > 1500) {
-                return MAX_WRIST_POS;
+                return WRIST_VERTICAL;
             } else if (isArmFacingBack(armPosition)) {
                 int angleA = ((armPosition * 360) / FULL_CIRCLE);
                 return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
@@ -451,10 +437,10 @@ public abstract class XBotOpMode extends LinearOpMode {
         return armPosition < 20;
     }
 
-    public double getHeading() {
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        return orientation.getYaw(AngleUnit.DEGREES);
-    }
+//    public double getHeading() {
+//        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+//        return orientation.getYaw(AngleUnit.DEGREES);
+//    }
 
     void moveRobot(int distance, MoveRobot moveRobot, double speed) {
         moveRobot(distance, moveRobot, speed, false);
@@ -515,7 +501,7 @@ public abstract class XBotOpMode extends LinearOpMode {
         while (opModeIsActive() && areDriveMotorsBusy()) {
             if (!yawfix) {
                 telemetry.addData("Status", moveRobot);
-                telemetry.addData("Heading- Target : Current", "%5.3f : %5.3f", heading, getHeading());
+//                telemetry.addData("Heading- Target : Current", "%5.3f : %5.3f", heading, getHeading());
                 telemetry.addData("Distance to go", distance);
                 telemetry.addData("Left Front Motor", leftFront.getCurrentPosition() + "  busy=" + leftFront.isBusy());
                 telemetry.addData("Left Back Motor", leftBack.getCurrentPosition() + "  busy=" + leftBack.isBusy());
@@ -551,26 +537,11 @@ public abstract class XBotOpMode extends LinearOpMode {
         aprilTag.setDecimation(2);
     }
 
-    int setArmPickPosition() {
-        double distanceFromGround = 200;
-        int tries = 30;
-        int armPosition = 60; //Starting point
-        while (tries > 0) {
-            moveArmToPosition(armPosition);
-            distanceFromGround = sensorDistance.getDistance(DistanceUnit.MM);
-            if (distanceFromGround < 20) break;
-            armPosition -= 2;
-            tries--;
-            sleep(10);
-        }
-        ARM_PICK_POSITION = Math.max(armPosition, ARM_PICK_POSITION);
-        return armPosition;
-    }
 
     void resetWristAndClawPosition() {
-        wristPosition = STARTING_WRIST_POSITION;
+        wristPosition = WRIST_FLAT_TO_GROUND;
         setWristPosition(wristPosition);
-        leftClawServo.setPosition(STARTING_LEFT_CLAW_POS);
-        rightClawServo.setPosition(STARTING_RIGHT_CLAW_POS);
+        leftClaw.setPosition(STARTING_LEFT_CLAW_POS);
+        rightClaw.setPosition(STARTING_RIGHT_CLAW_POS);
     }
 }

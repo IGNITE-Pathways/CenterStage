@@ -18,7 +18,7 @@ import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
-import static org.firstinspires.ftc.teamcode.XBot.WRIST_PICK_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 
 import com.qualcomm.robotcore.util.Range;
 
@@ -59,7 +59,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     void initializeAuto() {
         initialize();
-        initializeIMU();
+//        initializeIMU();
         initDriveMotorsToUseEncoders();
         closeBothClaws();
         gameMode = GameMode.AUTO_OP_MODE;
@@ -70,7 +70,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-        telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
+//        telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
         telemetry.update();
     }
 
@@ -141,18 +141,18 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             //BLUE ALLIANCE
             moveRobot(200, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
-            fixRobotYaw(0);
+//            fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //CLOSE to truss
                 moveRobot(600, STRAFE_LEFT); //Else the arm will hit the truss
-                fixRobotYaw(0);
+//                fixRobotYaw(0);
                 moveRobot(980, BACKWARD);
             } else {
                 moveRobot(520, STRAFE_RIGHT);
             }
         }
 
-        fixRobotYaw(0);
+//        fixRobotYaw(0);
 
         if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
@@ -165,16 +165,16 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 setWristPosition(wristPosition);
                 sleep(100);
                 moveRobot(420, BACKWARD);
-                fixRobotYaw(90);
+//                fixRobotYaw(90);
             } else {
                 //distance = NEAR, alliance = RED
                 moveRobot(1030, TANK_TURN_RIGHT);
                 moveArmToPosition(ARM_PICK_POSITION+4);
-                wristPosition = WRIST_PICK_POSITION;
+                wristPosition = WRIST_FLAT_TO_GROUND;
                 setWristPosition(wristPosition);
                 sleep(100);
                 moveRobot(200, FORWARD); //Robot Start position is almost centered
-                fixRobotYaw(-90);
+//                fixRobotYaw(-90);
             }
         } else {
             //Away from Truss
@@ -219,7 +219,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             } else {
                 //Close to truss -- use different strategy
                 moveRobot(850, BACKWARD); //Last Move
-                fixRobotYaw(-90); //RED
+//                fixRobotYaw(-90); //RED
             }
         } else {
             //BLUE, Strafe so we can go under the truss
@@ -228,7 +228,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             } else {
                 moveRobot(1030, TANK_TURN_LEFT);
             }
-            fixRobotYaw(90); //BLUE
+//            fixRobotYaw(90); //BLUE
         }
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -244,7 +244,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         if (alliance == Alliance.RED) {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(1090, STRAFE_RIGHT);
-                fixRobotYaw(-90);
+//                fixRobotYaw(-90);
             }
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -253,7 +253,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //BLUE, NEAR
                 moveRobot(350, STRAFE_LEFT); //Left April Tag Id 1 on left, strafe less
             }
-            fixRobotYaw(90);
+//            fixRobotYaw(90);
         }
 
         //April Tag Nav
@@ -276,11 +276,11 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             //RED ALLIANCE
             moveRobot(200, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
-            fixRobotYaw(0);
+//            fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //CLOSE to truss
                 moveRobot(600, STRAFE_RIGHT); //Else the arm will hit the truss
-                fixRobotYaw(0);
+//                fixRobotYaw(0);
                 moveRobot(980, BACKWARD);
             } else {
                 moveRobot(580, STRAFE_LEFT);
@@ -299,7 +299,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
-        fixRobotYaw(0);
+//        fixRobotYaw(0);
 
         if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
@@ -320,16 +320,16 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 setWristPosition(wristPosition);
                 sleep(100);
                 moveRobot(420, BACKWARD); //Push it under the truss
-                fixRobotYaw(-90);
+//                fixRobotYaw(-90);
             } else {
                 //distance = NEAR, alliance = BLUE
                 moveRobot(1030, TANK_TURN_LEFT);
                 moveArmToPosition(ARM_PICK_POSITION + 4);
-                wristPosition = WRIST_PICK_POSITION;
+                wristPosition = WRIST_FLAT_TO_GROUND;
                 setWristPosition(wristPosition);
                 sleep(100);
                 moveRobot(220, FORWARD);
-                fixRobotYaw(90);
+//                fixRobotYaw(90);
             }
         }
 
@@ -365,7 +365,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //NEAR
                 moveRobot(1030, TANK_TURN_RIGHT);
             }
-            fixRobotYaw(-90);
+//            fixRobotYaw(-90);
         } else {
             //BLUE alliance
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -376,7 +376,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //CLOSE to truss -- move forward toward april tag
                 moveRobot(850, BACKWARD);
             }
-            fixRobotYaw(90);
+//            fixRobotYaw(90);
         }
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -395,13 +395,13 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             } else {
                 moveRobot(400, STRAFE_RIGHT);
             }
-            fixRobotYaw(-90);
+//            fixRobotYaw(-90);
         } else {
             //BLUE
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //@TODO: Needs testing
                 moveRobot(1090, STRAFE_LEFT);
-                fixRobotYaw(90);
+//                fixRobotYaw(90);
             }
         }
 
@@ -424,7 +424,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         if (alliance == Alliance.RED) {
             moveRobot(420, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
-            fixRobotYaw(0);
+//            fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(350, STRAFE_RIGHT); //Robot away from truss, so strafe less
             } else {
@@ -433,7 +433,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             moveRobot(420, BACKWARD);
             moveArmToPosition(ARM_POSITION_UP);
-            fixRobotYaw(0);
+//            fixRobotYaw(0);
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 //@TODO: Needs testing
                 moveRobot(400, STRAFE_LEFT); //Robot close to truss, so strafe more
@@ -441,7 +441,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 moveRobot(350, STRAFE_RIGHT); //Robot away from truss, so strafe less
             }
         }
-        fixRobotYaw(0);
+//        fixRobotYaw(0);
         moveArmToPosition(1770);
         wristPosition = MAX_WRIST_POS;
         setWristPosition(wristPosition);
@@ -473,7 +473,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(660, STRAFE_LEFT);
             }
-            fixRobotYaw(-90); //RED
+//            fixRobotYaw(-90); //RED
         } else {
             moveRobot(1030, TANK_TURN_LEFT);
             //Strafe so we can go under the truss
@@ -481,7 +481,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //@TODO: Needs testing
                 moveRobot(720, STRAFE_RIGHT);
             }
-            fixRobotYaw(90); //BLUE
+//            fixRobotYaw(90); //BLUE
         }
 
         //drive towards back side
@@ -496,14 +496,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             } else {
                 moveRobot(300, STRAFE_RIGHT);
             }
-            fixRobotYaw(-90);
+//            fixRobotYaw(-90);
         } else {
             if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
                 moveRobot(890, STRAFE_LEFT);
             } else {
                 moveRobot(300, STRAFE_LEFT);
             }
-            fixRobotYaw(90);
+//            fixRobotYaw(90);
         }
 
         //Set the desired April Tag Id
@@ -590,28 +590,28 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         aTagPixelDropped = true;
     }
 
-    void dropYellowPixelNew() {
-        int armPosition = MAX_ARM_POSITION;
-        int endingArmPosition = AUTO_MAX_ARM_POSITION;
-        while (true) {
-            moveArmToPosition(armPosition);
-            double distanceFromBoard = sensorDistance.getDistance(DistanceUnit.MM);
-            if ((distanceFromBoard < 10) || (armPosition > AUTO_MAX_ARM_POSITION)) {
-                openBothClaws();
-                break;
-            }
-            armPosition += 5;
-        }
-        moveArmToPosition(200);
-        aTagPixelDropped = true;
-    }
+//    void dropYellowPixelNew() {
+//        int armPosition = MAX_ARM_POSITION;
+//        int endingArmPosition = AUTO_MAX_ARM_POSITION;
+//        while (true) {
+//            moveArmToPosition(armPosition);
+//            double distanceFromBoard = sensorDistance.getDistance(DistanceUnit.MM);
+//            if ((distanceFromBoard < 10) || (armPosition > AUTO_MAX_ARM_POSITION)) {
+//                openBothClaws();
+//                break;
+//            }
+//            armPosition += 5;
+//        }
+//        moveArmToPosition(200);
+//        aTagPixelDropped = true;
+//    }
 
     void parkRobot(Alliance alliance, Parking parking, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
-        if (alliance == Alliance.RED) {
-            fixRobotYaw(-90);
-        } else {
-            fixRobotYaw(90);
-        }
+//        if (alliance == Alliance.RED) {
+//            fixRobotYaw(-90);
+//        } else {
+//            fixRobotYaw(90);
+//        }
         if (parking == Parking.LEFT) {
             //LEFT SIDE PARKING
             switch (spikeMark) {
@@ -661,7 +661,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             detectTeamPropAndSwitchCameraToAprilTag();
         } else {
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-            telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
+//            telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
 
             if (!spikeMarkPixelDropped) {
                 switch (spikeMark) {
@@ -684,7 +684,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                         aprilTagNavMoveToDesiredTagPosition(alliance, distanceFromBackdrop);
                     } else {
                         telemetry.addData("Arrived", "Dropping Pixel now");
-                        fixRobotYaw(alliance == Alliance.RED ? -90 : 90);
+//                        fixRobotYaw(alliance == Alliance.RED ? -90 : 90);
                         dropYellowPixel();
                         //Park Now
                         telemetry.addData("Parking", "");
@@ -696,26 +696,26 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
     }
 
-    void fixRobotYaw(double heading) {
-        int tries = 5;
-        double error = Math.abs(heading - getHeading());
-        while ((error > 1) && (tries > 0)) {
-            //Fix
-            error = Math.abs(heading - getHeading());
-            double speed = Range.clip(error, 0, AUTONOMOUS_SPEED);
-            int distanceTicks = (int)Range.scale(error, 0, 5, 0, 30);
-//            if (heading >= 0) {
-                if (heading < getHeading())
-                    moveRobot(distanceTicks, TANK_TURN_RIGHT, speed, true);
-                else
-                    moveRobot(distanceTicks, TANK_TURN_LEFT, speed, true);
-//            } else {
-//                if (heading > getHeading())
+//    void fixRobotYaw(double heading) {
+//        int tries = 5;
+//        double error = Math.abs(heading - getHeading());
+//        while ((error > 1) && (tries > 0)) {
+//            //Fix
+//            error = Math.abs(heading - getHeading());
+//            double speed = Range.clip(error, 0, AUTONOMOUS_SPEED);
+//            int distanceTicks = (int)Range.scale(error, 0, 5, 0, 30);
+////            if (heading >= 0) {
+//                if (heading < getHeading())
 //                    moveRobot(distanceTicks, TANK_TURN_RIGHT, speed, true);
 //                else
 //                    moveRobot(distanceTicks, TANK_TURN_LEFT, speed, true);
-//            }
-            tries -= 1;
-        }
-    }
+////            } else {
+////                if (heading > getHeading())
+////                    moveRobot(distanceTicks, TANK_TURN_RIGHT, speed, true);
+////                else
+////                    moveRobot(distanceTicks, TANK_TURN_LEFT, speed, true);
+////            }
+//            tries -= 1;
+//        }
+//    }
 }
