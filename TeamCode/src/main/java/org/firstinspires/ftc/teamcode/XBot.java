@@ -14,7 +14,7 @@ public class XBot {
     static final int ARM_POSITION_UP = 800;
     static final int ARM_POSITION_ROBOT_HANGING = 800;
 
-    static final double ARM_SPEED = 0.7;
+    static final double ARM_SPEED = 0.75;
     static final double ARM_HOLD_SPEED = 0.05;
 
     // WRIST

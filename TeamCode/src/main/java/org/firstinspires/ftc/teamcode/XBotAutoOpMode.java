@@ -40,7 +40,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean arrivedAtBackDropTagPosition = false;
     int timesTargetFound = 0;
     boolean reachedAprilTag = false;
-    SampleMecanumDrive mecanumDrive = null;
+    SampleMecanumDrive xDrive = null;
     boolean detectDesiredAprilTag(int tagId) {
         boolean aprilTagFound = false;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -61,8 +61,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         initialize();
 //        initializeIMU();
         initDriveMotorsToUseEncoders();
-        mecanumDrive = new SampleMecanumDrive(hardwareMap);
-        mecanumDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        xDrive = new SampleMecanumDrive(hardwareMap);
+        xDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         closeBothClaws();
         gameMode = GameMode.AUTO_OP_MODE;
