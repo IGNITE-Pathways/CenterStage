@@ -24,6 +24,10 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
         runtime.reset();
 
         if (opModeIsActive()) {
+            if (!teamPropDetectionCompleted) {
+                detectTeamPropAndSwitchCameraToAprilTag();
+            }
+
             //autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.LEFT);
             TrajectorySequence trajToDropFirstPixel = xDrive.trajectorySequenceBuilder(startPose)
                     .back(27.5)
@@ -41,21 +45,28 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
                     .lineTo(new Vector2d(-50, 9.5))
                     .build();
 
-            TrajectorySequence trajSeq4 = xDrive.trajectorySequenceBuilder(trajToPickWhitePixels.end())
+            TrajectorySequence inchForward = xDrive.trajectorySequenceBuilder(trajToPickWhitePixels.end())
                     .forward(5)
                     .build();
 
-            TrajectorySequence trajSeq5 = xDrive.trajectorySequenceBuilder(trajSeq4.end())
+            TrajectorySequence inchBackward = xDrive.trajectorySequenceBuilder(inchForward.end())
                     .back(10)
                     .build();
 
-            TrajectorySequence trajBackToDropWhitePixles = xDrive.trajectorySequenceBuilder(trajSeq5.end())
+            TrajectorySequence trajBackToDropWhitePixles = xDrive.trajectorySequenceBuilder(inchBackward.end())
                     .back(87)
                     .strafeTo(new Vector2d(42.5, 36))
                     .build();
 
-            TrajectorySequence parkingSeq = xDrive.trajectorySequenceBuilder(trajBackToDropWhitePixles.end())
+
+
+            TrajectorySequence parkingLeftSeq = xDrive.trajectorySequenceBuilder(trajBackToDropWhitePixles.end())
                     .strafeRight(21)
+                    .back(15)
+                    .build();
+
+            TrajectorySequence parkingRightSeq = xDrive.trajectorySequenceBuilder(trajBackToDropWhitePixles.end())
+                    .strafeLeft(21)
                     .back(15)
                     .build();
 
@@ -73,28 +84,39 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION, true); sleep(1400);
             openRightClaw(); sleep(200);
 
-            //STEP 3 -- Go to pick 2 White Pixels
-            moveArmToPosition(MIN_ARM_POSITION + 40, false); //sleep(200);
-            xDrive.followTrajectorySequence(trajToPickWhitePixels);
-            setWristPosition(WRIST_FLAT_TO_GROUND); sleep(200);
-
-            //STEP 4 -- Move forward to grab pixels
-            xDrive.followTrajectorySequence(trajSeq4); sleep(100);
-            closeBothClaws(); sleep(200);
-
-            //STEP 5 -- Move back to make sure pixels are in claw
-            xDrive.followTrajectorySequence(trajSeq5); sleep(100);
-            setWristPosition(WRIST_VERTICAL);
-
-            //STEP 6 -- Going to drop white Pixels
-            xDrive.followTrajectorySequence(trajBackToDropWhitePixles); sleep(100);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, true); sleep(1400);
-            openBothClaws(); sleep(200);
+            grabAndDropWhitePixels(trajToPickWhitePixels, inchForward, inchBackward, trajBackToDropWhitePixles);
 
             //STEP 7 -- Park
             moveArmToPosition(MIN_ARM_POSITION, false);
-            xDrive.followTrajectorySequence(parkingSeq);
+            xDrive.followTrajectorySequence(parkingLeftSeq);
         }
         stopRobot();
+    }
+
+    private void grabAndDropWhitePixels(TrajectorySequence trajToPickWhitePixels, TrajectorySequence trajSeq4, TrajectorySequence trajSeq5, TrajectorySequence trajBackToDropWhitePixles) {
+        //STEP 3 -- Go to pick 2 White Pixels
+        moveArmToPosition(MIN_ARM_POSITION + 40, false); //sleep(200);
+        xDrive.followTrajectorySequence(trajToPickWhitePixels);
+        setWristPosition(WRIST_FLAT_TO_GROUND);
+        sleep(200);
+
+        //STEP 4 -- Move forward to grab pixels
+        xDrive.followTrajectorySequence(trajSeq4);
+        sleep(100);
+        closeBothClaws();
+        sleep(200);
+
+        //STEP 5 -- Move back to make sure pixels are in claw
+        xDrive.followTrajectorySequence(trajSeq5);
+        sleep(100);
+        setWristPosition(WRIST_VERTICAL);
+
+        //STEP 6 -- Going to drop white Pixels
+        xDrive.followTrajectorySequence(trajBackToDropWhitePixles);
+        sleep(100);
+        moveArmToPosition(DEFAULT_DROP_ARM_POSITION, true);
+        sleep(1400);
+        openBothClaws();
+        sleep(200);
     }
 }

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import java.util.LinkedList;
-import java.util.Queue;
 public class SizeLimitedQueue<E>
         extends LinkedList<E> {
 

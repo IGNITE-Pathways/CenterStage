@@ -7,7 +7,6 @@ public class XBot {
     static final int MIN_ARM_POSITION = 0;
     static final int DEFAULT_DROP_ARM_POSITION = 1540;
     static final int MAX_ARM_POSITION = 1600; //FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 60/100; //50%
-//    static final int AUTO_MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 55/100; //60%
 
     static int ARM_PICK_POSITION = MIN_ARM_POSITION; //Robot must move slow
     static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4/100;; // 4% //Robot running across field
@@ -22,22 +21,12 @@ public class XBot {
     static final double MAX_WRIST_POS = 1.0;     // Maximum rotational position (closer to ground)
     static final double WRIST_FLAT_TO_GROUND = 0.62;     // Maximum rotational position
     static final double WRIST_VERTICAL = 0.0;     // Maximum rotational position
-    static final double WRIST_UPPER_DROP_POSITION = 1.0;     // Maximum rotational position
 
     //CLAW
     static final double LEFT_CLAW_OPEN_POSITION = 0.13;
     static final double LEFT_CLAW_CLOSE_POSITION = 0.53;
-    static final double STARTING_LEFT_CLAW_POS = LEFT_CLAW_OPEN_POSITION;
-
     static final double RIGHT_CLAW_OPEN_POSITION = 0.06;
-    static final double RIGHT_CLAW_CLOSE_POSITION = 0.43;
-    static final double STARTING_RIGHT_CLAW_POS = RIGHT_CLAW_OPEN_POSITION;
-
-    //DRIVE
-    static final double MAX_SPEED = 1.0; //Increase as operator gets better
-    static final double SPEED_WHEN_PICKING_PIXELS = 0.3; //gameMode = PICKING_PIXELS
-    static final double SPEED_WHEN_DROPPING_PIXELS = 0.3; //gameMode = DROPPING_PIXELS
-    static final double SPEED_WHEN_ON_APRIL_TAG_NAV = 0.5; //gameMode = APRIL_TAG_NAVIGATION
+    static final double RIGHT_CLAW_CLOSE_POSITION = 0.45;
 
     //APRIL TAG
     static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.

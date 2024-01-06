@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
+import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_OPEN_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
-import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
-import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
+import static org.firstinspires.ftc.teamcode.XBot.RIGHT_CLAW_OPEN_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
@@ -23,7 +23,6 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-import org.opencv.core.Mat;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -550,7 +549,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     void resetWristAndClawPosition() {
         wristPosition = WRIST_FLAT_TO_GROUND;
         setWristPosition(wristPosition);
-        leftClaw.setPosition(STARTING_LEFT_CLAW_POS);
-        rightClaw.setPosition(STARTING_RIGHT_CLAW_POS);
+        leftClaw.setPosition(LEFT_CLAW_OPEN_POSITION);
+        rightClaw.setPosition(RIGHT_CLAW_OPEN_POSITION);
     }
 }

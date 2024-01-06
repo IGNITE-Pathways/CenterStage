@@ -16,10 +16,7 @@ public class AutoBlueNearRight extends XBotAutoOpMode implements AutoOpMode {
         runtime.reset();
 
         if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.RIGHT);
-                sleep(10);
-            }
+            autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.RIGHT);
         }
         stopRobot();
     }

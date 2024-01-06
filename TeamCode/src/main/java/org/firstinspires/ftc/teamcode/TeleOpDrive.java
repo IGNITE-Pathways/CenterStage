@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_ROBOT_HANGING;
-import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_CLOSE_POSITION;
@@ -13,46 +11,33 @@ import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_TURN;
-import static org.firstinspires.ftc.teamcode.XBot.MAX_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.RIGHT_CLAW_CLOSE_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.RIGHT_CLAW_OPEN_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
-import static org.firstinspires.ftc.teamcode.XBot.SPEED_WHEN_DROPPING_PIXELS;
-import static org.firstinspires.ftc.teamcode.XBot.SPEED_WHEN_ON_APRIL_TAG_NAV;
-import static org.firstinspires.ftc.teamcode.XBot.SPEED_WHEN_PICKING_PIXELS;
-import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
-import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.TELEOP_DESIRED_DISTANCE;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
-import static org.firstinspires.ftc.teamcode.XBot.WRIST_UPPER_DROP_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-
-import java.util.Queue;
 
 /*
  * This is the main manual OpMode
  */
 @TeleOp(name = "Manual Drive", group = "Concept")
 public class TeleOpDrive extends XBotOpMode {
-    double leftClawPosition = STARTING_LEFT_CLAW_POS;
-    double rightClawPosition = STARTING_RIGHT_CLAW_POS;
+    double leftClawPosition = LEFT_CLAW_OPEN_POSITION;
+    double rightClawPosition = RIGHT_CLAW_OPEN_POSITION;
     int armPosition = ARM_PICK_POSITION;
-    //Robot Speed
-    double driveSpeed = MAX_SPEED;
 //    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
 //    double calculatedDistance = DistanceSensor.distanceOutOfRange;
     @Override
@@ -140,7 +125,6 @@ public class TeleOpDrive extends XBotOpMode {
                 switch (gameMode) {
                     case GOING_TO_PICK_PIXELS:
                         // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
-                        driveSpeed = MAX_SPEED;
                         if (gameModeChanged) {
                             goToGoingToPickPixelPosition();
 //                            setWristPosition(WRIST_VERTICAL);
@@ -158,7 +142,6 @@ public class TeleOpDrive extends XBotOpMode {
                         break;
                     case GOING_TO_DROP_PIXELS:
                         // WRIST = AUTO (also allows Manual), CLAW = CLOSE POSITION (holding pixels)
-                        driveSpeed = MAX_SPEED; //Full speed from front to back
                         // Robot will be looking for april tag and will switch mode automatically once found
                         lookForAprilTag = true;
 
@@ -178,7 +161,6 @@ public class TeleOpDrive extends XBotOpMode {
                             }
                             aprilTagFound = detectAnyAprilTag();
                             if (aprilTagFound && lookForAprilTag && gamepad1.left_bumper) {
-                                driveSpeed = SPEED_WHEN_ON_APRIL_TAG_NAV;
                                 double rangeError = (desiredTagDetectionObj.ftcPose.range - TELEOP_DESIRED_DISTANCE);
                                 double headingError = desiredTagDetectionObj.ftcPose.bearing;
                                 double yawError = desiredTagDetectionObj.ftcPose.yaw;
@@ -224,7 +206,6 @@ public class TeleOpDrive extends XBotOpMode {
                         break;
                     case GOING_TO_HANG:
                         // ARM = AUTO, WRIST = AUTO, CLAW = AUTO
-                        driveSpeed = MAX_SPEED;
                         break;
                     case HANGING:
                         // ARM = AUTO and ENGAGED, WRIST = AUTO, CLAW = AUTO
@@ -242,8 +223,6 @@ public class TeleOpDrive extends XBotOpMode {
                         }
                         break;
                 }
-
-//                moveRobot(drive * driveSpeed, strafe * driveSpeed, yawTurn * driveSpeed);
 
                 mecanumDrive.setWeightedDrivePower(
                         new Pose2d(
@@ -265,16 +244,12 @@ public class TeleOpDrive extends XBotOpMode {
                 } else {
                     telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, yawTurn, strafe);
                 }
-                telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-                telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-
+                telemetry.addData("Arm: Left=", leftArmMotor.getCurrentPosition() + ", right=" + rightArmMotor.getCurrentPosition());
                 telemetry.addData("Arm Angle", ((leftArmMotor.getCurrentPosition() * 360) / FULL_CIRCLE));
                 telemetry.addData("Arm: Position", armPosition);
                 telemetry.addData("Wrist: Position", wristPosition);
                 telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
-                telemetry.addData("x", myPose.getX());
-                telemetry.addData("y", myPose.getY());
-                telemetry.addData("heading", myPose.getHeading());
+                telemetry.addData("x", myPose.getX() + ", y " + myPose.getY() + ", heading " + myPose.getHeading());
                 telemetry.update();
                 idle();
             }

@@ -1,11 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
-import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
-
 import static java.lang.Math.signum;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
