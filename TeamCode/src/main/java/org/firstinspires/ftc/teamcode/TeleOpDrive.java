@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_HIGH;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_ROBOT_HANGING;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
 import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_CLOSE_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.LEFT_CLAW_OPEN_POSITION;
@@ -52,9 +53,8 @@ public class TeleOpDrive extends XBotOpMode {
     int armPosition = ARM_PICK_POSITION;
     //Robot Speed
     double driveSpeed = MAX_SPEED;
-    // Declare OpMode members for each of the 4 motors.
-    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
-    double calculatedDistance = DistanceSensor.distanceOutOfRange;
+//    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
+//    double calculatedDistance = DistanceSensor.distanceOutOfRange;
     @Override
     public void runOpMode() {
 
@@ -67,6 +67,7 @@ public class TeleOpDrive extends XBotOpMode {
         resetWristAndClawPosition();
 
         SampleMecanumDrive mecanumDrive = new SampleMecanumDrive(hardwareMap);
+        mecanumDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mecanumDrive.setPoseEstimate(new Pose2d(10, 10, Math.toRadians(90)));
 
         // Wait for the game to start (driver presses PLAY)
@@ -142,9 +143,8 @@ public class TeleOpDrive extends XBotOpMode {
                         driveSpeed = MAX_SPEED;
                         if (gameModeChanged) {
                             armPosition = goToGoingToPickPixelPosition();
-                            setWristPosition(WRIST_VERTICAL);
+//                            setWristPosition(WRIST_VERTICAL);
                             gameModeChanged = Boolean.FALSE;
-                            resetDistanceSensor();
                         }
                         break;
                     case PICKING_PIXELS:
@@ -167,7 +167,6 @@ public class TeleOpDrive extends XBotOpMode {
 
                         if (gameModeChanged) {
                             gameModeChanged = Boolean.FALSE;
-                            resetDistanceSensor();
                         }
                         //Y Button = Manual override only required if April Tag Nav doesn't work
                         //Pressing Y Button will skill April Tag Navigation
@@ -202,25 +201,22 @@ public class TeleOpDrive extends XBotOpMode {
                         // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
                         lookForAprilTag = false;
 //                        driveSpeed = SPEED_WHEN_DROPPING_PIXELS; //Robot should not move, except yawTurn if needed
-//                        updateDistance();
 
                         if (gameModeChanged) {
                             gameModeChanged = Boolean.FALSE;
                             // Move Arm to back board -- only once
-                            armPosition = MAX_ARM_POSITION;
+                            armPosition = DEFAULT_DROP_ARM_POSITION;
                             moveArmToPosition(armPosition);
-//                            wristPosition = WRIST_UPPER_DROP_POSITION;
-//                            setWristPosition(wristPosition);
                             sleep(200);
                         }
                         //User Action :: Press O (or if distance sensor is close) to drop pixels
-                        if (gamepad2.circle || isDistanceSensorClose()) {
+//                        if (gamepad2.circle || isDistanceSensorClose()) {
+                        if (gamepad2.circle) {
                             dropPixels();
                             sleep(200);
 
                             // Move robot back a bit
-                            moveRobotBack();
-                            resetDistanceSensor();
+//                            moveRobotBack();
 
                             // Change Mode, let's go get next set of pixels
                             changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
@@ -247,7 +243,17 @@ public class TeleOpDrive extends XBotOpMode {
                         break;
                 }
 
-                moveRobot(drive * driveSpeed, strafe * driveSpeed, yawTurn * driveSpeed);
+//                moveRobot(drive * driveSpeed, strafe * driveSpeed, yawTurn * driveSpeed);
+
+                mecanumDrive.setWeightedDrivePower(
+                        new Pose2d(
+                                drive,
+                                strafe,
+                                yawTurn
+                        )
+                );
+
+                mecanumDrive.update();
 
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -266,10 +272,6 @@ public class TeleOpDrive extends XBotOpMode {
                 telemetry.addData("Arm: Position", armPosition);
                 telemetry.addData("Wrist: Position", wristPosition);
                 telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
-//                telemetry.addData("Touch: Left", leftPixelInClaw + " Right=" + rightPixelInClaw);
-//                if (calculatedDistance != DistanceSensor.distanceOutOfRange) {
-//                    telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
-//                }
                 telemetry.addData("x", myPose.getX());
                 telemetry.addData("y", myPose.getY());
                 telemetry.addData("heading", myPose.getHeading());
@@ -310,15 +312,6 @@ public class TeleOpDrive extends XBotOpMode {
         if (leftPixelInClaw) {
             waitAndMoveArmAndResetDistance();
         }
-    }
-
-    private void resetDistanceSensor() {
-        distanceQueue.clear();
-        calculatedDistance = DistanceSensor.distanceOutOfRange;
-    }
-
-    private boolean isDistanceSensorClose() {
-        return calculatedDistance < 40;
     }
 
     private void dropPixels() {
@@ -389,27 +382,5 @@ public class TeleOpDrive extends XBotOpMode {
         leftBack.setPower(0);
         rightBack.setPower(0);
     }
-
-    private void addNewDistanceValue(double distance) {
-        distanceQueue.add(distance);
-    }
-
-//    private void updateDistance() {
-//        double distance = sensorDistance.getDistance(DistanceUnit.MM);
-//        if ((distance != DistanceSensor.distanceOutOfRange)) {
-//            addNewDistanceValue(distance);
-//        }
-//        calculatedDistance = calculateDistance();
-//    }
-
-//    private Double calculateDistance() {
-//        //Must have multiple entries
-//        if (distanceQueue.size() < 2) return DistanceSensor.distanceOutOfRange;
-//        Double total = 0.0;
-//        for (Double d : distanceQueue) {
-//            total += d;
-//        }
-//        return total/distanceQueue.size();
-//    }
 
 }

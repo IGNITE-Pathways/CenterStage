@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
@@ -9,6 +10,7 @@ public class AutoBlueFarRight extends XBotAutoOpMode implements AutoOpMode {
     public void runOpMode() {
         // Initialize hardware
         initializeAuto();
+        mecanumDrive.setPoseEstimate(new Pose2d(-15, 63.5, Math.toRadians(90)));
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

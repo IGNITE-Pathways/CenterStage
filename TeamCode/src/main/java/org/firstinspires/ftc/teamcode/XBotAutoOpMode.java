@@ -19,9 +19,11 @@ import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.TURN_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
@@ -38,7 +40,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean arrivedAtBackDropTagPosition = false;
     int timesTargetFound = 0;
     boolean reachedAprilTag = false;
-
+    SampleMecanumDrive mecanumDrive = null;
     boolean detectDesiredAprilTag(int tagId) {
         boolean aprilTagFound = false;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -59,6 +61,9 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         initialize();
 //        initializeIMU();
         initDriveMotorsToUseEncoders();
+        mecanumDrive = new SampleMecanumDrive(hardwareMap);
+        mecanumDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         closeBothClaws();
         gameMode = GameMode.AUTO_OP_MODE;
         if (!DEBUG) {
