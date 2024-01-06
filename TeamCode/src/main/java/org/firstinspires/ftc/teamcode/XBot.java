@@ -5,7 +5,7 @@ public class XBot {
     static final int FULL_CIRCLE = 1425; //3895.9 for 43RPM, 1425.1 for 117 RPM
     static final int ARM_MOTOR_GEAR_RATIO = 2;
     static final int MIN_ARM_POSITION = 0;
-    static final int DEFAULT_DROP_ARM_POSITION = 1500;
+    static final int DEFAULT_DROP_ARM_POSITION = 1540;
     static final int MAX_ARM_POSITION = 1600; //FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 60/100; //50%
 //    static final int AUTO_MAX_ARM_POSITION = FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 55/100; //60%
 
@@ -14,7 +14,7 @@ public class XBot {
     static final int ARM_POSITION_UP = 800;
     static final int ARM_POSITION_ROBOT_HANGING = 800;
 
-    static final double ARM_SPEED = 0.5;
+    static final double ARM_SPEED = 0.7;
     static final double ARM_HOLD_SPEED = 0.05;
 
     // WRIST
@@ -26,7 +26,7 @@ public class XBot {
 
     //CLAW
     static final double LEFT_CLAW_OPEN_POSITION = 0.13;
-    static final double LEFT_CLAW_CLOSE_POSITION = 0.5;
+    static final double LEFT_CLAW_CLOSE_POSITION = 0.53;
     static final double STARTING_LEFT_CLAW_POS = LEFT_CLAW_OPEN_POSITION;
 
     static final double RIGHT_CLAW_OPEN_POSITION = 0.06;

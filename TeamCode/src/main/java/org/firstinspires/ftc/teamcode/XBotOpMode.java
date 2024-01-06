@@ -221,6 +221,8 @@ public abstract class XBotOpMode extends LinearOpMode {
     void resetArmEncoders() {
         leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     void changeGameMode(GameMode mode) {
@@ -354,8 +356,8 @@ public abstract class XBotOpMode extends LinearOpMode {
         closeRightClaw();
     }
 
-    int moveArmToPosition(int armPosition) {
-        int savePos = armPosition;
+    void moveArmToPosition(int armPosition) {
+//        int savePos = armPosition;
         // set motors to run forward for 5000 encoder counts.
         leftArmMotor.setTargetPosition(armPosition);
         rightArmMotor.setTargetPosition(armPosition);
@@ -367,21 +369,24 @@ public abstract class XBotOpMode extends LinearOpMode {
         leftArmMotor.setPower(ARM_SPEED);
         rightArmMotor.setPower(ARM_SPEED);
 
-        while (opModeIsActive() && rightArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
+        while (leftArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
         {
-            armPosition = leftArmMotor.getCurrentPosition();
-            wristPosition = getWristPosition(armPosition);
-            setWristPosition(wristPosition);
-            telemetry.addData("Arm: Target", savePos);
+            if (gameMode != GameMode.AUTO_OP_MODE) {
+                armPosition = leftArmMotor.getCurrentPosition();
+                wristPosition = getWristPosition(armPosition);
+                setWristPosition(wristPosition);
+            }
+//            telemetry.addData("Arm: Target", savePos);
             telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-//            telemetry.update();
+//            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+            telemetry.update();
+            sleep(10);
         }
 
-        leftArmMotor.setPower(ARM_HOLD_SPEED);
-        rightArmMotor.setPower(ARM_HOLD_SPEED);
+//        leftArmMotor.setPower(ARM_HOLD_SPEED);
+//        rightArmMotor.setPower(ARM_HOLD_SPEED);
 
-        return armPosition;
+//        return armPosition;
     }
 
     void setWristPosition(double wristPosition) {

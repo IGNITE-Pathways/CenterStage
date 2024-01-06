@@ -142,7 +142,7 @@ public class TeleOpDrive extends XBotOpMode {
                         // ARM = AUTO, WRIST = AUTO, CLAWS = AUTO
                         driveSpeed = MAX_SPEED;
                         if (gameModeChanged) {
-                            armPosition = goToGoingToPickPixelPosition();
+                            goToGoingToPickPixelPosition();
 //                            setWristPosition(WRIST_VERTICAL);
                             gameModeChanged = Boolean.FALSE;
                         }
@@ -151,7 +151,7 @@ public class TeleOpDrive extends XBotOpMode {
                         // ARM = AUTO, WRIST = AUTO, CLAWS = OPEN or CLOSE
                         if (gameModeChanged) {
 //                            driveSpeed = SPEED_WHEN_PICKING_PIXELS; //Slow down, need precision to pick pixels
-                            armPosition = goToPickPixelPosition();
+                            goToPickPixelPosition();
                             gameModeChanged = Boolean.FALSE;
                         }
                         if (gamepad2.circle) pickPixels(); //Manual Grab
@@ -323,53 +323,53 @@ public class TeleOpDrive extends XBotOpMode {
         changeGameMode(GameMode.GOING_TO_PICK_PIXELS);
     }
 
-    private int goToPickPixelPosition() {
+    private void goToPickPixelPosition() {
         setClawsToPixelPickPosition();
         wristPosition = WRIST_FLAT_TO_GROUND;
         setWristPosition(wristPosition);
-        return moveArmToPosition(ARM_PICK_POSITION);
+        moveArmToPosition(ARM_PICK_POSITION);
     }
 
-    private int goToGoingToPickPixelPosition() {
+    private void goToGoingToPickPixelPosition() {
         setClawsToPixelPickPosition();
         wristPosition = WRIST_VERTICAL;
         setWristPosition(wristPosition);
-        return moveArmToPosition(ARM_POSITION_HIGH);
+        moveArmToPosition(ARM_POSITION_HIGH);
     }
     private void setClawsToPixelPickPosition() {
         leftClaw.setPosition(LEFT_CLAW_OPEN_POSITION);
         rightClaw.setPosition(RIGHT_CLAW_OPEN_POSITION);
     }
 
-    int moveArmToPosition(int armPosition) {
-        int savePos = armPosition;
-        // set motors to run forward for 5000 encoder counts.
-        leftArmMotor.setTargetPosition(armPosition);
-        rightArmMotor.setTargetPosition(armPosition);
-
-        // set motors to run to target encoder position and stop with brakes on.
-        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftArmMotor.setPower(ARM_SPEED);
-        rightArmMotor.setPower(ARM_SPEED);
-
-        while (opModeIsActive() && leftArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
-        {
-            armPosition = leftArmMotor.getCurrentPosition();
-            wristPosition = getWristPosition(armPosition);
-            setWristPosition(wristPosition);
-            telemetry.addData("Arm: Target", savePos);
-            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-            telemetry.update();
-        }
-
-//        leftArmMotor.setPower(ARM_HOLD_SPEED);
-//        rightArmMotor.setPower(ARM_HOLD_SPEED);
-        
-        return armPosition;
-    }
+//    void moveArmToPosition(int armPosition) {
+//        int savePos = armPosition;
+//        // set motors to run forward for 5000 encoder counts.
+//        leftArmMotor.setTargetPosition(armPosition);
+//        rightArmMotor.setTargetPosition(armPosition);
+//
+//        // set motors to run to target encoder position and stop with brakes on.
+//        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//        leftArmMotor.setPower(ARM_SPEED);
+//        rightArmMotor.setPower(ARM_SPEED);
+//
+//        while (opModeIsActive() && leftArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
+//        {
+//            armPosition = leftArmMotor.getCurrentPosition();
+//            wristPosition = getWristPosition(armPosition);
+//            setWristPosition(wristPosition);
+//            telemetry.addData("Arm: Target", savePos);
+//            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+//            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+//            telemetry.update();
+//        }
+//
+////        leftArmMotor.setPower(ARM_HOLD_SPEED);
+////        rightArmMotor.setPower(ARM_HOLD_SPEED);
+//
+////        return armPosition;
+//    }
 
     public void moveRobotBack() {
         leftFront.setPower(0.2);
