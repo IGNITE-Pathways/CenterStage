@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_HOLD_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.FULL_CIRCLE;
-import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_LEFT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.STARTING_RIGHT_CLAW_POS;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_UPPER_DROP_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -384,7 +385,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     }
 
     void setWristPosition(double wristPosition) {
-        wristPosition = Math.min(MIN_WRIST_POS, Math.max(MAX_WRIST_POS, wristPosition));
+        wristPosition = Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, wristPosition));
         leftWrist.setPosition(wristPosition);
         rightWrist.setPosition(wristPosition);
     }
@@ -407,25 +408,25 @@ public abstract class XBotOpMode extends LinearOpMode {
                 || (gameMode == GameMode.DROPPING_PIXELS)) {
 //            //Calculate claw position based on arm position
 //            if (isArmFacingBack(armPosition)) {
-//                int angleA = ((armPosition * 360) / FULL_CIRCLE);
-//                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
-//            } else {
-//                return wristPosition; //return existing position
-//            }
-                return WRIST_VERTICAL;
+                int angleA = ((armPosition * 360) / FULL_CIRCLE);
+                if (angleA < 340) {
+                    return MIN_WRIST_POS;
+                } else {
+                    return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (-115 + (.303 * angleA)) / 100));
+                }
             } else
         if ((gameMode == GameMode.AUTO_OP_MODE)) {
             if (armPosition > 1500) {
                 return WRIST_VERTICAL;
             } else if (isArmFacingBack(armPosition)) {
                 int angleA = ((armPosition * 360) / FULL_CIRCLE);
-                return Math.min(MAX_WRIST_POS, Math.max(MIN_WRIST_POS, (123 - (0.196 * angleA)) / 100));
+                return Math.min(MIN_WRIST_POS, Math.max(MAX_WRIST_POS, (123 - (0.196 * angleA)) / 100));
             } else {
-                return MIN_WRIST_POS;
+                return MAX_WRIST_POS;
             }
         } else {
             //HOME
-            return MIN_WRIST_POS;
+            return MAX_WRIST_POS;
         }
     }
 

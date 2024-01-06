@@ -13,7 +13,9 @@ import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_TURN;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_SPEED;
+import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.RIGHT_CLAW_CLOSE_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.RIGHT_CLAW_OPEN_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
@@ -67,12 +69,10 @@ public class TeleOpDrive extends XBotOpMode {
         SampleMecanumDrive mecanumDrive = new SampleMecanumDrive(hardwareMap);
         mecanumDrive.setPoseEstimate(new Pose2d(10, 10, Math.toRadians(90)));
 
-
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("Arm: Target", armPosition);
-        telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-        telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+        telemetry.addData("Arm: Position", leftArmMotor.getCurrentPosition() + ": " + rightArmMotor.getCurrentPosition());
+        telemetry.addData("Claw: Position", leftClaw.getPosition() + ": " + rightClaw.getPosition());
         telemetry.addData("Wrist: Position", leftWrist.getPosition() +" : " + rightWrist.getPosition());
         telemetry.update();
 
@@ -119,6 +119,13 @@ public class TeleOpDrive extends XBotOpMode {
                     moveArmToPosition(armPosition);
                 }
 
+                double moveWristBy = -(gamepad2.right_stick_y / 100.0);
+                if (moveWristBy != 0) {
+                    wristPosition += moveWristBy;
+                    wristPosition = Math.max(MIN_WRIST_POS, wristPosition); // cannot go below MIN_ARM_POSITION
+                    wristPosition = Math.min(MAX_WRIST_POS, wristPosition); // cannot go above MAX_ARM_POSITION
+                    setWristPosition(wristPosition);
+                }
                 //Hanging mode
                 if (gamepad2.dpad_up) {
                     changeGameMode(GameMode.HANGING);
@@ -183,7 +190,8 @@ public class TeleOpDrive extends XBotOpMode {
                                 yawTurn = Range.clip(-yawError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
 
                                 //Y Button = Manual override only required if April Tag Nav doesn't work
-                                if (((rangeError < 0.1) && (rangeError > -0.1)) || gamepad2.y) {
+                                telemetry.addData("Range Error", rangeError);
+                                if (((rangeError < 0.5) && (rangeError > -0.5)) || gamepad2.y) {
                                     changeGameMode(GameMode.DROPPING_PIXELS);
                                 }
                             }
@@ -201,7 +209,8 @@ public class TeleOpDrive extends XBotOpMode {
                             // Move Arm to back board -- only once
                             armPosition = MAX_ARM_POSITION;
                             moveArmToPosition(armPosition);
-                            setWristPosition(WRIST_UPPER_DROP_POSITION);
+//                            wristPosition = WRIST_UPPER_DROP_POSITION;
+//                            setWristPosition(wristPosition);
                             sleep(200);
                         }
                         //User Action :: Press O (or if distance sensor is close) to drop pixels
@@ -257,7 +266,7 @@ public class TeleOpDrive extends XBotOpMode {
                 telemetry.addData("Arm: Position", armPosition);
                 telemetry.addData("Wrist: Position", wristPosition);
                 telemetry.addData("Claw: Left", leftClawPosition + " Right=" + rightClawPosition);
-                telemetry.addData("Touch: Left", leftPixelInClaw + " Right=" + rightPixelInClaw);
+//                telemetry.addData("Touch: Left", leftPixelInClaw + " Right=" + rightPixelInClaw);
 //                if (calculatedDistance != DistanceSensor.distanceOutOfRange) {
 //                    telemetry.addData("Distance", "%.01f mm, %.01f mm", sensorDistance.getDistance(DistanceUnit.MM), calculatedDistance);
 //                }
@@ -352,19 +361,19 @@ public class TeleOpDrive extends XBotOpMode {
         leftArmMotor.setPower(ARM_SPEED);
         rightArmMotor.setPower(ARM_SPEED);
 
-        while (opModeIsActive() && rightArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
+        while (opModeIsActive() && leftArmMotor.isBusy())   //leftMotor.getCurrentPosition() < leftMotor.getTargetPosition())
         {
-            leftArmMotor.getCurrentPosition();
-//            wristPosition = getWristPosition(armPosition);
-//            setWristPosition(wristPosition);
+            armPosition = leftArmMotor.getCurrentPosition();
+            wristPosition = getWristPosition(armPosition);
+            setWristPosition(wristPosition);
             telemetry.addData("Arm: Target", savePos);
             telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
             telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
             telemetry.update();
         }
 
-        leftArmMotor.setPower(ARM_HOLD_SPEED);
-        rightArmMotor.setPower(ARM_HOLD_SPEED);
+//        leftArmMotor.setPower(ARM_HOLD_SPEED);
+//        rightArmMotor.setPower(ARM_HOLD_SPEED);
         
         return armPosition;
     }

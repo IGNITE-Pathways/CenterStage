@@ -8,12 +8,11 @@ import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_LEFT;
 import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_RIGHT;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
-import static org.firstinspires.ftc.teamcode.XBot.AUTO_MAX_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_TURN;
-import static org.firstinspires.ftc.teamcode.XBot.MAX_WRIST_POS;
+import static org.firstinspires.ftc.teamcode.XBot.MIN_WRIST_POS;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.SPEED_GAIN;
 import static org.firstinspires.ftc.teamcode.XBot.STRAFE_GAIN;
@@ -22,7 +21,6 @@ import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -161,7 +159,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //distance = FAR, alliance = BLUE
                 moveRobot(1030, TANK_TURN_LEFT);
                 moveArmToPosition(1770);
-                wristPosition = MAX_WRIST_POS;
+                wristPosition = MIN_WRIST_POS;
                 setWristPosition(wristPosition);
                 sleep(100);
                 moveRobot(420, BACKWARD);
@@ -179,7 +177,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         } else {
             //Away from Truss
             moveArmToPosition(1770);
-            wristPosition = MAX_WRIST_POS;
+            wristPosition = MIN_WRIST_POS;
             setWristPosition(wristPosition);
             sleep(100);
             //@TODO: Test for FAR, RED (BLUE, NEAR works)
@@ -305,7 +303,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
             //Away from Truss
             moveArmToPosition(1770);
-            wristPosition = MAX_WRIST_POS;
+            wristPosition = MIN_WRIST_POS;
             setWristPosition(wristPosition);
             sleep(100);
             //@TODO: Test for FAR, BLUE (RED, NEAR works)
@@ -316,7 +314,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
                 //distance = FAR, alliance = RED
                 moveRobot(1030, TANK_TURN_RIGHT);
                 moveArmToPosition(1770);
-                wristPosition = MAX_WRIST_POS;
+                wristPosition = MIN_WRIST_POS;
                 setWristPosition(wristPosition);
                 sleep(100);
                 moveRobot(420, BACKWARD); //Push it under the truss
@@ -443,7 +441,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
 //        fixRobotYaw(0);
         moveArmToPosition(1770);
-        wristPosition = MAX_WRIST_POS;
+        wristPosition = MIN_WRIST_POS;
         setWristPosition(wristPosition);
         moveRobot(300, BACKWARD);
         stopDriveMotors();
