@@ -352,17 +352,19 @@ public abstract class XBotOpMode extends LinearOpMode {
         closeRightClaw();
     }
 
-    void moveArmToPosition(int armPosition, boolean increasing) {
-        int slowSpeedMovement = Math.abs(armPosition - leftArmMotor.getCurrentPosition()) / 10;
-        if (increasing) {
-            //Arm going up
-            moveArmToPosition(armPosition - slowSpeedMovement);
-            moveArmToPosition(slowSpeedMovement, ARM_SPEED / 2);
-        } else {
-            moveArmToPosition(slowSpeedMovement);
-            moveArmToPosition(armPosition, ARM_SPEED / 2);
-        }
-    }
+//    void moveArmToPosition(int armPosition, boolean increasing) {
+//        int slowSpeedMovement = Math.abs(armPosition - leftArmMotor.getCurrentPosition()) / 10;
+//        if (increasing) {
+//            //Arm going up
+//            moveArmToPosition(armPosition - slowSpeedMovement);
+//            sleep(100);
+//            moveArmToPosition(slowSpeedMovement, ARM_SPEED / 2);
+//        } else {
+//            moveArmToPosition(slowSpeedMovement);
+//            sleep(100);
+//            moveArmToPosition(armPosition, ARM_SPEED / 2);
+//        }
+//    }
 
     void moveArmToPosition(int armPosition) {
         moveArmToPosition(armPosition, ARM_SPEED);

@@ -1,7 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
+import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name = "Auto Blue Near Right", group = "Concept")
 public class AutoBlueNearRight extends XBotAutoOpMode implements AutoOpMode {
@@ -9,14 +18,78 @@ public class AutoBlueNearRight extends XBotAutoOpMode implements AutoOpMode {
     public void runOpMode() {
         // Initialize hardware
         initializeAuto();
-        xDrive.setPoseEstimate(new Pose2d(15, 63.5, Math.toRadians(90)));
+        Pose2d startPose = new Pose2d(16, 63.5, Math.toRadians(90));
+        xDrive.setPoseEstimate(startPose);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         if (opModeIsActive()) {
-            autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.RIGHT);
+            while (!teamPropDetectionCompleted) {
+                detectTeamPropAndSwitchCameraToAprilTag();
+            }
+            telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
+            //spikeMark is set
+
+//            autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.RIGHT);
+            TrajectorySequence trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                    .back(27.5)
+                    .turn(Math.toRadians(90))
+                    .back(21)
+                    .build();
+
+//            Trajectory trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end())
+//                    .strafeRight(8.5)
+//                    .back(6.5)
+//                    .build();
+
+            Trajectory trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
+                    .splineTo(new Vector2d(43.5, 44.5), 0)
+                    .build();
+
+            TrajectorySequence trajToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajToDropYellowPixel.end())
+                    .strafeTo(new Vector2d(42.5, 9.5))
+                    .lineTo(new Vector2d(-50, 9.5))
+                    .build();
+
+            TrajectorySequence inchForward = xDrive.trajectorySequenceBuilder(trajToPickWhitePixels.end())
+                    .forward(5)
+                    .build();
+
+            TrajectorySequence inchBackward = xDrive.trajectorySequenceBuilder(inchForward.end())
+                    .back(10)
+                    .build();
+
+            TrajectorySequence trajBackToDropWhitePixles = xDrive.trajectorySequenceBuilder(inchBackward.end())
+                    .back(88)
+                    .strafeTo(new Vector2d(42.5, 36))
+                    .build();
+
+            TrajectorySequence parkingRightSeq = xDrive.trajectorySequenceBuilder(trajBackToDropWhitePixles.end())
+                    .strafeLeft(22)
+                    .back(15)
+                    .build();
+
+            sleep(10);
+
+            if (isStopRequested()) return;
+            //STEP 1 -- Purple Pixel Drop on spike mark
+            xDrive.followTrajectorySequence(trajToDropPurplePixel);
+            setWristPosition(WRIST_FLAT_TO_GROUND); sleep(200);
+            openLeftClaw(); sleep(200);
+
+            //STEP 2 -- Yellow Pixel to back board
+            setWristPosition(WRIST_VERTICAL); sleep(50);
+            xDrive.followTrajectory(trajToDropYellowPixel); //sleep(100);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION ); sleep(1400);
+            openRightClaw(); sleep(200);
+
+            grabAndDropWhitePixels(trajToPickWhitePixels, inchForward, inchBackward, trajBackToDropWhitePixles);
+
+            //STEP 7 -- Park
+            moveArmToPosition(MIN_ARM_POSITION );
+            xDrive.followTrajectorySequence(parkingRightSeq);
         }
         stopRobot();
     }

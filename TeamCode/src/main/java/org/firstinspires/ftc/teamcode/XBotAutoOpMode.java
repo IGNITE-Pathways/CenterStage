@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_LEFT;
 import static org.firstinspires.ftc.teamcode.MoveRobot.TANK_TURN_RIGHT;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_PICK_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.ARM_POSITION_UP;
+import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_SPEED;
 import static org.firstinspires.ftc.teamcode.XBot.MAX_AUTO_STRAFE;
@@ -25,6 +26,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
@@ -636,4 +638,30 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         }
     }
 
+    public void grabAndDropWhitePixels(TrajectorySequence trajToPickWhitePixels, TrajectorySequence trajSeq4, TrajectorySequence trajSeq5, TrajectorySequence trajBackToDropWhitePixles) {
+        //STEP 3 -- Go to pick 2 White Pixels
+        moveArmToPosition(MIN_ARM_POSITION + 43); //sleep(200);
+        xDrive.followTrajectorySequence(trajToPickWhitePixels);
+        setWristPosition(WRIST_FLAT_TO_GROUND);
+        sleep(200);
+
+        //STEP 4 -- Move forward to grab pixels
+        xDrive.followTrajectorySequence(trajSeq4);
+        sleep(100);
+        closeBothClaws();
+        sleep(200);
+
+        //STEP 5 -- Move back to make sure pixels are in claw
+        xDrive.followTrajectorySequence(trajSeq5);
+        sleep(100);
+        setWristPosition(WRIST_VERTICAL);
+
+        //STEP 6 -- Going to drop white Pixels
+        xDrive.followTrajectorySequence(trajBackToDropWhitePixles);
+        sleep(100);
+        moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 80);
+        sleep(1400);
+        openBothClaws();
+        sleep(200);
+    }
 }
