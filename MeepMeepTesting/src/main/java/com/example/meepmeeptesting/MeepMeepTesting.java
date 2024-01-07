@@ -36,7 +36,7 @@ public class MeepMeepTesting {
 //                                .build()
 //                );
 
-        RoadRunnerBotEntity blueNearLeft = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity blueNearLeftPixelLeftParking = new DefaultBotBuilder(meepMeep)
                 .setDimensions(14,14)
                 .setDriveTrainType(DriveTrainType.MECANUM)
                 .setColorScheme(new ColorSchemeBlueLight())
@@ -63,7 +63,7 @@ public class MeepMeepTesting {
                                 .build()
                 );
 
-        RoadRunnerBotEntity blueNearRight = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity blueNearRightPixelLeftParking = new DefaultBotBuilder(meepMeep)
                 .setDimensions(14,14)
                 .setDriveTrainType(DriveTrainType.MECANUM)
                 .setColorScheme(new ColorSchemeBlueLight())
@@ -71,15 +71,50 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(15, 63.5, Math.toRadians(90)))
-                                .back(34)
+                        drive.trajectorySequenceBuilder(new Pose2d(16, 63.5, Math.toRadians(90)))
+                                .back(27.5)
                                 .turn(Math.toRadians(90))
-                                .back(21)
+                                .forward(2)
+                                .back(23)
                                 //Drop Pixel on Spikemark
-                                .strafeRight(10)
-                                .back(4)
+                                .strafeRight(8.5)
+                                .back(6.5)
                                 //Drop Pixel on Backdrop
-                                .strafeLeft(29)
+                                .strafeTo(new Vector2d(43.5, 9.5))
+                                .lineTo(new Vector2d(-50, 9.5))
+                                .forward(5)
+                                .back(10)
+                                .back(88.5)
+                                .strafeTo(new Vector2d(43.5, 36))
+                                .strafeRight(22.5)
+                                .back(15)
+                                .build()
+                );
+
+        RoadRunnerBotEntity blueFarLeftPixelLeftParking = new DefaultBotBuilder(meepMeep)
+                .setDimensions(14,14)
+                .setDriveTrainType(DriveTrainType.MECANUM)
+                .setColorScheme(new ColorSchemeBlueLight())
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(52.48291908330528, 52.48291908330528,
+                        5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
+                                .back(27.5)
+                                .turn(Math.toRadians(90))
+                                .forward(2)
+                                .back(23)
+                                //Drop Pixel on Spikemark
+                                .strafeRight(8.5)
+                                .back(6.5)
+                                //Drop Pixel on Backdrop
+                                .strafeTo(new Vector2d(43.5, 9.5))
+                                .lineTo(new Vector2d(-50, 9.5))
+                                .forward(5)
+                                .back(10)
+                                .back(88.5)
+                                .strafeTo(new Vector2d(43.5, 36))
+                                .strafeRight(22.5)
                                 .back(15)
                                 .build()
                 );
@@ -130,7 +165,9 @@ public class MeepMeepTesting {
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
 //                .addEntity(blueFarLeft)
-                .addEntity(blueNearLeft)
+//                .addEntity(blueNearLeftPixelLeftParking)
+//                .addEntity(blueNearRightPixelLeftParking)
+                .addEntity(blueFarLeftPixelLeftParking)
 //                .addEntity(redNearRight)
 //                .addEntity(redNearLeft)
 //                .addEntity(blueNearRight)
