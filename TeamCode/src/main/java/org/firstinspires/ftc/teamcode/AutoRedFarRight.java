@@ -6,6 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class AutoRedFarRight extends XBotAutoOpMode implements AutoOpMode {
     @Override
     public void runOpMode() {
+        Double DROP_LINE_X = 43.0;
+        Double WHITE_STACK_Y = 9.0;
+        Double WHITE_STACK_X = -50.0;
+
         // Initialize hardware
         initializeAuto();
 
@@ -13,12 +17,8 @@ public class AutoRedFarRight extends XBotAutoOpMode implements AutoOpMode {
         waitForStart();
         runtime.reset();
 
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                autonomousPlay(Alliance.RED, DistanceFromBackdrop.FAR, Parking.RIGHT);
-                sleep(9);
-            }
-        }
+//        autonomousPlay(Alliance.RED, DistanceFromBackdrop.FAR, Parking.RIGHT);
+
         stopRobot();
     }
 }

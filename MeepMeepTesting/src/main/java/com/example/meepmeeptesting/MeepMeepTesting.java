@@ -45,7 +45,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(16, 63.5, Math.toRadians(90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(15, 63.5, Math.toRadians(90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(90))
                                 .back(21)
@@ -75,18 +75,22 @@ public class MeepMeepTesting {
                         drive.trajectorySequenceBuilder(new Pose2d(16, 63.5, Math.toRadians(90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(90))
-                                .forward(2)
-                                .back(23)
+                                .forward(10)
+                                .back(9)
+                                .waitSeconds(1)
                                 //Drop Pixel on Spikemark
-                                .strafeRight(8.5)
-                                .back(6.5)
+                                .setReversed(true)
+                                .splineTo(new Vector2d(43.5, 32.5), 0)
                                 //Drop Pixel on Backdrop
+                                .waitSeconds(1)
                                 .strafeTo(new Vector2d(43.5, 9.5))
                                 .lineTo(new Vector2d(-50, 9.5))
                                 .forward(5)
+                                .waitSeconds(1)
                                 .back(10)
                                 .back(88.5)
                                 .strafeTo(new Vector2d(43.5, 36))
+                                .waitSeconds(1)
                                 .strafeRight(22.5)
                                 .back(15)
                                 .build()
@@ -100,21 +104,6 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-//                        drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
-//                                .back(27.5)
-//                                .turn(Math.toRadians(135))
-//                                .splineTo(new Vector2d(-30, 36), 0)
-//                                .turn(Math.toRadians(90))
-//                                .splineTo(new Vector2d(25, -15), 0)
-//                                .waitSeconds(3)
-//                                .turn(Math.toRadians(45))
-//                                .forward(10)
-//                                .strafeRight(5)
-//                                .turn(Math.toRadians(90))
-//                                .strafeLeft(5)
-//                                .waitSeconds(1)
-//                                .splineToLinearHeading(new Pose2d(-10, -10, Math.toRadians(45)), 0)
-//                                .build()
                         drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(145))
@@ -158,7 +147,7 @@ public class MeepMeepTesting {
                                 .build()
                 );
 
-        RoadRunnerBotEntity redNearLeft = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity redNearLeftPixelLeftParking = new DefaultBotBuilder(meepMeep)
                 .setDimensions(14,14)
                 .setDriveTrainType(DriveTrainType.MECANUM)
                 .setColorScheme(new ColorSchemeRedLight())
@@ -166,28 +155,97 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(15, -63.5, Math.toRadians(-90)))
-                                .back(34)
+                        drive.trajectorySequenceBuilder(new Pose2d(10, -63.5, Math.toRadians(-90)))
+                                .back(27.5)
                                 .turn(Math.toRadians(-90))
                                 .back(21)
                                 //Drop Pixel on Spikemark
-                                .strafeLeft(10)
-                                .back(4)
+                                .waitSeconds(1)
+                                .setReversed(true)
+                                .splineTo(new Vector2d(43.5, -32.5), 0)
                                 //Drop Pixel on Backdrop
-                                .strafeRight(29)
+                                .waitSeconds(1)
+                                .strafeTo(new Vector2d(43.5, 9.5))
+                                .lineTo(new Vector2d(-50, 9.5))
+                                .forward(5)
+                                .back(10)
+                                .back(88.5)
+                                .strafeTo(new Vector2d(43.5, -36))
+                                .strafeRight(22.5)
                                 .back(15)
                                 .build()
                 );
 
+        RoadRunnerBotEntity redNearCenterPixelLeftParking = new DefaultBotBuilder(meepMeep)
+                .setDimensions(14,14)
+                .setDriveTrainType(DriveTrainType.MECANUM)
+                .setColorScheme(new ColorSchemeRedLight())
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(52.48291908330528, 52.48291908330528,
+                        5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(10, -63.5, Math.toRadians(-90)))
+                                .setReversed(true)
+                                .splineTo(new Vector2d(15, -24), Math.toRadians(90))
+                                .turn(Math.toRadians(-90))
+                                .back(8)
+                                //Drop Pixel on Spikemark
+                                .waitSeconds(1)
+//                                .setReversed(true)
+//                                .splineTo(new Vector2d(43.5, -32.5), 0)
+//                                //Drop Pixel on Backdrop
+//                                .waitSeconds(1)
+//                                .strafeTo(new Vector2d(43.5, 9.5))
+//                                .lineTo(new Vector2d(-50, 9.5))
+//                                .forward(5)
+//                                .back(10)
+//                                .back(88.5)
+//                                .strafeTo(new Vector2d(43.5, -36))
+//                                .strafeRight(22.5)
+//                                .back(15)
+                                .build()
+                );
+
+        RoadRunnerBotEntity redFarCenterPixelLeftParking = new DefaultBotBuilder(meepMeep)
+                .setDimensions(14,14)
+                .setDriveTrainType(DriveTrainType.MECANUM)
+                .setColorScheme(new ColorSchemeRedLight())
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(52.48291908330528, 52.48291908330528,
+                        5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
+                .followTrajectorySequence(drive ->
+                                drive.trajectorySequenceBuilder(new Pose2d(-39, -63.5, Math.toRadians(-90)))
+                                        .setReversed(true)
+                                        .back(51.5)
+                                        .splineTo(new Vector2d(10, -10), 0)
+                                        .splineTo(new Vector2d(43, -38), 0)
+                                        //Drop Pixel on Spikemark
+                                        .waitSeconds(1)
+//                                .setReversed(true)
+//                                .splineTo(new Vector2d(43.5, -32.5), 0)
+//                                //Drop Pixel on Backdrop
+//                                .waitSeconds(1)
+//                                .strafeTo(new Vector2d(43.5, 9.5))
+//                                .lineTo(new Vector2d(-50, 9.5))
+//                                .forward(5)
+//                                .back(10)
+//                                .back(88.5)
+//                                .strafeTo(new Vector2d(43.5, -36))
+//                                .strafeRight(22.5)
+//                                .back(15)
+                                        .build()
+                );
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_LIGHT)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
 //                .addEntity(blueFarLeft)
 //                .addEntity(blueNearLeftPixelLeftParking)
-//                .addEntity(blueNearRightPixelLeftParking)
-                .addEntity(blueFarCenterPixelLeftParking)
+                .addEntity(blueNearRightPixelLeftParking)
+//                .addEntity(blueFarCenterPixelLeftParking)
 //                .addEntity(redNearRight)
-//                .addEntity(redNearLeft)
+//                .addEntity(redNearLeftPixelLeftParking)
+//                .addEntity(redNearCenterPixelLeftParking)
+                .addEntity(redFarCenterPixelLeftParking)
 //                .addEntity(blueNearRight)
                 .start();
     }

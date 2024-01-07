@@ -19,8 +19,12 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
     @Override
     public void runOpMode() {
         // Initialize hardware
+        Double DROP_LINE_X = 43.0;
+        Double WHITE_STACK_Y = 9.0;
+        Double WHITE_STACK_X = -50.0;
+
         initializeAuto();
-        Pose2d startPose = new Pose2d(16, 63.5, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(15, 63.5, Math.toRadians(90));
         xDrive.setPoseEstimate(startPose);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -43,7 +47,7 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
                     .build();
 
             Trajectory trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
-                    .splineTo(new Vector2d(43.5, 44.5), 0,
+                    .splineTo(new Vector2d(DROP_LINE_X, 44.5), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
@@ -57,7 +61,7 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
                         .build();
 
                 trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
-                        .splineTo(new Vector2d(43.5, 32.5), 0,
+                        .splineTo(new Vector2d(DROP_LINE_X, 32.5), 0,
                                 SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build();
@@ -69,7 +73,7 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
                         .build();
 
                 trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
-                        .splineTo(new Vector2d(43.5, 38), 0,
+                        .splineTo(new Vector2d(DROP_LINE_X, 38), 0,
                                 SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build();
@@ -81,8 +85,8 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
 //                    .build();
 
             TrajectorySequence trajToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajToDropYellowPixel.end())
-                    .strafeTo(new Vector2d(43.5, 9.5))
-                    .lineTo(new Vector2d(-50, 9.5))
+                    .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
+                    .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                     .build();
 
             TrajectorySequence inchForward = xDrive.trajectorySequenceBuilder(trajToPickWhitePixels.end())
@@ -94,8 +98,8 @@ public class AutoBlueNearLeft extends XBotAutoOpMode implements AutoOpMode {
                     .build();
 
             TrajectorySequence trajBackToDropWhitePixles = xDrive.trajectorySequenceBuilder(inchBackward.end())
-                    .back(88.5)
-                    .strafeTo(new Vector2d(43.5, 36))
+                    .lineTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
+                    .strafeTo(new Vector2d(DROP_LINE_X, 36))
                     .build();
 
             TrajectorySequence parkingLeftSeq = xDrive.trajectorySequenceBuilder(trajBackToDropWhitePixles.end())
