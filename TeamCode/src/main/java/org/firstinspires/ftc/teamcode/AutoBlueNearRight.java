@@ -33,7 +33,7 @@ public class AutoBlueNearRight extends XBotAutoOpMode implements AutoOpMode {
             }
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             //spikeMark is set
-            spikeMark = SpikeMark.RIGHT;
+//            spikeMark = SpikeMark.RIGHT;
 
 //            autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.RIGHT);
             TrajectorySequence trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)

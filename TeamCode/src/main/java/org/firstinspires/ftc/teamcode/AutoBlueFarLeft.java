@@ -33,7 +33,7 @@ public class AutoBlueFarLeft extends XBotAutoOpMode implements AutoOpMode {
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             //spikeMark is set
 
-            spikeMark = SpikeMark.CENTER; //@TODO:TESTING
+//            spikeMark = SpikeMark.CENTER; //@TODO:TESTING
 
             //        autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.FAR, Parking.LEFT);
             TrajectorySequence trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
@@ -66,7 +66,7 @@ public class AutoBlueFarLeft extends XBotAutoOpMode implements AutoOpMode {
             } else if (spikeMark == SpikeMark.CENTER) {
                 trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                         .back(27.5)
-                        .turn(Math.toRadians(135)) //@TODO: Calibrate
+                        .turn(Math.toRadians(145))
                         .build();
 
                 trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)

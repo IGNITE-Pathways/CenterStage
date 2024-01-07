@@ -11,6 +11,7 @@ import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedLight;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveTrainType;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
+import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequence;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
@@ -91,7 +92,7 @@ public class MeepMeepTesting {
                                 .build()
                 );
 
-        RoadRunnerBotEntity blueFarLeftPixelLeftParking = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity blueFarCenterPixelLeftParking = new DefaultBotBuilder(meepMeep)
                 .setDimensions(14,14)
                 .setDriveTrainType(DriveTrainType.MECANUM)
                 .setColorScheme(new ColorSchemeBlueLight())
@@ -99,15 +100,32 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
+//                        drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
+//                                .back(27.5)
+//                                .turn(Math.toRadians(135))
+//                                .splineTo(new Vector2d(-30, 36), 0)
+//                                .turn(Math.toRadians(90))
+//                                .splineTo(new Vector2d(25, -15), 0)
+//                                .waitSeconds(3)
+//                                .turn(Math.toRadians(45))
+//                                .forward(10)
+//                                .strafeRight(5)
+//                                .turn(Math.toRadians(90))
+//                                .strafeLeft(5)
+//                                .waitSeconds(1)
+//                                .splineToLinearHeading(new Pose2d(-10, -10, Math.toRadians(45)), 0)
+//                                .build()
                         drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
                                 .back(27.5)
-                                .turn(Math.toRadians(90))
-                                .forward(2)
-                                .back(23)
+                                .turn(Math.toRadians(145))
+                                .waitSeconds(1)
+                                .setReversed(true)
                                 //Drop Pixel on Spikemark
-                                .strafeRight(8.5)
-                                .back(6.5)
-                                //Drop Pixel on Backdrop
+                                .splineTo(new Vector2d(-30, 36), 0)
+                                .back(40)
+                                .splineTo(new Vector2d(43.5, 38), 0)
+                                .waitSeconds(1)
+//                                //Drop Pixel on Backboard
                                 .strafeTo(new Vector2d(43.5, 9.5))
                                 .lineTo(new Vector2d(-50, 9.5))
                                 .forward(5)
@@ -167,7 +185,7 @@ public class MeepMeepTesting {
 //                .addEntity(blueFarLeft)
 //                .addEntity(blueNearLeftPixelLeftParking)
 //                .addEntity(blueNearRightPixelLeftParking)
-                .addEntity(blueFarLeftPixelLeftParking)
+                .addEntity(blueFarCenterPixelLeftParking)
 //                .addEntity(redNearRight)
 //                .addEntity(redNearLeft)
 //                .addEntity(blueNearRight)
