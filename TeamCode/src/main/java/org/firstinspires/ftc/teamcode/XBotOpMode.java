@@ -38,7 +38,6 @@ public abstract class XBotOpMode extends LinearOpMode {
     Servo rightWrist = null;
     Servo leftClaw = null;
     Servo rightClaw = null;
-    //    private IMU imu = null;      // Control Hub IMU
     WebcamName webcam1;
     TfodProcessor tfod;
     VisionPortal visionPortal;               // Used to manage the video source.
@@ -51,16 +50,6 @@ public abstract class XBotOpMode extends LinearOpMode {
     double wristPosition = WRIST_FLAT_TO_GROUND;
     boolean autoDrive = false;
     boolean leftPixelInClaw = false, rightPixelInClaw = false;
-    double previousLeftFrontPower, previousLeftBackPower, previousRightFrontPower, previousRightBackPower;
-
-//    void initializeIMU() {
-//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
-//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
-//        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-//        imu = hardwareMap.get(IMU.class, "imu");
-//        imu.initialize(new IMU.Parameters(orientationOnRobot));
-//        imu.resetYaw();
-//    }
 
     void initialize() {
         gameMode = GameMode.INIT;
@@ -135,14 +124,12 @@ public abstract class XBotOpMode extends LinearOpMode {
         visionPortal.setProcessorEnabled(tfod, false);
         visionPortal.setProcessorEnabled(aprilTag, true);
         makeSureCamIsReadyandExposureIsSet(XBot.APRIL_TAG_CAM_EXPOSURE, 250, "AprilTag Cam");  // Use low exposure time to reduce motion blur
-//        visionPortal.setActiveCamera(webcam1);
     }
 
     void switchToTFODCamera() {
         visionPortal.setProcessorEnabled(tfod, true);
         visionPortal.setProcessorEnabled(aprilTag, false);
         makeSureCamIsReadyandExposureIsSet(XBot.TFOD_CAM_EXPOSURE, 250, "TFOD Cam");  // Use low exposure time to reduce motion blur
-//        visionPortal.setActiveCamera(webcam2);
     }
 
     void initDriveMotorsToUseEncoders() {
@@ -352,20 +339,6 @@ public abstract class XBotOpMode extends LinearOpMode {
         closeRightClaw();
     }
 
-//    void moveArmToPosition(int armPosition, boolean increasing) {
-//        int slowSpeedMovement = Math.abs(armPosition - leftArmMotor.getCurrentPosition()) / 10;
-//        if (increasing) {
-//            //Arm going up
-//            moveArmToPosition(armPosition - slowSpeedMovement);
-//            sleep(100);
-//            moveArmToPosition(slowSpeedMovement, ARM_SPEED / 2);
-//        } else {
-//            moveArmToPosition(slowSpeedMovement);
-//            sleep(100);
-//            moveArmToPosition(armPosition, ARM_SPEED / 2);
-//        }
-//    }
-
     void moveArmToPosition(int armPosition) {
         moveArmToPosition(armPosition, ARM_SPEED);
     }
@@ -445,11 +418,6 @@ public abstract class XBotOpMode extends LinearOpMode {
     private boolean isCloseToGround(double armPosition) {
         return armPosition < 20;
     }
-
-//    public double getHeading() {
-//        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-//        return orientation.getYaw(AngleUnit.DEGREES);
-//    }
 
     void moveRobot(int distance, MoveRobot moveRobot, double speed) {
         moveRobot(distance, moveRobot, speed, false);
@@ -535,18 +503,6 @@ public abstract class XBotOpMode extends LinearOpMode {
         // Save more CPU resources when camera is no longer needed.
         visionPortal.close();
     }
-
-    void setAprilTagDecimation() {
-        // Adjust Image Decimation to trade-off detection-range for detection-rate.
-        // eg: Some typical detection data using a Logitech C920 WebCam
-        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
-        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
-        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
-        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
-        // Note: Decimation can be changed on-the-fly to adapt during a match.
-        aprilTag.setDecimation(2);
-    }
-
 
     void resetWristAndClawPosition() {
         wristPosition = WRIST_FLAT_TO_GROUND;

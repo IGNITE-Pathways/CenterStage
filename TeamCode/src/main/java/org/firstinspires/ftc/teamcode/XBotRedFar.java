@@ -13,13 +13,9 @@ import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-public abstract class XBotRedFar extends XBotAutoOpMode {
+public abstract class XBotRedFar extends XBotRed {
     public void autoRedFar(Parking parking) {
         // Initialize hardware
-        Double DROP_LINE_X = 43.0;
-        Double WHITE_STACK_Y = 9.0;
-        Double WHITE_STACK_X = -50.0;
-
         initializeAuto();
         Pose2d startPose = new Pose2d(-38, -63.5, Math.toRadians(-90));
         xDrive.setPoseEstimate(startPose);
@@ -32,7 +28,6 @@ public abstract class XBotRedFar extends XBotAutoOpMode {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-//            spikeMark = SpikeMark.LEFT; //@TODO:TESTING
 
             TrajectorySequence trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                     .back(27.5)
@@ -77,8 +72,8 @@ public abstract class XBotRedFar extends XBotAutoOpMode {
             }
 
             TrajectorySequence trajToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajToDropYellowPixel.end())
-                    .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-                    .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
+                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y))
+                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y))
                     .build();
 
             TrajectorySequence inchForward = xDrive.trajectorySequenceBuilder(trajToPickWhitePixels.end())
@@ -90,7 +85,7 @@ public abstract class XBotRedFar extends XBotAutoOpMode {
                     .build();
 
             TrajectorySequence trajBackToDropWhitePixles = xDrive.trajectorySequenceBuilder(inchBackward.end())
-                    .lineTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
+                    .lineTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y))
                     .strafeTo(new Vector2d(DROP_LINE_X, -36))
                     .build();
 

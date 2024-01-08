@@ -13,13 +13,9 @@ import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-public abstract class XBotBlueNear extends XBotAutoOpMode {
+public abstract class XBotBlueNear extends XBotBlue {
     public void autoBlueNear(Parking parking) {
         // Initialize hardware
-        Double DROP_LINE_X = 43.0;
-        Double WHITE_STACK_Y = 9.0;
-        Double WHITE_STACK_X = -50.0;
-
         initializeAuto();
         Pose2d startPose = new Pose2d(15, 63.5, Math.toRadians(90));
         xDrive.setPoseEstimate(startPose);
@@ -32,11 +28,7 @@ public abstract class XBotBlueNear extends XBotAutoOpMode {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-            //spikeMark is set
 
-//            spikeMark = SpikeMark.CENTER; //@TODO:TESTING
-
-            //autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.NEAR, Parking.LEFT);
             TrajectorySequence trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                     .back(27.5)
                     .turn(Math.toRadians(90))
@@ -44,7 +36,7 @@ public abstract class XBotBlueNear extends XBotAutoOpMode {
                     .build();
 
             Trajectory trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
-                    .splineTo(new Vector2d(DROP_LINE_X, 44.5), 0,
+                    .splineToConstantHeading(new Vector2d(DROP_LINE_X, 44.5), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
@@ -75,11 +67,6 @@ public abstract class XBotBlueNear extends XBotAutoOpMode {
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build();
             }
-
-//            Trajectory trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end())
-//                    .strafeRight(8.5)
-//                    .back(6.5)
-//                    .build();
 
             TrajectorySequence trajToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajToDropYellowPixel.end())
                     .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
