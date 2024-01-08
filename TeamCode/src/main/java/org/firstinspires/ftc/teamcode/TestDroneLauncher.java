@@ -8,11 +8,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Test Drone", group = "Concept")
 public class TestDroneLauncher extends LinearOpMode {
 
+    static final double DRONE_LOADED = 1.0;     // Maximum rotational position
+    static final double DRONE_LAUNCHED = 0.0;     // Maximum rotational position
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
     Servo droneServo = null;
-    static final double DRONE_LOADED = 1.0;     // Maximum rotational position
-    static final double DRONE_LAUNCHED = 0.0;     // Maximum rotational position
+
     @Override
     public void runOpMode() {
         droneServo = hardwareMap.get(Servo.class, "drone");

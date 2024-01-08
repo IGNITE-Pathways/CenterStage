@@ -8,16 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name="Test Encoder", group="Concept")
+@TeleOp(name = "Test Encoder", group = "Concept")
 @Disabled
-public class TestEncoder extends LinearOpMode
-{
+public class TestEncoder extends LinearOpMode {
     DcMotor leftArmMotor;
     DcMotor rightArmMotor;
 
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         leftArmMotor = hardwareMap.dcMotor.get("leftArmMotor");
         rightArmMotor = hardwareMap.dcMotor.get("rightArmMotor");
 

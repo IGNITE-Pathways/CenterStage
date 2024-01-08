@@ -32,8 +32,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import java.util.List;
 
 public abstract class XBotAutoOpMode extends XBotOpMode {
-    boolean DEBUG = false; //Use to test certain code / bypass some
     static final double AUTONOMOUS_SPEED = 0.6;  // Adjust as needed
+    boolean DEBUG = false; //Use to test certain code / bypass some
     int desiredTagId = -1;                  // change based on spikeMark identification
     SpikeMark spikeMark = SpikeMark.RIGHT; //Default
     float detectionConfidence = 0;
@@ -44,6 +44,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     int timesTargetFound = 0;
     boolean reachedAprilTag = false;
     SampleMecanumDrive xDrive = null;
+
     boolean detectDesiredAprilTag(int tagId) {
         boolean aprilTagFound = false;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -156,7 +157,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
 //        fixRobotYaw(0);
 
-        if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
+        if (((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
             //CLOSE to truss
             if (alliance == Alliance.BLUE) {
@@ -170,7 +171,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             } else {
                 //distance = NEAR, alliance = RED
                 moveRobot(1030, TANK_TURN_RIGHT);
-                moveArmToPosition(ARM_PICK_POSITION+4);
+                moveArmToPosition(ARM_PICK_POSITION + 4);
                 wristPosition = WRIST_FLAT_TO_GROUND;
                 setWristPosition(wristPosition);
                 sleep(100);
@@ -201,7 +202,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
-        if( (alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
+        if ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
             moveRobot(420, FORWARD);
         }
 
@@ -258,11 +259,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             desiredTagId = 1;
         }
 
-        if ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
-            //Since we didn't go through truss, we return false
-            return false;
-        }
-        return true;
+        //Since we didn't go through truss, we return false
+        return (alliance != Alliance.BLUE) || (distanceFromBackdrop != DistanceFromBackdrop.FAR);
     }
 
     boolean rightSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {
@@ -293,7 +291,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
-        if ( ((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
+        if (((alliance == Alliance.BLUE) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) ||
                 ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.NEAR))) {
             //Away from Truss
             moveArmToPosition(1770);
@@ -338,7 +336,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             }
         }
 
-        if( (alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
+        if ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
             moveRobot(420, FORWARD);
         }
 
@@ -398,11 +396,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             desiredTagId = 3;
         }
 
-        if ((alliance == Alliance.RED) && (distanceFromBackdrop == DistanceFromBackdrop.FAR)) {
-            //Since we didn't go through truss, we return false
-            return false;
-        }
-        return true;
+        //Since we didn't go through truss, we return false
+        return (alliance != Alliance.RED) || (distanceFromBackdrop != DistanceFromBackdrop.FAR);
     }
 
     boolean centerSpikeMark(Alliance alliance, SpikeMark spikeMark, DistanceFromBackdrop distanceFromBackdrop) {

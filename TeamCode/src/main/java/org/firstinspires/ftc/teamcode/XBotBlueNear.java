@@ -116,19 +116,24 @@ public abstract class XBotBlueNear extends XBotAutoOpMode {
             if (isStopRequested()) return;
             //STEP 1 -- Purple Pixel Drop on spike mark
             xDrive.followTrajectorySequence(trajToDropPurplePixel);
-            setWristPosition(WRIST_FLAT_TO_GROUND); sleep(200);
-            openLeftClaw(); sleep(200);
+            setWristPosition(WRIST_FLAT_TO_GROUND);
+            sleep(200);
+            openLeftClaw();
+            sleep(200);
 
             //STEP 2 -- Yellow Pixel to back board
-            setWristPosition(WRIST_VERTICAL); sleep(50);
+            setWristPosition(WRIST_VERTICAL);
+            sleep(50);
             xDrive.followTrajectory(trajToDropYellowPixel); //sleep(100);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION ); sleep(1400);
-            openRightClaw(); sleep(200);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION);
+            sleep(1400);
+            openRightClaw();
+            sleep(200);
 
             grabAndDropWhitePixels(trajToPickWhitePixels, inchForward, inchBackward, trajBackToDropWhitePixles);
 
             //STEP 7 -- Park
-            moveArmToPosition(MIN_ARM_POSITION );
+            moveArmToPosition(MIN_ARM_POSITION);
             xDrive.followTrajectorySequence(parkingSeq);
         }
         stopRobot();

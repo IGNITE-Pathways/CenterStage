@@ -38,7 +38,8 @@ public class TeleOpDrive extends XBotOpMode {
     double leftClawPosition = LEFT_CLAW_OPEN_POSITION;
     double rightClawPosition = RIGHT_CLAW_OPEN_POSITION;
     int armPosition = ARM_PICK_POSITION;
-//    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
+
+    //    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
 //    double calculatedDistance = DistanceSensor.distanceOutOfRange;
     @Override
     public void runOpMode() {
@@ -59,7 +60,7 @@ public class TeleOpDrive extends XBotOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Arm: Position", leftArmMotor.getCurrentPosition() + ": " + rightArmMotor.getCurrentPosition());
         telemetry.addData("Claw: Position", leftClaw.getPosition() + ": " + rightClaw.getPosition());
-        telemetry.addData("Wrist: Position", leftWrist.getPosition() +" : " + rightWrist.getPosition());
+        telemetry.addData("Wrist: Position", leftWrist.getPosition() + " : " + rightWrist.getPosition());
         telemetry.update();
 
         waitForStart();
@@ -156,28 +157,28 @@ public class TeleOpDrive extends XBotOpMode {
                         if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                         break;
                     case APRIL_TAG_NAVIGATION:
-                            if (gameModeChanged) {
-                                gameModeChanged = Boolean.FALSE;
-                            }
-                            aprilTagFound = detectAnyAprilTag();
-                            if (aprilTagFound && lookForAprilTag && gamepad1.left_bumper) {
-                                double rangeError = (desiredTagDetectionObj.ftcPose.range - TELEOP_DESIRED_DISTANCE);
-                                double headingError = desiredTagDetectionObj.ftcPose.bearing;
-                                double yawError = desiredTagDetectionObj.ftcPose.yaw;
+                        if (gameModeChanged) {
+                            gameModeChanged = Boolean.FALSE;
+                        }
+                        aprilTagFound = detectAnyAprilTag();
+                        if (aprilTagFound && lookForAprilTag && gamepad1.left_bumper) {
+                            double rangeError = (desiredTagDetectionObj.ftcPose.range - TELEOP_DESIRED_DISTANCE);
+                            double headingError = desiredTagDetectionObj.ftcPose.bearing;
+                            double yawError = desiredTagDetectionObj.ftcPose.yaw;
 
-                                // Use the speed and strafe "gains" to calculate how we want the robot to move.
-                                drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                                strafe = Range.clip( headingError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-                                yawTurn = Range.clip(-yawError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                            // Use the speed and strafe "gains" to calculate how we want the robot to move.
+                            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                            strafe = Range.clip(headingError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                            yawTurn = Range.clip(-yawError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
 
-                                //Y Button = Manual override only required if April Tag Nav doesn't work
-                                telemetry.addData("Range Error", rangeError);
-                                if (((rangeError < 0.5) && (rangeError > -0.5)) || gamepad2.y) {
-                                    changeGameMode(GameMode.DROPPING_PIXELS);
-                                }
+                            //Y Button = Manual override only required if April Tag Nav doesn't work
+                            telemetry.addData("Range Error", rangeError);
+                            if (((rangeError < 0.5) && (rangeError > -0.5)) || gamepad2.y) {
+                                changeGameMode(GameMode.DROPPING_PIXELS);
                             }
-                            //break out of april tag nav if Y is pressed
-                            if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
+                        }
+                        //break out of april tag nav if Y is pressed
+                        if (gamepad2.y) changeGameMode(GameMode.DROPPING_PIXELS);
                         break;
                     case DROPPING_PIXELS:
                         // ARM = AUTO, WRIST = NONE, CLAWS = OPEN
@@ -235,7 +236,7 @@ public class TeleOpDrive extends XBotOpMode {
                 mecanumDrive.update();
 
                 // Show the elapsed game time and wheel power.
-                telemetry.addData("Status", "Run Time: " + runtime.toString());
+                telemetry.addData("Status", "Run Time: " + runtime);
                 telemetry.addData("GameMode", gameMode);
                 telemetry.addData("AprilTag Nav: ", aprilTagFound + " " + lookForAprilTag);
 
@@ -266,6 +267,7 @@ public class TeleOpDrive extends XBotOpMode {
         wristPosition = WRIST_VERTICAL;
         setWristPosition(wristPosition);
     }
+
     private void pickPixels() {
         leftClaw.setPosition(LEFT_CLAW_CLOSE_POSITION);
         rightClaw.setPosition(RIGHT_CLAW_CLOSE_POSITION);
@@ -273,6 +275,7 @@ public class TeleOpDrive extends XBotOpMode {
         rightPixelInClaw = true;
         waitAndMoveArmAndResetDistance();
     }
+
     private void pickLeftPixel() {
         leftClaw.setPosition(LEFT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
@@ -280,6 +283,7 @@ public class TeleOpDrive extends XBotOpMode {
             waitAndMoveArmAndResetDistance();
         }
     }
+
     private void pickRightPixel() {
         rightClaw.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         rightPixelInClaw = true;
@@ -310,6 +314,7 @@ public class TeleOpDrive extends XBotOpMode {
         setWristPosition(wristPosition);
         moveArmToPosition(ARM_POSITION_HIGH);
     }
+
     private void setClawsToPixelPickPosition() {
         leftClaw.setPosition(LEFT_CLAW_OPEN_POSITION);
         rightClaw.setPosition(RIGHT_CLAW_OPEN_POSITION);

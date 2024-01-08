@@ -6,17 +6,16 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-@TeleOp(name="Exposure Test", group = "Concept")
-public class GetExposureSettings extends XBotOpMode
-{
+@TeleOp(name = "Exposure Test", group = "Concept")
+public class GetExposureSettings extends XBotOpMode {
     private static final int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
 
-    @Override public void runOpMode()
-    {
-        boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-        double  drive           = 0;        // Desired forward power/speed (-1 to +1)
-        double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
-        double  yawTurn            = 0;        // Desired turning power/speed (-1 to +1)
+    @Override
+    public void runOpMode() {
+        boolean targetFound = false;    // Set to true when an AprilTag target is detected
+        double drive = 0;        // Desired forward power/speed (-1 to +1)
+        double strafe = 0;        // Desired strafe power/speed (-1 to +1)
+        double yawTurn = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
         initialize();
@@ -27,8 +26,7 @@ public class GetExposureSettings extends XBotOpMode
         telemetry.update();
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             targetFound = false;
             desiredTagDetectionObj = null;
             moveArmToPosition(200);
@@ -57,11 +55,11 @@ public class GetExposureSettings extends XBotOpMode
 
             // Tell the driver what we see, and what to do.
             if (targetFound) {
-                telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
+                telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
                 telemetry.addData("Found", "ID %d (%s)", desiredTagDetectionObj.id, desiredTagDetectionObj.metadata.name);
-                telemetry.addData("Range",  "%5.1f inches", desiredTagDetectionObj.ftcPose.range);
-                telemetry.addData("Bearing","%3.0f degrees", desiredTagDetectionObj.ftcPose.bearing);
-                telemetry.addData("Yaw","%3.0f degrees", desiredTagDetectionObj.ftcPose.yaw);
+                telemetry.addData("Range", "%5.1f inches", desiredTagDetectionObj.ftcPose.range);
+                telemetry.addData("Bearing", "%3.0f degrees", desiredTagDetectionObj.ftcPose.bearing);
+                telemetry.addData("Yaw", "%3.0f degrees", desiredTagDetectionObj.ftcPose.yaw);
                 telemetry.addData("Exposure", getExposure());
             } else {
                 makeSureCamIsReadyandExposureIsSet(getExposure() + 1, 250, "Cam");

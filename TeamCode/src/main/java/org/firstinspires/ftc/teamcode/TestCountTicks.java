@@ -9,9 +9,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Test Count Ticks", group = "Concept")
 @Disabled
 public class TestCountTicks extends LinearOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
     double MOTOR_SPEED = 0.4;
     DcMotor motor = null;
+    private final ElapsedTime runtime = new ElapsedTime();
+
     @Override
     public void runOpMode() throws InterruptedException {
         int position = 0;
@@ -26,7 +27,7 @@ public class TestCountTicks extends LinearOpMode {
         runtime.reset();
 
         while (opModeIsActive()) {
-            position += (int)-(gamepad2.left_stick_y * 10);
+            position += (int) -(gamepad2.left_stick_y * 10);
             moveArmToPosition(position);
         }
     }
@@ -55,8 +56,7 @@ public class TestCountTicks extends LinearOpMode {
 
         motor.setPower(MOTOR_SPEED);
 
-        while (opModeIsActive() && motor.isBusy())
-        {
+        while (opModeIsActive() && motor.isBusy()) {
             telemetry.addData("Motor Position", motor.getCurrentPosition() + "  busy=" + motor.isBusy());
             telemetry.update();
             idle();

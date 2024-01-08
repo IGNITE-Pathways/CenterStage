@@ -17,14 +17,14 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 @TeleOp(group = "drive")
 public class LocalizationTest extends LinearOpMode {
-    Servo leftWrist = null;
-    Servo rightWrist = null;
-    Servo leftClaw = null;
-    Servo rightClaw = null;
     static final double WRIST_FLAT_TO_GROUND = 0.95;     // Maximum rotational position
     static final double CLAW_OPEN = 0.1272;     // Maximum rotational position
     static final double CLAW_CLOSED = 0.5;     // Maximum rotational position
     static final double WRIST_VERTICAL = 0.49;     // Maximum rotational position
+    Servo leftWrist = null;
+    Servo rightWrist = null;
+    Servo leftClaw = null;
+    Servo rightClaw = null;
 
     @Override
     public void runOpMode() throws InterruptedException {

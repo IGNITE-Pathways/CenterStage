@@ -10,5 +10,7 @@ public enum SpikeMark {
         value = newValue;
     }
 
-    public int getValue() { return value; }
+    public int getValue() {
+        return value;
+    }
 }

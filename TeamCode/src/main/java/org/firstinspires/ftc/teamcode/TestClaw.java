@@ -10,18 +10,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Test Claw", group = "Concept")
 public class TestClaw extends LinearOpMode {
 
+    static final double CLAW_OPEN = 0.1272;     // Maximum rotational position
+    static final double CLAW_CLOSED = 0.5;     // Maximum rotational position
+    static final double WRIST_FLAT_TO_GROUND = 0.95;     // Maximum rotational position
+    static final double WRIST_VERTICAL = 0.49;     // Maximum rotational position
+    static final double MIN_WRIST_POSITION = 0.0;     // Maximum rotational position
+    static final double MAX_WRIST_POSITION = 1.0;     // Maximum rotational position
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
     Servo leftClaw = null;
     Servo rightClaw = null;
     Servo leftWrist = null;
     Servo rightWrist = null;
-    static final double CLAW_OPEN = 0.1272;     // Maximum rotational position
-    static final double CLAW_CLOSED = 0.5;     // Maximum rotational position
-        static final double WRIST_FLAT_TO_GROUND = 0.95;     // Maximum rotational position
-    static final double WRIST_VERTICAL = 0.49;     // Maximum rotational position
-    static final double MIN_WRIST_POSITION = 0.0;     // Maximum rotational position
-    static final double MAX_WRIST_POSITION = 1.0;     // Maximum rotational position
     double clawPos = 0.2;
     double wristPosition = 0;
 

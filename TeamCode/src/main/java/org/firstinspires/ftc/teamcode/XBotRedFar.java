@@ -13,13 +13,15 @@ import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-public abstract class XBotBlueFar extends XBotAutoOpMode {
-    public void autoBlueFar(Parking parking) {
-        Double DROP_LINE_X = 42.5;
+public abstract class XBotRedFar extends XBotAutoOpMode {
+    public void autoRedFar(Parking parking) {
+        // Initialize hardware
+        Double DROP_LINE_X = 43.0;
         Double WHITE_STACK_Y = 9.0;
         Double WHITE_STACK_X = -50.0;
+
         initializeAuto();
-        Pose2d startPose = new Pose2d(-32, 63.5, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-38, -63.5, Math.toRadians(-90));
         xDrive.setPoseEstimate(startPose);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -30,20 +32,18 @@ public abstract class XBotBlueFar extends XBotAutoOpMode {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-            //spikeMark is set
+//            spikeMark = SpikeMark.LEFT; //@TODO:TESTING
 
-//            spikeMark = SpikeMark.CENTER; //@TODO:TESTING
-
-            //        autonomousPlay(Alliance.BLUE, DistanceFromBackdrop.FAR, Parking.LEFT);
             TrajectorySequence trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                     .back(27.5)
-                    .turn(Math.toRadians(90))
-                    .back(21)
+                    .turn(Math.toRadians(-90))
+                    .forward(5)
+                    .back(9)
                     .build();
 
             Trajectory trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
                     .back(40)
-                    .splineTo(new Vector2d(DROP_LINE_X, 44.5), 0,
+                    .splineTo(new Vector2d(DROP_LINE_X, -32.5), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
@@ -51,29 +51,26 @@ public abstract class XBotBlueFar extends XBotAutoOpMode {
             if (spikeMark == SpikeMark.RIGHT) {
                 trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                         .back(27.5)
-                        .turn(Math.toRadians(90))
-                        .forward(10)
-                        .back(9)
+                        .turn(Math.toRadians(-90))
+                        .back(26)
                         .build();
 
                 trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
                         .back(40)
-                        .splineTo(new Vector2d(DROP_LINE_X, 32.5), 0,
+                        .splineTo(new Vector2d(DROP_LINE_X, -42.5), 0,
                                 SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build();
             } else if (spikeMark == SpikeMark.CENTER) {
                 trajToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                        .back(27.5)
-                        .turn(Math.toRadians(140))
+                        .back(51.5)
                         .build();
 
                 trajToDropYellowPixel = xDrive.trajectoryBuilder(trajToDropPurplePixel.end(), true)
-                        .splineTo(new Vector2d(-30, 36), 0,
+                        .splineTo(new Vector2d(10, -10), 0,
                                 SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                        .back(40)
-                        .splineTo(new Vector2d(DROP_LINE_X, 38), 0,
+                        .splineToConstantHeading(new Vector2d(DROP_LINE_X, -38), 0,
                                 SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build();
@@ -94,7 +91,7 @@ public abstract class XBotBlueFar extends XBotAutoOpMode {
 
             TrajectorySequence trajBackToDropWhitePixles = xDrive.trajectorySequenceBuilder(inchBackward.end())
                     .lineTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-                    .strafeTo(new Vector2d(DROP_LINE_X, 36))
+                    .strafeTo(new Vector2d(DROP_LINE_X, -36))
                     .build();
 
             TrajectorySequence parkingSeq = xDrive.trajectorySequenceBuilder(trajBackToDropWhitePixles.end())
@@ -116,7 +113,7 @@ public abstract class XBotBlueFar extends XBotAutoOpMode {
             xDrive.followTrajectorySequence(trajToDropPurplePixel);
             setWristPosition(WRIST_FLAT_TO_GROUND);
             sleep(200);
-            openLeftClaw();
+            openRightClaw();
             sleep(200);
 
             //STEP 2 -- Yellow Pixel to back board
@@ -125,7 +122,7 @@ public abstract class XBotBlueFar extends XBotAutoOpMode {
             xDrive.followTrajectory(trajToDropYellowPixel); //sleep(100);
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION);
             sleep(1400);
-            openRightClaw();
+            openLeftClaw();
             sleep(200);
 
             grabAndDropWhitePixels(trajToPickWhitePixels, inchForward, inchBackward, trajBackToDropWhitePixles);
@@ -134,6 +131,7 @@ public abstract class XBotBlueFar extends XBotAutoOpMode {
             moveArmToPosition(MIN_ARM_POSITION);
             xDrive.followTrajectorySequence(parkingSeq);
         }
+
         stopRobot();
     }
 }

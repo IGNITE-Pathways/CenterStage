@@ -15,14 +15,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Disabled
 public class TestMotor extends LinearOpMode {
 
+    // Declare OpMode members for each of the 4 motors.
+    private final ElapsedTime runtime = new ElapsedTime();
     DcMotor rightFront = null;
     DcMotor leftFront = null;
     DcMotor rightBack = null;
     DcMotor leftBack = null;
     DcMotor leftArmMotor, rightArmMotor = null;
-
-    // Declare OpMode members for each of the 4 motors.
-    private final ElapsedTime runtime = new ElapsedTime();
     int armPosition = 0;
 
     @Override
