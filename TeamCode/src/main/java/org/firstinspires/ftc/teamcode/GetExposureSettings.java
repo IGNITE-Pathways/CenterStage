@@ -6,7 +6,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-@TeleOp(name = "Exposure Test", group = "Concept")
+@TeleOp(name = "Find Exposure", group = "Concept")
 public class GetExposureSettings extends XBotOpMode {
     private static final int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
 
@@ -20,9 +20,12 @@ public class GetExposureSettings extends XBotOpMode {
         // Initialize the Apriltag Detection process
         initialize();
         switchToAprilTagCamera();
+        //Start from Exposure = 1, Lower exposure if room is bright and vice-versa
+        makeSureCamIsReadyandExposureIsSet(1, 250, "AprilTag Cam");
         // Wait for driver to press start
+        telemetry.addData("Position Bot facing April Tag with ID:", "1");
         telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch Play to start OpMode");
+        telemetry.addData(">", "Touch Play to find best exposure value");
         telemetry.update();
         waitForStart();
 
@@ -62,7 +65,7 @@ public class GetExposureSettings extends XBotOpMode {
                 telemetry.addData("Yaw", "%3.0f degrees", desiredTagDetectionObj.ftcPose.yaw);
                 telemetry.addData("Exposure", getExposure());
             } else {
-                makeSureCamIsReadyandExposureIsSet(getExposure() + 1, 250, "Cam");
+                makeSureCamIsReadyandExposureIsSet(getExposure() + 1, 250, "AprilTag Cam");
             }
 
             telemetry.update();
