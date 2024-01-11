@@ -66,9 +66,8 @@ public class SampleTankDrive extends TankDrive {
     private final List<DcMotorEx> motors;
     private final List<DcMotorEx> leftMotors;
     private final List<DcMotorEx> rightMotors;
-    private IMU imu;
-
     private final VoltageSensor batteryVoltageSensor;
+    private IMU imu;
 
     public SampleTankDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH);

@@ -40,31 +40,26 @@ public class Robot {
     private final double ODOM_INCHES_PER_COUNT = 0.002969;   //  GoBilda Odometry Pod (1/226.8)
     private final boolean INVERT_DRIVE_ODOMETRY = true;       //  When driving FORWARD, the odometry value MUST increase.  If it does not, flip the value of this constant.
     private final boolean INVERT_STRAFE_ODOMETRY = true;       //  When strafing to the LEFT, the odometry value MUST increase.  If it does not, flip the value of this constant.
+    private final LinearOpMode myOpMode;
+    private final ElapsedTime holdTimer = new ElapsedTime();  // User for any motion requiring a hold time or timeout.
     // Public Members
     public double driveDistance = 0; // scaled axial distance (+ = forward)
     public double strafeDistance = 0; // scaled lateral distance (+ = left)
     public double heading = 0; // Latest Robot heading from IMU
-
     // Establish a proportional controller for each axis to calculate the required power to achieve a setpoint.
     public ProportionalControl driveController = new ProportionalControl(DRIVE_GAIN, DRIVE_ACCEL, DRIVE_MAX_AUTO, DRIVE_TOLERANCE, DRIVE_DEADBAND, false);
-    public ProportionalControl strafeController = new ProportionalControl(STRAFE_GAIN, STRAFE_ACCEL, STRAFE_MAX_AUTO, STRAFE_TOLERANCE, STRAFE_DEADBAND, false);
-    public ProportionalControl yawController = new ProportionalControl(YAW_GAIN, YAW_ACCEL, YAW_MAX_AUTO, YAW_TOLERANCE, YAW_DEADBAND, true);
 
     // ---  Private Members
-
+    public ProportionalControl strafeController = new ProportionalControl(STRAFE_GAIN, STRAFE_ACCEL, STRAFE_MAX_AUTO, STRAFE_TOLERANCE, STRAFE_DEADBAND, false);
+    public ProportionalControl yawController = new ProportionalControl(YAW_GAIN, YAW_ACCEL, YAW_MAX_AUTO, YAW_TOLERANCE, YAW_DEADBAND, true);
     // Hardware interface Objects
     private DcMotor leftFrontDrive;     //  control the left front drive wheel
     private DcMotor rightFrontDrive;    //  control the right front drive wheel
     private DcMotor leftBackDrive;      //  control the left back drive wheel
     private DcMotor rightBackDrive;     //  control the right back drive wheel
-
     private DcMotor driveEncoder;       //  the Axial (front/back) Odometry Module (may overlap with motor, or may not)
     private DcMotor strafeEncoder;      //  the Lateral (left/right) Odometry Module (may overlap with motor, or may not)
-
-    private final LinearOpMode myOpMode;
     private IMU imu;
-    private final ElapsedTime holdTimer = new ElapsedTime();  // User for any motion requiring a hold time or timeout.
-
     private int rawDriveOdometer = 0; // Unmodified axial odometer count
     private int driveOdometerOffset = 0; // Used to offset axial odometer
     private int rawStrafeOdometer = 0; // Unmodified lateral odometer count

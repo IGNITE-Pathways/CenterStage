@@ -395,21 +395,21 @@ public class MeepMeepTesting {
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
 
-//                .addEntity(blueNearLeftPixelLeftParking)
-//                .addEntity(redNearRightPixelRightParking)
+                .addEntity(blueNearLeftPixelLeftParking)
+                .addEntity(redNearRightPixelRightParking)
 
-//                .addEntity(blueNearCenterPixelLeftParking)
-//                .addEntity(redNearCenterPixelRightParking)
-//
-//                .addEntity(blueNearRightPixelLeftParking)
-//                .addEntity(redNearLeftPixelRightParking)
-//
-//                .addEntity(blueFarLeftPixelLeftParking)
-//                .addEntity(redFarRightPixelRightParking)
-//
-//                .addEntity(blueFarCenterPixelLeftParking)
-//                .addEntity(redFarCenterPixelRightParking)
-//
+                .addEntity(blueNearCenterPixelLeftParking)
+                .addEntity(redNearCenterPixelRightParking)
+
+                .addEntity(blueNearRightPixelLeftParking)
+                .addEntity(redNearLeftPixelRightParking)
+
+                .addEntity(blueFarLeftPixelLeftParking)
+                .addEntity(redFarRightPixelRightParking)
+
+                .addEntity(blueFarCenterPixelLeftParking)
+                .addEntity(redFarCenterPixelRightParking)
+
                 .addEntity(blueFarRightPixelLeftParking)
                 .addEntity(redFarLeftPixelRightParking)
 

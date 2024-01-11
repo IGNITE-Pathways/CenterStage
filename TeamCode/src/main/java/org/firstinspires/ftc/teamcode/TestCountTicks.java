@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Test Count Ticks", group = "Concept")
 @Disabled
 public class TestCountTicks extends LinearOpMode {
+    private final ElapsedTime runtime = new ElapsedTime();
     double MOTOR_SPEED = 0.4;
     DcMotor motor = null;
-    private final ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {

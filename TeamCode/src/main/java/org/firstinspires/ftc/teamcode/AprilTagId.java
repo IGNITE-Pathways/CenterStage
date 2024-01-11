@@ -6,7 +6,7 @@ public enum AprilTagId {
     BLUE_RIGHT(3, 34.0),
     RED_LEFT(4, -32.0),
     RED_CENTER(5, -36.0),
-    RED_RIGHT(6, - 42.5);
+    RED_RIGHT(6, -42.5);
 
     private final int value;
     private final double yPos;
@@ -19,5 +19,8 @@ public enum AprilTagId {
     public int getValue() {
         return value;
     }
-    public double getYPos() { return yPos; }
+
+    public double getYPos() {
+        return yPos;
+    }
 }
