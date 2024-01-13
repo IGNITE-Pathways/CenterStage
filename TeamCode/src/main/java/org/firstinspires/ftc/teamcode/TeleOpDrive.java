@@ -40,8 +40,6 @@ public class TeleOpDrive extends XBotOpMode {
     double rightClawPosition = RIGHT_CLAW_OPEN_POSITION;
     int armPosition = ARM_PICK_POSITION;
 
-    //    Queue<Double> distanceQueue = new SizeLimitedQueue<>(10);
-//    double calculatedDistance = DistanceSensor.distanceOutOfRange;
     @Override
     public void runOpMode() {
 
@@ -84,6 +82,7 @@ public class TeleOpDrive extends XBotOpMode {
                         sleep(500);
                     }
                 }
+
                 if (gamepad2.x) {
                     changeGameMode(GameMode.PICKING_PIXELS);
                     leftPixelInClaw = false;
