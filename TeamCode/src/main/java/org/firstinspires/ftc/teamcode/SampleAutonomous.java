@@ -7,6 +7,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 /*
@@ -16,7 +17,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * The IMU gyro is used to stabilize the heading during all motions
  */
 
-@Autonomous(name = "Sample Autonomous", group = "Mr. Phil")
+@Autonomous(name = "Sample Autonomous 2-Wheel Odo", group = "Mr. Phil")
+@Disabled
 public class SampleAutonomous extends LinearOpMode {
     // get an instance of the "Robot" class.
     private final Robot robot = new Robot(this);

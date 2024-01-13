@@ -6,6 +6,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,7 +17,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * The IMU gyro is used to stabilize the heading when the operator is not requesting a turn.
  */
 
-@TeleOp(name = "Sample Teleop", group = "Mr. Phil")
+@TeleOp(name = "Sample Teleop 2-Wheel Odo", group = "Mr. Phil")
+@Disabled
 public class SampleTeleop extends LinearOpMode {
     final double SAFE_DRIVE_SPEED = 0.8; // Adjust this to your robot and your driver.  Slower usually means more accuracy.  Max value = 1.0
     final double SAFE_STRAFE_SPEED = 0.8; // Adjust this to your robot and your driver.  Slower usually means more accuracy.  Max value = 1.0
