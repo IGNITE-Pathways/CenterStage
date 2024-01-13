@@ -30,6 +30,12 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
+<<<<<<< Updated upstream
+=======
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
+
+>>>>>>> Stashed changes
 /*
  * This is the main manual OpMode
  */
@@ -74,8 +80,15 @@ public class TeleOpDrive extends XBotOpMode {
 
                 // Retrieve your pose
                 Pose2d myPose = mecanumDrive.getPoseEstimate();
-
+                droneServo.setPosition(DRONE_LOADED);
                 autoDrive = aprilTagFound && lookForAprilTag && gamepad1.left_bumper;
+
+                if (runtime.time(TimeUnit.SECONDS) >= 90) {
+                    if (gamepad1.circle) {
+                        droneServo.setPosition(DRONE_LAUNCHED);
+                        sleep(500);
+                    }
+                }
                 if (gamepad2.x) {
                     changeGameMode(GameMode.PICKING_PIXELS);
                     leftPixelInClaw = false;
