@@ -29,13 +29,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-
-<<<<<<< Updated upstream
-=======
-import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
->>>>>>> Stashed changes
 /*
  * This is the main manual OpMode
  */

@@ -38,13 +38,8 @@ public abstract class XBotOpMode extends LinearOpMode {
     Servo rightWrist = null;
     Servo leftClaw = null;
     Servo rightClaw = null;
-<<<<<<< Updated upstream
-=======
-
     Servo droneServo = null;
 
-//    private IMU imu = null;      // Control Hub IMU
->>>>>>> Stashed changes
     WebcamName webcam1;
     TfodProcessor tfod;
     VisionPortal visionPortal;               // Used to manage the video source.
@@ -54,14 +49,9 @@ public abstract class XBotOpMode extends LinearOpMode {
     //Game Mode
     GameMode gameMode = GameMode.NONE;
     Boolean gameModeChanged = Boolean.FALSE;
-<<<<<<< Updated upstream
-=======
-    private static final String TFOD_MODEL_ASSET = "TeaXProp_TFOD.tflite";
-    private static final String[] LABELS = {"X"};
 
     static final double DRONE_LOADED = 1.0;     // Maximum rotational position
     static final double DRONE_LAUNCHED = 0.0;     // Maximum rotational position
->>>>>>> Stashed changes
     double wristPosition = WRIST_FLAT_TO_GROUND;
     boolean autoDrive = false;
     boolean leftPixelInClaw = false, rightPixelInClaw = false;
