@@ -4,8 +4,10 @@ import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -48,36 +50,6 @@ public abstract class XBotBlueFar extends XBotBlue {
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
                 }
-
-//                trajectoryToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectoryToDropYellowPixel.end())
-//                        .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-//                        .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
-//                        .build();
-//
-//                inchForward = xDrive.trajectorySequenceBuilder(trajectoryToPickWhitePixels.end())
-//                        .forward(5)
-//                        .build();
-//
-//                inchBackward = xDrive.trajectorySequenceBuilder(inchForward.end())
-//                        .back(10)
-//                        .build();
-//
-//                trajectoryToDropWhitePixels = xDrive.trajectorySequenceBuilder(inchBackward.end())
-//                        .lineTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-//                        .strafeTo(new Vector2d(DROP_LINE_X, 36))
-//                        .build();
-//
-//                parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end())
-//                        .strafeRight(22.5)
-//                        .back(15)
-//                        .build();
-//
-//                if (parking == Parking.RIGHT) {
-//                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end())
-//                            .strafeLeft(22.5)
-//                            .back(15)
-//                            .build();
-//                }
 
                 sleep(10);
             }
