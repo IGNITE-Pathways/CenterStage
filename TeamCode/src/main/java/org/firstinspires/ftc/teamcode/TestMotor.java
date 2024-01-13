@@ -59,33 +59,39 @@ public class TestMotor extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double turn = -gamepad1.left_stick_x;
-            double strafe = -gamepad1.right_stick_x;
+            leftFront.setPower(-gamepad1.left_stick_y);
+            leftBack.setPower(-gamepad1.left_stick_x);
+            rightFront.setPower(-gamepad1.right_stick_y);
+            rightBack.setPower(-gamepad1.right_stick_x);
 
-//            moveRobot(drive, turn, strafe);
+//            double drive = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+//            double turn = -gamepad1.left_stick_x;
+//            double strafe = -gamepad1.right_stick_x;
+//
+////            moveRobot(drive, turn, strafe);
+//
+//            int moveArmBy = (int) -(gamepad2.left_stick_y * 120);
+//            if (moveArmBy != 0) {
+//                armPosition += moveArmBy;
+//                armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
+//                armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
+//                moveArmToPosition(armPosition);
+//            }
 
-            int moveArmBy = (int) -(gamepad2.left_stick_y * 120);
-            if (moveArmBy != 0) {
-                armPosition += moveArmBy;
-                armPosition = Math.max(MIN_ARM_POSITION, armPosition); // cannot go below MIN_ARM_POSITION
-                armPosition = Math.min(MAX_ARM_POSITION, armPosition); // cannot go above MAX_ARM_POSITION
-                moveArmToPosition(armPosition);
-            }
-
-            if (gamepad2.x) {
-                armPosition += 8000;
-                moveArmToPosition(armPosition);
-            }
-
-            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-            telemetry.addData("Arm: Position", armPosition);
-            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
-            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
-            telemetry.addData("MoveArmBy", moveArmBy);
-            telemetry.update();
+//            if (gamepad2.x) {
+//                armPosition += 8000;
+//                moveArmToPosition(armPosition);
+//            }
+//
+//            telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+//            telemetry.addData("Arm: Position", armPosition);
+//            telemetry.addData("Arm: Left Motor Position", leftArmMotor.getCurrentPosition() + "  busy=" + leftArmMotor.isBusy());
+//            telemetry.addData("Arm: Right Motor Position", rightArmMotor.getCurrentPosition() + "  busy=" + rightArmMotor.isBusy());
+//            telemetry.addData("MoveArmBy", moveArmBy);
+//            telemetry.update();
         }
     }
 
