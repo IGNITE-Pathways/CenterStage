@@ -19,13 +19,14 @@ public abstract class XBotRedFar extends XBotRed {
             while (!teamPropDetectionCompleted) {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
+//            spikeMark = SpikeMark.RIGHT;
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             if (spikeMark != SpikeMark.RIGHT) {
                 if (spikeMark == SpikeMark.LEFT) {
                     trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .back(27.5)
                             .turn(Math.toRadians(-90))
-                            .forward(5)
+                            .forward(7)
                             .back(9)
                             .build();
 
@@ -37,7 +38,7 @@ public abstract class XBotRedFar extends XBotRed {
                             .build();
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                            .back(51.5)
+                            .back(49)
                             .build();
 
                     trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)

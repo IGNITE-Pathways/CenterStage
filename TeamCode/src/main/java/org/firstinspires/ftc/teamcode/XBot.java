@@ -20,7 +20,7 @@ public class XBot {
     static final double WRIST_VERTICAL = 0.0;     // Maximum rotational position
     //CLAW
     static final double LEFT_CLAW_OPEN_POSITION = 0.13;
-    static final double LEFT_CLAW_CLOSE_POSITION = 0.53;
+    static final double LEFT_CLAW_CLOSE_POSITION = 0.51;
     static final double RIGHT_CLAW_OPEN_POSITION = 0.06;
     static final double RIGHT_CLAW_CLOSE_POSITION = 0.45;
     //APRIL TAG
@@ -34,6 +34,6 @@ public class XBot {
     static final double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     static final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
     static final int APRIL_TAG_CAM_EXPOSURE = 4; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
-    static final int TFOD_CAM_EXPOSURE = 10; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
+    static final int TFOD_CAM_EXPOSURE = 5; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
     static int ARM_PICK_POSITION = MIN_ARM_POSITION; //Robot must move slow
 }

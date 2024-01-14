@@ -640,7 +640,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     public void grabAndDropWhitePixels(TrajectorySequence trajToPickWhitePixels, TrajectorySequence trajSeq4, TrajectorySequence trajSeq5, TrajectorySequence trajBackToDropWhitePixles) {
         //STEP 3 -- Go to pick 2 White Pixels
-        moveArmToPosition(MIN_ARM_POSITION + 43); //sleep(200);
+        moveArmToPosition(MIN_ARM_POSITION + 45); //sleep(200);
         xDrive.followTrajectorySequence(trajToPickWhitePixels);
         setWristPosition(WRIST_FLAT_TO_GROUND);
         sleep(200);

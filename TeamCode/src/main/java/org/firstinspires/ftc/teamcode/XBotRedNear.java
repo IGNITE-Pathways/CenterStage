@@ -13,12 +13,14 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public abstract class XBotRedNear extends XBotRed {
     public void autoRedNear(Parking parking) {
-        super.initializeAuto(new Pose2d(12, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.FAR, parking);
+        super.initializeAuto(new Pose2d(12, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.NEAR, parking);
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
+//            spikeMark = SpikeMark.RIGHT;
+
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             if (spikeMark != SpikeMark.RIGHT) {
 
@@ -31,23 +33,24 @@ public abstract class XBotRedNear extends XBotRed {
                             .build();
 
                     trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)
-                            .splineTo(new Vector2d(DROP_LINE_X, -32.5), 0,
+                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -32.5), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .setReversed(true)
-                            .splineTo(new Vector2d(15, -29), Math.toRadians(90),
+                            .splineTo(new Vector2d(30, -34), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .turn(Math.toRadians(-90))
-                            .back(8)
+//                            .turn(Math.toRadians(-90))
+                            .strafeRight(6)
+//                            .back(8)
                             .build();
 
                     trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)
-                            .splineTo(new Vector2d(DROP_LINE_X, -38), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -37), 0,
+                                    SampleMecanumDrive.getVelocityConstraint(25, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
                 }

@@ -19,7 +19,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             while (!teamPropDetectionCompleted) {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
-            spikeMark = SpikeMark.RIGHT;
+            
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             if (spikeMark != SpikeMark.RIGHT) {
                 if (spikeMark == SpikeMark.LEFT) {
