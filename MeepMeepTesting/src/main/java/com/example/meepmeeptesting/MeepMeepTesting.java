@@ -29,7 +29,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(15, 63.5, Math.toRadians(90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 63.5, Math.toRadians(90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(90))
                                 .back(21)
@@ -60,7 +60,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(16, 63.5, Math.toRadians(90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 63.5, Math.toRadians(90)))
                                 .back(34)
                                 .turn(Math.toRadians(90))
                                 .back(8)
@@ -88,11 +88,14 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(16, 63.5, Math.toRadians(90)))
-                                .back(27.5)
-                                .turn(Math.toRadians(90))
-                                .forward(10)
-                                .back(9)
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 63.5, Math.toRadians(90)))
+                                .setReversed(true)
+                                .splineTo(new Vector2d(20, 35), 0)
+//                                .splineToConstantHeading(new Vector2d(15, 35), 0)
+//                                .back(27.5)
+//                                .turn(Math.toRadians(90))
+                                .forward(5)
+//                                .back(9)
                                 .waitSeconds(1)
                                 //Drop Pixel on Spikemark
                                 .setReversed(true)
@@ -120,7 +123,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-36, 63.5, Math.toRadians(90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(145))
                                 .waitSeconds(1)
@@ -152,7 +155,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                                drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
+                                drive.trajectorySequenceBuilder(new Pose2d(-36, 63.5, Math.toRadians(90)))
                                         .back(27.5)
                                         .turn(Math.toRadians(90))
                                         .back(21)
@@ -185,7 +188,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-32, 63.5, Math.toRadians(90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-36, 63.5, Math.toRadians(90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(90))
                                 .forward(10)
@@ -219,11 +222,15 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(10, -63.5, Math.toRadians(-90)))
-                                .back(27.5)
-                                .turn(Math.toRadians(-90))
-                                .forward(5)
-                                .back(9)
+                        drive.trajectorySequenceBuilder(new Pose2d(12, -63.5, Math.toRadians(-90)))
+                                .setReversed(true)
+                                .splineTo(new Vector2d(20, -35), 0)
+                                .forward(10)
+                                .back(5)
+//                                .back(27.5)
+//                                .turn(Math.toRadians(-90))
+//                                .forward(5)
+//                                .back(9)
                                 //Drop Pixel on Spikemark
                                 .waitSeconds(1)
                                 .setReversed(true)
@@ -251,7 +258,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(10, -63.5, Math.toRadians(-90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(12, -63.5, Math.toRadians(-90)))
                                 .setReversed(true)
                                 .splineTo(new Vector2d(15, -29), Math.toRadians(90))
                                 .turn(Math.toRadians(-90))
@@ -280,7 +287,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(10, -63.5, Math.toRadians(-90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(12, -63.5, Math.toRadians(-90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(-90))
                                 .back(26)
@@ -309,7 +316,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-38, -63.5, Math.toRadians(-90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
                                 .back(27.5)
                                 .turn(Math.toRadians(-90))
                                 .forward(5)
@@ -340,7 +347,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-38, -63.5, Math.toRadians(-90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
                                 .setReversed(true)
                                 .back(51)
                                 .waitSeconds(1)
@@ -369,7 +376,7 @@ public class MeepMeepTesting {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                                drive.trajectorySequenceBuilder(new Pose2d(-38, -63.5, Math.toRadians(-90)))
+                                drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
                                         .back(27.5)
                                         .turn(Math.toRadians(-90))
                                         .back(27)
@@ -399,7 +406,7 @@ public class MeepMeepTesting {
 //                .addEntity(redNearRightPixelRightParking)
 
 //                .addEntity(blueNearCenterPixelLeftParking)
-//                .addEntity(redNearCenterPixelRightParking)
+                .addEntity(redNearCenterPixelRightParking)
 //
 //                .addEntity(blueNearRightPixelLeftParking)
 //                .addEntity(redNearLeftPixelRightParking)
@@ -407,10 +414,10 @@ public class MeepMeepTesting {
 //                .addEntity(blueFarLeftPixelLeftParking)
 //                .addEntity(redFarRightPixelRightParking)
 //
-                .addEntity(blueFarCenterPixelLeftParking)
-                .addEntity(redFarCenterPixelRightParking)
+//                .addEntity(blueFarCenterPixelLeftParking)
+//                .addEntity(redFarCenterPixelRightParking)
 //
-//                .addEntity(blueFarRightPixelLeftParking)
+                .addEntity(blueFarRightPixelLeftParking)
 //                .addEntity(redFarLeftPixelRightParking)
 
                 .start();

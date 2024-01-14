@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public abstract class XBotOpMode extends LinearOpMode {
-    private static final String TFOD_MODEL_ASSET = "TeaXProp_TFOD.tflite";
+    private static final String TFOD_MODEL_ASSET = "TeamXProp_TFOD_v2.tflite";
     private static final String[] LABELS = {"X"};
     final ElapsedTime runtime = new ElapsedTime();
     //Define motors and sensors

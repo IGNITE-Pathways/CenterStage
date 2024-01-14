@@ -13,19 +13,20 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public abstract class XBotBlueFar extends XBotBlue {
     public void autoBlueFar(Parking parking) {
-        super.initializeAuto(new Pose2d(-32, 63.5, Math.toRadians(90)), DistanceFromBackdrop.FAR, parking);
+        super.initializeAuto(new Pose2d(-36, 63.5, Math.toRadians(90)), DistanceFromBackdrop.FAR, parking);
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
+            spikeMark = SpikeMark.RIGHT;
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             if (spikeMark != SpikeMark.RIGHT) {
                 if (spikeMark == SpikeMark.LEFT) {
                     trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .back(27.5)
                             .turn(Math.toRadians(90))
-                            .back(21)
+                            .back(24)
                             .build();
 
                     trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)

@@ -47,7 +47,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     Double DROP_LINE_X = 42.5;
     Double WHITE_STACK_Y = 9.0;
-    Double WHITE_STACK_X = -50.0;
+    Double WHITE_STACK_X = -51.0;
+    Double PARKING_OFFSET = 23.0;
 
     boolean detectDesiredAprilTag(int tagId) {
         boolean aprilTagFound = false;

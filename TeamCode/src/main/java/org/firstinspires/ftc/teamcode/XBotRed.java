@@ -19,6 +19,9 @@ public abstract class XBotRed extends XBotAutoOpMode {
     Pose2d startPose = null;
 
     public void initializeAuto(Pose2d pose2d, DistanceFromBackdrop distanceFromBackdrop, Parking parking) {
+        //RED OVERRIDE
+//        WHITE_STACK_X = -50.0;
+
         startPose = pose2d;
         super.initializeAuto();
         xDrive.setPoseEstimate(startPose);
@@ -26,7 +29,7 @@ public abstract class XBotRed extends XBotAutoOpMode {
         trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                 .back(27.5)
                 .turn(Math.toRadians(-90))
-                .back(26)
+                .back(23)
                 .build();
 
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
@@ -58,9 +61,9 @@ public abstract class XBotRed extends XBotAutoOpMode {
                 .build();
 
         if (parking == Parking.RIGHT) {
-            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeLeft(22.5).back(15).build();
+            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeLeft(PARKING_OFFSET).back(15).build();
         } else {
-            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeRight(22.5).back(15).build();
+            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeRight(PARKING_OFFSET).back(15).build();
         }
 
         waitForStart();

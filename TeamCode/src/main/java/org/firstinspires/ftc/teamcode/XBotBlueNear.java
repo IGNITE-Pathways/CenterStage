@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public abstract class XBotBlueNear extends XBotBlue {
     public void autoBlueNear(Parking parking) {
-        super.initializeAuto(new Pose2d(15, 63.5, Math.toRadians(90)), DistanceFromBackdrop.NEAR, parking);
+        super.initializeAuto(new Pose2d(12, 63.5, Math.toRadians(90)), DistanceFromBackdrop.NEAR, parking);
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
@@ -25,7 +25,7 @@ public abstract class XBotBlueNear extends XBotBlue {
                     trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .back(27.5)
                             .turn(Math.toRadians(90))
-                            .back(21)
+                            .back(24)
                             .build();
 
                     trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)

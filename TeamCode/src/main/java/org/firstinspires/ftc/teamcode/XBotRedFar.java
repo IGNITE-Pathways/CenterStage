@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public abstract class XBotRedFar extends XBotRed {
     public void autoRedFar(Parking parking) {
-        super.initializeAuto(new Pose2d(-38, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.FAR, parking);
+        super.initializeAuto(new Pose2d(-36, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.FAR, parking);
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {

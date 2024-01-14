@@ -24,14 +24,14 @@ public abstract class XBotBlue extends XBotAutoOpMode {
         xDrive.setPoseEstimate(startPose);
 
         //RIGHT Spike Mark -- Initialized for default
-        trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                .back(27.5)
-                .turn(Math.toRadians(90))
-                .forward(10)
-                .back(9)
-                .build();
-
         if (distanceFromBackdrop == DistanceFromBackdrop.FAR) {
+            trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                    .back(27.5)
+                    .turn(Math.toRadians(90))
+                    .forward(8)
+                    .back(9)
+                    .build();
+
             trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)
                     .back(40)
                     .splineTo(new Vector2d(DROP_LINE_X, 32.5), 0,
@@ -39,6 +39,13 @@ public abstract class XBotBlue extends XBotAutoOpMode {
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
         } else {
+            trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                    .setReversed(true)
+                    .splineTo(new Vector2d(20, 35), 0)
+                    .forward(10)
+                    .back(5)
+                    .build();
+
             trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)
                     .splineTo(new Vector2d(DROP_LINE_X, 32.5), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -60,9 +67,9 @@ public abstract class XBotBlue extends XBotAutoOpMode {
                 .build();
 
         if (parking == Parking.RIGHT) {
-            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeLeft(22.5).back(15).build();
+            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeLeft(PARKING_OFFSET).back(15).build();
         } else {
-            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeRight(22.5).back(15).build();
+            parkingSeq = xDrive.trajectorySequenceBuilder(trajectoryToDropWhitePixels.end()).strafeRight(PARKING_OFFSET).back(15).build();
         }
 
         waitForStart();
