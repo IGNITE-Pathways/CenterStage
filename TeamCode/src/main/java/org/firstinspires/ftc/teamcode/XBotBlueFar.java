@@ -66,6 +66,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             //STEP 2 -- Yellow Pixel to back board
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
+            sleep(14000); //10s sleep so alliance robot can park
             xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION);
             sleep(1400);
@@ -73,7 +74,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             sleep(200);
 
             //STEP 3 to 6 -- Grab White Pixels and drop the on backboard
-            grabAndDropWhitePixels(trajectoryToPickWhitePixels, inchForward, inchBackward, trajectoryToDropWhitePixels);
+//            grabAndDropWhitePixels(trajectoryToPickWhitePixels, inchForward, inchBackward, trajectoryToDropWhitePixels);
 
             //STEP 7 -- Park
             moveArmToPosition(MIN_ARM_POSITION);

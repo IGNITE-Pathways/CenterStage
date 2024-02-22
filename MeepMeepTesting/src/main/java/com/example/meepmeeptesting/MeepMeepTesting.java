@@ -130,18 +130,19 @@ public class MeepMeepTesting {
                                 .setReversed(true)
                                 //Drop Pixel on Spikemark
                                 .splineTo(new Vector2d(-30, 36), 0)
+                                .waitSeconds(10)
                                 .back(40)
                                 .splineTo(new Vector2d(DROP_LINE_X, 38), 0)
                                 .waitSeconds(1)
 //                                //Drop Pixel on Backboard
-                                .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-                                .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
-                                .forward(5)
-                                .waitSeconds(1)
-                                .back(10)
-                                .lineTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-                                .strafeTo(new Vector2d(DROP_LINE_X, 36))
-                                .waitSeconds(1)
+//                                .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
+//                                .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
+//                                .forward(5)
+//                                .waitSeconds(1)
+//                                .back(10)
+//                                .lineTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
+//                                .strafeTo(new Vector2d(DROP_LINE_X, 36))
+//                                .waitSeconds(1)
                                 .strafeRight(22.5)
                                 .back(15)
                                 .build()
@@ -405,7 +406,7 @@ public class MeepMeepTesting {
                 .setBackgroundAlpha(0.95f)
 
 //                .addEntity(blueNearLeftPixelLeftParking)
-                .addEntity(redNearRightPixelRightParking)
+//                .addEntity(redNearRightPixelRightParking)
 
 //                .addEntity(blueNearCenterPixelLeftParking)
 //                .addEntity(redNearCenterPixelRightParking)
@@ -416,7 +417,7 @@ public class MeepMeepTesting {
 //                .addEntity(blueFarLeftPixelLeftParking)
 //                .addEntity(redFarRightPixelRightParking)
 //
-//                .addEntity(blueFarCenterPixelLeftParking)
+                .addEntity(blueFarCenterPixelLeftParking)
 //                .addEntity(redFarCenterPixelRightParking)
 //
 //                .addEntity(blueFarRightPixelLeftParking)
