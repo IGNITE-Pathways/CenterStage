@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public abstract class XBotRedNear extends XBotRed {
     public void autoRedNear(Parking parking) {
-        super.initializeAuto(new Pose2d(12.6, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.NEAR, parking);
+        super.initializeAuto(new Pose2d(12.0, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.NEAR, parking);
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
@@ -34,10 +34,11 @@ public abstract class XBotRedNear extends XBotRed {
                             .back(5)
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
-                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -32.5), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                    trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                            .strafeTo(new Vector2d(DROP_LINE_X + 1.0, -32.5)) //ID 4 Red
+//                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -32.5), 0,
+//                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+//                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
@@ -45,13 +46,11 @@ public abstract class XBotRedNear extends XBotRed {
                             .splineTo(new Vector2d(30, -34), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-//                            .turn(Math.toRadians(-90))
                             .strafeRight(6)
-//                            .back(8)
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
-                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -37), 0,
+                    trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                            .splineToConstantHeading(new Vector2d(DROP_LINE_X + 1.0, -37), 0,
                                     SampleMecanumDrive.getVelocityConstraint(25, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
@@ -69,9 +68,13 @@ public abstract class XBotRedNear extends XBotRed {
             //STEP 2 -- Yellow Pixel to back board
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
-            xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.5);
-            sleep(1500);
+            xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
+
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
+            sleep(1200);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 40, 0.3);
+            sleep(600);
+
             openLeftClaw();
             sleep(200);
 

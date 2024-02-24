@@ -57,9 +57,12 @@ public class MeepMeepTesting_Near {
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(12, 63.5, Math.toRadians(90)))
-                                .back(34)
-                                .turn(Math.toRadians(90))
-                                .back(8)
+                                .strafeTo(new Vector2d(26, 30))
+                                .splineToConstantHeading(new Vector2d(20, 15.5), Math.toRadians(90))
+//                                .back(34)
+//                                .turn(Math.toRadians(90))
+//                                .back(8)
+                                //DROP
                                 .waitSeconds(1)
                                 .setReversed(true)
                                 .splineTo(new Vector2d(DROP_LINE_X, 38), 0)
@@ -225,10 +228,10 @@ public class MeepMeepTesting_Near {
 //                .addEntity(blueNearLeftPixelLeftParking)
 //                .addEntity(redNearRightPixelRightParking)
 
-//                .addEntity(blueNearCenterPixelLeftParking)
+                .addEntity(blueNearCenterPixelLeftParking)
 //                .addEntity(redNearCenterPixelRightParking)
 //
-                .addEntity(blueNearRightPixelLeftParking)
+//                .addEntity(blueNearRightPixelLeftParking)
 //                .addEntity(redNearLeftPixelRightParking)
 
                 .start();

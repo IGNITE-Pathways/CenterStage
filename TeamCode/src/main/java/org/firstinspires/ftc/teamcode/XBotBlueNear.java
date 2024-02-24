@@ -30,20 +30,19 @@ public abstract class XBotBlueNear extends XBotBlue {
                             .back(24)
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
+                    trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                             .splineToConstantHeading(new Vector2d(DROP_LINE_X, 44.5), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                            .back(34)
-                            .turn(Math.toRadians(90))
-                            .back(8)
+                            .strafeTo(new Vector2d(26, 30))
+                            .splineToConstantHeading(new Vector2d(19.5, 15.5), Math.toRadians(90))
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
-                            .splineTo(new Vector2d(DROP_LINE_X, 38), 0,
+                    trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                            .splineTo(new Vector2d(DROP_LINE_X, 35), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
@@ -63,9 +62,14 @@ public abstract class XBotBlueNear extends XBotBlue {
             //STEP 2 -- Yellow Pixel to back board
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
-            xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.5);
-            sleep(1500);
+            xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
+//            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.5);
+//            sleep(1500);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
+            sleep(1200);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 20, 0.3);
+            sleep(600);
+
             openRightClaw();
             sleep(200);
 

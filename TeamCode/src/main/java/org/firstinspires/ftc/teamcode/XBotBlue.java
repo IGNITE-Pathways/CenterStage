@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 public abstract class XBotBlue extends XBotAutoOpMode {
     TrajectorySequence trajectorySeqToDropPurplePixel = null;
-    Trajectory trajectoryToDropYellowPixel = null;
     TrajectorySequence trajectorySeqToDropYellowPixel = null;
     TrajectorySequence trajectorySeqToPickWhitePixels = null;
     TrajectorySequence inchForwardSeq = null;
@@ -49,17 +48,17 @@ public abstract class XBotBlue extends XBotAutoOpMode {
             trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                     .setReversed(true)
                     .splineTo(new Vector2d(20, 35), 0)
-                    .forward(10)
-                    .back(5)
+                    .forward(12)
+                    .back(6)
                     .build();
 
-            trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
+            trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                     .splineTo(new Vector2d(DROP_LINE_X, 32.5), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
 
-            trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectoryToDropYellowPixel.end())
+            trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
                     .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
                     .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                     .build();

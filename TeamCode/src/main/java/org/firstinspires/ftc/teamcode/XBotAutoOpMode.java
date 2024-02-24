@@ -45,8 +45,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean reachedAprilTag = false;
     SampleMecanumDrive xDrive = null;
 
-    Double DROP_LINE_X = 40.4;
-    Double WHITE_STACK_Y = 9.5;
+    Double DROP_LINE_X = 40.0;
+    Double WHITE_STACK_Y = 11.0;
     Double WHITE_STACK_X = -51.0;
     Double PARKING_OFFSET = 24.0;
 
@@ -659,8 +659,14 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         //STEP 6 -- Going to drop white Pixels
         xDrive.followTrajectorySequence(trajBackToDropWhitePixles);
         sleep(100);
-        moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 80);
-        sleep(1400);
+//        moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 80);
+//        sleep(1400);
+
+        moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
+        sleep(1200);
+        moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.3);
+        sleep(600);
+
         openBothClaws();
         sleep(200);
     }

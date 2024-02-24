@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.SKIP_PICKING_WHITE_PIXELS_FAR;
+import static org.firstinspires.ftc.teamcode.XBot.WAIT_TIME_FOR_ALLIANCE_TO_CLEAR;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
@@ -37,8 +38,8 @@ public abstract class XBotBlueFar extends XBotBlue {
                             .back(4)
                             .strafeTo(new Vector2d(-41, 12.5))
                             //180 degree turn
-                            .turn(Math.toRadians(90))
-                            .turn(Math.toRadians(90))
+                            .turn(Math.toRadians(180))
+//                            .turn(Math.toRadians(90))
                             .lineTo(new Vector2d(DROP_LINE_X, 12.5))
                             .strafeTo(new Vector2d(DROP_LINE_X, 43)) //ID 1 Blue
                             .build();
@@ -52,12 +53,17 @@ public abstract class XBotBlueFar extends XBotBlue {
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                             .turn(Math.toRadians(90))
                             .lineTo(new Vector2d(DROP_LINE_X, 15.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, 39)) //ID 2 Blue
+                            .strafeTo(new Vector2d(DROP_LINE_X, 38)) //ID 2 Blue
                             .build();
                 }
             }
 
             if (isStopRequested()) return;
+
+            if (spikeMark == SpikeMark.CENTER && SKIP_PICKING_WHITE_PIXELS_FAR) {
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR); //10s sleep so alliance robot can park
+            }
+
             //STEP 1 -- Purple Pixel Drop on spike mark
             xDrive.followTrajectorySequence(trajectorySeqToDropPurplePixel);
             setWristPosition(WRIST_FLAT_TO_GROUND);
@@ -68,17 +74,19 @@ public abstract class XBotBlueFar extends XBotBlue {
             //STEP 2 -- Yellow Pixel to back board
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
-            if (SKIP_PICKING_WHITE_PIXELS_FAR) {
-                sleep(12000); //10s sleep so alliance robot can park
-            }
-            if (trajectorySeqToDropYellowPixel != null) {
-                xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
-            } else {
-                xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
+
+            if (spikeMark == SpikeMark.LEFT && SKIP_PICKING_WHITE_PIXELS_FAR) {
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR - 3000); //10s sleep so alliance robot can park
+            } else if (spikeMark == SpikeMark.RIGHT && SKIP_PICKING_WHITE_PIXELS_FAR) {
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR); //10s sleep so alliance robot can park
             }
 
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.4);
-            sleep(1700);
+            xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
+
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
+            sleep(1200);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 10, 0.3);
+            sleep(600);
             openLeftClaw();
             sleep(200);
 

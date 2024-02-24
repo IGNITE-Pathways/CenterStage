@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.SKIP_PICKING_WHITE_PIXELS_FAR;
+import static org.firstinspires.ftc.teamcode.XBot.WAIT_TIME_FOR_ALLIANCE_TO_CLEAR;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
@@ -25,55 +26,63 @@ public abstract class XBotRedFar extends XBotRed {
             if (spikeMark != SpikeMark.RIGHT) {
                 if (spikeMark == SpikeMark.LEFT) {
                     trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                            .back(29)
+                            .back(27.5)
                             .turn(Math.toRadians(-90))
-                            .forward(5)
-                            .back(9)
+                            .forward(10)
+                            .back(11)
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                            .strafeTo(new Vector2d(-32, -12.5))
+                            .strafeTo(new Vector2d(-37, -12.5))
                             .lineTo(new Vector2d(DROP_LINE_X, -12.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, -32.5)) //ID 4 Red
+                            .strafeTo(new Vector2d(DROP_LINE_X, -33.5)) //ID 4 Red
                             .build();
 
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                            .back(51)
+                            .strafeTo(new Vector2d(-50, -30))
+                            .splineToConstantHeading(new Vector2d(-44, -15.5), Math.toRadians(-90))
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                             .turn(Math.toRadians(-90))
-                            .lineTo(new Vector2d(DROP_LINE_X, -12.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, -36)) //ID 5 Red
+                            .lineTo(new Vector2d(DROP_LINE_X, -15.5))
+                            .strafeTo(new Vector2d(DROP_LINE_X, -37)) //ID 5 Red
                             .build();
                 }
                 sleep(10);
             }
 
             if (isStopRequested()) return;
+            if (spikeMark == SpikeMark.CENTER && SKIP_PICKING_WHITE_PIXELS_FAR) {
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR); //10s sleep so alliance robot can park
+            }
+
             //STEP 1 -- Purple Pixel Drop on spike mark
             xDrive.followTrajectorySequence(trajectorySeqToDropPurplePixel);
             setWristPosition(WRIST_FLAT_TO_GROUND);
             sleep(200);
-            openRightClaw();
+            openLeftClaw();
             sleep(200);
 
             //STEP 2 -- Yellow Pixel to back board
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
-            if (SKIP_PICKING_WHITE_PIXELS_FAR) {
-                sleep(14000); //10s sleep so alliance robot can park
+
+            if (spikeMark == SpikeMark.LEFT && SKIP_PICKING_WHITE_PIXELS_FAR) {
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR - 3000); //10s sleep so alliance robot can park
+            } else if (spikeMark == SpikeMark.RIGHT && SKIP_PICKING_WHITE_PIXELS_FAR) {
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR); //10s sleep so alliance robot can park
             }
 
-            if (trajectorySeqToDropYellowPixel != null) {
-                xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
-            } else {
-                xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
-            }
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.5);
-            sleep(1400);
-            openLeftClaw();
+            xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
+
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
+            sleep(1200);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 20, 0.3);
+            sleep(600);
+
+            openRightClaw();
             sleep(200);
 
             if (!SKIP_PICKING_WHITE_PIXELS_FAR) {
