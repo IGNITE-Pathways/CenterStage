@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.XBot.DEFAULT_DROP_ARM_POSITION;
 import static org.firstinspires.ftc.teamcode.XBot.MIN_ARM_POSITION;
+import static org.firstinspires.ftc.teamcode.XBot.SKIP_PICKING_WHITE_PIXELS_FAR;
+import static org.firstinspires.ftc.teamcode.XBot.SKIP_PICKING_WHITE_PIXELS_NEAR;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_FLAT_TO_GROUND;
 import static org.firstinspires.ftc.teamcode.XBot.WRIST_VERTICAL;
 
@@ -22,25 +24,25 @@ public abstract class XBotBlueNear extends XBotBlue {
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             if (spikeMark != SpikeMark.RIGHT) {
                 if (spikeMark == SpikeMark.LEFT) {
-                    trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                    trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .back(27.5)
                             .turn(Math.toRadians(90))
                             .back(24)
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)
+                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
                             .splineToConstantHeading(new Vector2d(DROP_LINE_X, 44.5), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();
                 } else if (spikeMark == SpikeMark.CENTER) {
-                    trajectoryToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                    trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .back(34)
                             .turn(Math.toRadians(90))
                             .back(8)
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectoryToDropPurplePixel.end(), true)
+                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
                             .splineTo(new Vector2d(DROP_LINE_X, 38), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -52,7 +54,7 @@ public abstract class XBotBlueNear extends XBotBlue {
 
             if (isStopRequested()) return;
             //STEP 1 -- Purple Pixel Drop on spike mark
-            xDrive.followTrajectorySequence(trajectoryToDropPurplePixel);
+            xDrive.followTrajectorySequence(trajectorySeqToDropPurplePixel);
             setWristPosition(WRIST_FLAT_TO_GROUND);
             sleep(200);
             openLeftClaw();
@@ -62,14 +64,15 @@ public abstract class XBotBlueNear extends XBotBlue {
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
             xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION);
-            sleep(1400);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.5);
+            sleep(1500);
             openRightClaw();
             sleep(200);
 
-            //STEP 3 to 6 -- Grab White Pixels and drop the on backboard
-            grabAndDropWhitePixels(trajectoryToPickWhitePixels, inchForward, inchBackward, trajectoryToDropWhitePixels);
-
+            if (!SKIP_PICKING_WHITE_PIXELS_NEAR) {
+                //STEP 3 to 6 -- Grab White Pixels and drop the on backboard
+                grabAndDropWhitePixels(trajectorySeqToPickWhitePixels, inchForwardSeq, inchBackwardSeq, trajectorySeqToDropWhitePixels);
+            }
             //STEP 7 -- Park
             moveArmToPosition(MIN_ARM_POSITION);
             xDrive.followTrajectorySequence(parkingSeq);
