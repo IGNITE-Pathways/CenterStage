@@ -45,7 +45,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean reachedAprilTag = false;
     SampleMecanumDrive xDrive = null;
 
-    Double DROP_LINE_X = 40.5;
+    Double DROP_LINE_X = 40.4;
     Double WHITE_STACK_Y = 9.5;
     Double WHITE_STACK_X = -51.0;
     Double PARKING_OFFSET = 24.0;

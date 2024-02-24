@@ -40,7 +40,7 @@ public abstract class XBotBlueFar extends XBotBlue {
                             .turn(Math.toRadians(90))
                             .turn(Math.toRadians(90))
                             .lineTo(new Vector2d(DROP_LINE_X, 12.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, 43))
+                            .strafeTo(new Vector2d(DROP_LINE_X, 43)) //ID 1 Blue
                             .build();
 
                 } else if (spikeMark == SpikeMark.CENTER) {
@@ -52,11 +52,9 @@ public abstract class XBotBlueFar extends XBotBlue {
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                             .turn(Math.toRadians(90))
                             .lineTo(new Vector2d(DROP_LINE_X, 15.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, 39))
+                            .strafeTo(new Vector2d(DROP_LINE_X, 39)) //ID 2 Blue
                             .build();
                 }
-
-//                sleep(10);
             }
 
             if (isStopRequested()) return;
@@ -71,7 +69,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             setWristPosition(WRIST_VERTICAL);
             sleep(50);
             if (SKIP_PICKING_WHITE_PIXELS_FAR) {
-                sleep(14000); //10s sleep so alliance robot can park
+                sleep(12000); //10s sleep so alliance robot can park
             }
             if (trajectorySeqToDropYellowPixel != null) {
                 xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
@@ -80,7 +78,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             }
 
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.4);
-            sleep(1400);
+            sleep(1700);
             openLeftClaw();
             sleep(200);
 

@@ -29,43 +29,23 @@ public abstract class XBotRedFar extends XBotRed {
                             .turn(Math.toRadians(-90))
                             .forward(5)
                             .back(9)
-//                            .back(27.5)
-//                            .turn(Math.toRadians(-90))
-//                            .forward(7)
-//                            .back(9)
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                             .strafeTo(new Vector2d(-32, -12.5))
                             .lineTo(new Vector2d(DROP_LINE_X, -12.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, -32.5))
+                            .strafeTo(new Vector2d(DROP_LINE_X, -32.5)) //ID 4 Red
                             .build();
 
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
-                            .back(40)
-                            .splineTo(new Vector2d(DROP_LINE_X, -32.5), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .build();
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .back(51)
-//                            .back(49)
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                             .turn(Math.toRadians(-90))
                             .lineTo(new Vector2d(DROP_LINE_X, -12.5))
-                            .strafeTo(new Vector2d(DROP_LINE_X, -36))
-                            .build();
-
-                    trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
-                            .splineTo(new Vector2d(10, -10), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -38), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                            .strafeTo(new Vector2d(DROP_LINE_X, -36)) //ID 5 Red
                             .build();
                 }
                 sleep(10);
@@ -91,7 +71,7 @@ public abstract class XBotRedFar extends XBotRed {
             } else {
                 xDrive.followTrajectory(trajectoryToDropYellowPixel); //sleep(100);
             }
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.4);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.5);
             sleep(1400);
             openLeftClaw();
             sleep(200);

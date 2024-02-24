@@ -35,9 +35,6 @@ public abstract class XBotRed extends XBotAutoOpMode {
                     .forward(10)
                     //Move Back to drop Pixel
                     .back(5)
-//                    .back(27.5)
-//                    .turn(Math.toRadians(-90))
-//                    .back(23)
                     .build();
 
             trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
@@ -47,15 +44,14 @@ public abstract class XBotRed extends XBotAutoOpMode {
                     .turn(Math.toRadians(90))
                     .turn(Math.toRadians(90))
                     .lineTo(new Vector2d(DROP_LINE_X, -12.5))
-                    .strafeTo(new Vector2d(DROP_LINE_X, -42.5))
+                    .strafeTo(new Vector2d(DROP_LINE_X, -42.5)) //ID 6 Red
                     .build();
 
-            trajectoryToDropYellowPixel = xDrive.trajectoryBuilder(trajectorySeqToDropPurplePixel.end(), true)
-                    .back(40)
-                    .splineTo(new Vector2d(DROP_LINE_X, -42.5), 0,
-                            SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+            trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
+                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
                     .build();
+
         } else {
             trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                     .back(27.5)
@@ -68,12 +64,13 @@ public abstract class XBotRed extends XBotAutoOpMode {
 //                            SampleMecanumDrive.getVelocityConstraint(25, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
 //                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
+            trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectoryToDropYellowPixel.end())
+                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
+                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
+                    .build();
         }
 
-        trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectoryToDropYellowPixel.end())
-                .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
-                .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
-                .build();
+
 
         inchForwardSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToPickWhitePixels.end()).forward(5).build();
         inchBackwardSeq = xDrive.trajectorySequenceBuilder(inchForwardSeq.end()).back(10).build();
