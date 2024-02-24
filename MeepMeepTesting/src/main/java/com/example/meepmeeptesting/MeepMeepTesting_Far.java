@@ -28,7 +28,7 @@ public class MeepMeepTesting_Far {
                         drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
                                 .setReversed(true)
                                 .strafeTo(new Vector2d(-50, -30))
-                                .splineToConstantHeading(new Vector2d(-44, -15.5), Math.toRadians(-90))
+                                .splineToConstantHeading(new Vector2d(-43, -15.5), Math.toRadians(-90))
 
 //                                .back(51)
                                 //Drop Pixel on Spikemark
@@ -263,10 +263,10 @@ public class MeepMeepTesting_Far {
                 .setBackgroundAlpha(0.95f)
 //
 //                .addEntity(blueFarLeftPixelLeftParking)
-                .addEntity(redFarRightPixelRightParking)
+//                .addEntity(redFarRightPixelRightParking)
 
 //                .addEntity(blueFarCenterPixelLeftParking)
-//                .addEntity(redFarCenterPixelRightParking)
+                .addEntity(redFarCenterPixelRightParking)
 ////
 //                .addEntity(blueFarRightPixelLeftParking)
 //                .addEntity(redFarLeftPixelRightParking)

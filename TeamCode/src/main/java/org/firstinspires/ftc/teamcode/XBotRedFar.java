@@ -41,7 +41,7 @@ public abstract class XBotRedFar extends XBotRed {
                 } else if (spikeMark == SpikeMark.CENTER) {
                     trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                             .strafeTo(new Vector2d(-50, -30))
-                            .splineToConstantHeading(new Vector2d(-44, -15.5), Math.toRadians(-90))
+                            .splineToConstantHeading(new Vector2d(-43, -15.5), Math.toRadians(-90))
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
