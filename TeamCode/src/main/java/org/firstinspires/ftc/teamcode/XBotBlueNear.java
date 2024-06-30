@@ -42,6 +42,7 @@ public abstract class XBotBlueNear extends XBotBlue {
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                            .setReversed(true)
                             .splineTo(new Vector2d(DROP_LINE_X, 35), 0,
                                     SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -76,6 +77,16 @@ public abstract class XBotBlueNear extends XBotBlue {
             if (!SKIP_PICKING_WHITE_PIXELS_NEAR) {
                 //STEP 3 to 6 -- Grab White Pixels and drop the on backboard
                 grabAndDropWhitePixels(trajectorySeqToPickWhitePixels, inchForwardSeq, inchBackwardSeq, trajectorySeqToDropWhitePixels);
+            } else {
+                if (parking == Parking.RIGHT) {
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+                            .strafeLeft(PARKING_OFFSET)
+                            .back(15).build();
+                } else {
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+                            .strafeRight(PARKING_OFFSET)
+                            .back(15).build();
+                }
             }
             //STEP 7 -- Park
             moveArmToPosition(MIN_ARM_POSITION);

@@ -53,6 +53,7 @@ public abstract class XBotBlue extends XBotAutoOpMode {
                     .build();
 
             trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                    .setReversed(true)
                     .splineTo(new Vector2d(DROP_LINE_X, 32.5), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
