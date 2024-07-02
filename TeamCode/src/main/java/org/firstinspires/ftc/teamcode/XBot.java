@@ -7,7 +7,7 @@ public class XBot {
     static final int MIN_ARM_POSITION = 0;
     static final int DEFAULT_DROP_ARM_POSITION = 1540;
     static final int MAX_ARM_POSITION = 1600; //FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 60/100; //50%
-    static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 4 / 100;
+    static final int ARM_POSITION_HIGH = MIN_ARM_POSITION + FULL_CIRCLE * ARM_MOTOR_GEAR_RATIO * 2 / 100;
     static final int ARM_POSITION_UP = 800;
     // 4% //Robot running across field
     static final int ARM_POSITION_ROBOT_HANGING = 800;

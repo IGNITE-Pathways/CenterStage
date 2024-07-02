@@ -38,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 public class TeleOpDrive extends XBotOpMode {
     double leftClawPosition = LEFT_CLAW_OPEN_POSITION;
     double rightClawPosition = RIGHT_CLAW_OPEN_POSITION;
+
+    int saved_drop_arm_position = DEFAULT_DROP_ARM_POSITION;
     int armPosition = ARM_PICK_POSITION;
 
     @Override
@@ -82,7 +84,9 @@ public class TeleOpDrive extends XBotOpMode {
                         sleep(500);
                     }
                 }
-
+                if (gamepad2.dpad_left) {
+                    saved_drop_arm_position = armPosition;
+                }
                 if (gamepad2.x) {
                     changeGameMode(GameMode.PICKING_PIXELS);
                     leftPixelInClaw = false;
@@ -195,7 +199,7 @@ public class TeleOpDrive extends XBotOpMode {
                         if (gameModeChanged) {
                             gameModeChanged = Boolean.FALSE;
                             // Move Arm to back board -- only once
-                            armPosition = DEFAULT_DROP_ARM_POSITION - 40;
+                            armPosition = saved_drop_arm_position - 40;
                             moveArmToPosition(armPosition);
                             sleep(200);
                         }
