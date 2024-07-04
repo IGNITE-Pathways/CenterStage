@@ -280,6 +280,8 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private void pickPixels() {
+        wristPosition = WRIST_FLAT_TO_GROUND + 0.05;
+        setWristPosition(wristPosition);
         leftClaw.setPosition(LEFT_CLAW_CLOSE_POSITION);
         rightClaw.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
@@ -288,6 +290,8 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private void pickLeftPixel() {
+        wristPosition = WRIST_FLAT_TO_GROUND + 0.05;
+        setWristPosition(wristPosition);
         leftClaw.setPosition(LEFT_CLAW_CLOSE_POSITION);
         leftPixelInClaw = true;
         if (rightPixelInClaw) {
@@ -296,6 +300,8 @@ public class TeleOpDrive extends XBotOpMode {
     }
 
     private void pickRightPixel() {
+        wristPosition = WRIST_FLAT_TO_GROUND + 0.05;
+        setWristPosition(wristPosition);
         rightClaw.setPosition(RIGHT_CLAW_CLOSE_POSITION);
         rightPixelInClaw = true;
         if (leftPixelInClaw) {
