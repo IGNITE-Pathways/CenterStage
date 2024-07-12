@@ -47,7 +47,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     Double DROP_LINE_X = 40.0;
     Double WHITE_STACK_Y = 11.0;
-    Double WHITE_STACK_X = -51.0;
+    Double WHITE_STACK_X = -53.0;
     Double PARKING_OFFSET = 24.0;
 
     boolean detectDesiredAprilTag(int tagId) {
@@ -640,7 +640,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     public void grabAndDropWhitePixels(TrajectorySequence trajToPickWhitePixels, TrajectorySequence trajSeq4, TrajectorySequence trajSeq5, TrajectorySequence trajBackToDropWhitePixles) {
         //STEP 3 -- Go to pick 2 White Pixels
-        moveArmToPosition(MIN_ARM_POSITION + 55); //sleep(200);
+        moveArmToPosition(MIN_ARM_POSITION + 60); //sleep(200);
         xDrive.followTrajectorySequence(trajToPickWhitePixels);
         setWristPosition(WRIST_FLAT_TO_GROUND);
         sleep(200);
