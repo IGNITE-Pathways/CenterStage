@@ -110,7 +110,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             sleep(50);
 
             if (spikeMark == SpikeMark.LEFT && SKIP_PICKING_WHITE_PIXELS_FAR) {
-                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR - 3000); //10s sleep so alliance robot can park
+                sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR); //10s sleep so alliance robot can park
             } else if (spikeMark == SpikeMark.RIGHT && SKIP_PICKING_WHITE_PIXELS_FAR) {
                 sleep(WAIT_TIME_FOR_ALLIANCE_TO_CLEAR); //10s sleep so alliance robot can park
             }
