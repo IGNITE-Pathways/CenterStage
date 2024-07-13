@@ -12,7 +12,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 public abstract class XBotBlueFar extends XBotBlue {
     public void autoBlueFar(Parking parking) {
-        super.initializeAuto(new Pose2d(-36.5, 63.5, Math.toRadians(90)));
+        super.initializeAuto(new Pose2d(-36.5, 64.7, Math.toRadians(90)));
         Double strafeDistance = PARKING_OFFSET;
 
         if (opModeIsActive()) {
@@ -38,9 +38,8 @@ public abstract class XBotBlueFar extends XBotBlue {
                         .strafeTo(new Vector2d(-41, 12.5))
                         //180 degree turn
                         .turn(Math.toRadians(180))
-//                            .turn(Math.toRadians(90))
                         .lineTo(new Vector2d(DROP_LINE_X, 12.5))
-                        .strafeTo(new Vector2d(DROP_LINE_X, 43)) //ID 1 Blue
+                        .strafeTo(new Vector2d(DROP_LINE_X, 44)) //ID 1 Blue
                         .build();
 
                 trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
@@ -48,7 +47,7 @@ public abstract class XBotBlueFar extends XBotBlue {
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                         .build();
 
-                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 12 : PARKING_OFFSET + 12;
+                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 8 : PARKING_OFFSET + 10;
 
             } else if (spikeMark == SpikeMark.CENTER) {
                 trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
@@ -59,13 +58,15 @@ public abstract class XBotBlueFar extends XBotBlue {
                 trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                         .turn(Math.toRadians(90))
                         .lineTo(new Vector2d(DROP_LINE_X, 15.5))
-                        .strafeTo(new Vector2d(DROP_LINE_X, 38)) //ID 2 Blue
+                        .strafeTo(new Vector2d(DROP_LINE_X, 40)) //ID 2 Blue
                         .build();
 
                 trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
                         .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                         .build();
+
+                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 1 : PARKING_OFFSET - 1;
 
             } else if (spikeMark == SpikeMark.RIGHT) {
                 trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
@@ -78,7 +79,7 @@ public abstract class XBotBlueFar extends XBotBlue {
                 trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
                         .strafeTo(new Vector2d(-40, 12.5))
                         .lineTo(new Vector2d(DROP_LINE_X, 12.5))
-                        .strafeTo(new Vector2d(DROP_LINE_X, 33.0)) //ID 3 Blue
+                        .strafeTo(new Vector2d(DROP_LINE_X, 36)) //ID 3 Blue
                         .build();
 
                 trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
@@ -86,7 +87,7 @@ public abstract class XBotBlueFar extends XBotBlue {
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                         .build();
 
-                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 12 : PARKING_OFFSET - 12;
+                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 9 : PARKING_OFFSET - 8;
             }
 
             inchForwardSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToPickWhitePixels.end()).forward(5).build();
@@ -123,7 +124,7 @@ public abstract class XBotBlueFar extends XBotBlue {
             xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
 
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
-            sleep(1200);
+            sleep(1000);
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 10, 0.3);
             sleep(600);
             openLeftClaw();

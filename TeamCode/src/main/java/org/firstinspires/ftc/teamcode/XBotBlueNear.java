@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 public abstract class XBotBlueNear extends XBotBlue {
     public void autoBlueNear(Parking parking) {
         super.initializeAuto(new Pose2d(12, 63.5, Math.toRadians(90)));
+        Double strafeDistance = PARKING_OFFSET;
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
@@ -39,6 +40,8 @@ public abstract class XBotBlueNear extends XBotBlue {
                         .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y - 0.5)) //0.5 is to fix Claw hitting center of White pixel stack
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y - 0.5))
                         .build();
+
+                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 10 : PARKING_OFFSET + 10;
 
             } else if (spikeMark == SpikeMark.CENTER) {
                 trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
@@ -77,6 +80,9 @@ public abstract class XBotBlueNear extends XBotBlue {
                         .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                         .build();
+
+                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 10 : PARKING_OFFSET - 10;
+
             }
             sleep(10);
 
@@ -113,21 +119,21 @@ public abstract class XBotBlueNear extends XBotBlue {
                 grabAndDropWhitePixels(trajectorySeqToPickWhitePixels, inchForwardSeq, inchBackwardSeq, trajectorySeqToDropWhitePixels);
                 if (parking == Parking.RIGHT) {
                     parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end())
-                            .strafeLeft(PARKING_OFFSET)
+                            .strafeLeft(strafeDistance)
                             .back(15).build();
                 } else {
                     parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end())
-                            .strafeRight(PARKING_OFFSET)
+                            .strafeRight(strafeDistance)
                             .back(15).build();
                 }
             } else {
                 if (parking == Parking.RIGHT) {
                     parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                            .strafeLeft(PARKING_OFFSET)
+                            .strafeLeft(strafeDistance)
                             .back(15).build();
                 } else {
                     parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                            .strafeRight(PARKING_OFFSET)
+                            .strafeRight(strafeDistance)
                             .back(15).build();
                 }
             }
