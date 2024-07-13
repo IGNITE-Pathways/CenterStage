@@ -24,37 +24,75 @@ public abstract class XBotRedNear extends XBotRed {
 //            spikeMark = SpikeMark.RIGHT;
 
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
-            if (spikeMark != SpikeMark.RIGHT) {
+            if (spikeMark == SpikeMark.LEFT) {
+                trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                        .setReversed(true)
+                        .splineTo(new Vector2d(20, -35), 0)
+                        .forward(11)
+                        .back(5)
+                        .build();
 
-                if (spikeMark == SpikeMark.LEFT) {
-                    trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                            .setReversed(true)
-                            .splineTo(new Vector2d(20, -35), 0)
-                            .forward(11)
-                            .back(5)
-                            .build();
-
-                    trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                            .strafeTo(new Vector2d(DROP_LINE_X, -32.5)) //ID 4 Red
+                trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                        .strafeTo(new Vector2d(DROP_LINE_X, -32.5)) //ID 4 Red
 //                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -32.5), 0,
 //                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
 //                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .build();
-                } else if (spikeMark == SpikeMark.CENTER) {
-                    trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                            .setReversed(true)
-                            .splineTo(new Vector2d(30, -34), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .strafeRight(6)
-                            .build();
+                        .build();
 
-                    trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -37), 0,
-                                    SampleMecanumDrive.getVelocityConstraint(25, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .build();
-                }
+                trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
+                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 1.5))
+                        .build();
+            } else if (spikeMark == SpikeMark.CENTER) {
+                trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                        .setReversed(true)
+                        .splineTo(new Vector2d(30, -34), 0,
+                                SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                        .strafeRight(6)
+                        .build();
+
+                trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                        .splineToConstantHeading(new Vector2d(DROP_LINE_X, -37), 0,
+                                SampleMecanumDrive.getVelocityConstraint(25, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                        .build();
+
+                trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
+                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 1.5))
+                        .build();
+
+            } else if (spikeMark == SpikeMark.RIGHT) {
+                trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+                        .back(27.5)
+                        .turn(Math.toRadians(-90))
+                        .back(23)
+                        .build();
+
+                trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+                        .strafeTo(new Vector2d(DROP_LINE_X, -43))
+                        .build();
+
+                trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
+                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
+                        .build();
+            }
+
+            inchForwardSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToPickWhitePixels.end()).forward(5).build();
+            inchBackwardSeq = xDrive.trajectorySequenceBuilder(inchForwardSeq.end()).back(10).build();
+
+            trajectorySeqToDropWhitePixels = xDrive.trajectorySequenceBuilder(inchBackwardSeq.end())
+                    .lineTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
+                    .strafeTo(new Vector2d(DROP_LINE_X, -39))
+                    .build();
+
+            Double strafeDistance = PARKING_OFFSET;
+            if (parking == Parking.RIGHT) {
+                parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end()).strafeLeft(strafeDistance).back(15).build();
+            } else {
+                parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end()).strafeRight(strafeDistance).back(15).build();
             }
 
             if (isStopRequested()) return;

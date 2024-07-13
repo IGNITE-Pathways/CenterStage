@@ -50,24 +50,22 @@ public abstract class XBotRed extends XBotAutoOpMode {
                     .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
                     .build();
 
-        } else {
-            trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
-                    .back(27.5)
-                    .turn(Math.toRadians(-90))
-                    .back(23)
-                    .build();
-
-            trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                    .strafeTo(new Vector2d(DROP_LINE_X, -43))
-                    .build();
-
-            trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
-                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
-                    .build();
+//        } else {
+//            trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
+//                    .back(27.5)
+//                    .turn(Math.toRadians(-90))
+//                    .back(23)
+//                    .build();
+//
+//            trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
+//                    .strafeTo(new Vector2d(DROP_LINE_X, -43))
+//                    .build();
+//
+//            trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
+//                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
+//                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
+//                    .build();
         }
-
-
 
         inchForwardSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToPickWhitePixels.end()).forward(5).build();
         inchBackwardSeq = xDrive.trajectorySequenceBuilder(inchForwardSeq.end()).back(10).build();
