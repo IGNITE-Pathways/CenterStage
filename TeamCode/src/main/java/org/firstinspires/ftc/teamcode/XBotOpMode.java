@@ -507,7 +507,7 @@ public abstract class XBotOpMode extends LinearOpMode {
     void stopRobot() {
         stopDriveMotors();
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
+        visionPortal.getActiveCamera().close();
     }
 
     void resetWristAndClawPosition() {

@@ -533,7 +533,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
             if ((rangeError < 0.1) && (rangeError > -0.1)) {
                 arrivedAtBackDropTagPosition = true;
-                visionPortal.close();
+                visionPortal.getActiveCamera().close();
                 stopDriveMotors();
             }
         } else {
@@ -542,7 +542,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
             //Reasons for not able to find -- exposure or not in-front of aTags
             if (timesTargetFound > 5) {
                 arrivedAtBackDropTagPosition = true;
-                visionPortal.close();
+                visionPortal.getActiveCamera().close();
                 stopDriveMotors();
             }
         }
