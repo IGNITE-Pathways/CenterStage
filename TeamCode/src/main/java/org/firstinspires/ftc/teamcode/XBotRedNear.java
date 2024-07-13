@@ -15,13 +15,12 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public abstract class XBotRedNear extends XBotRed {
     public void autoRedNear(Parking parking) {
-        super.initializeAuto(new Pose2d(12.0, -63.5, Math.toRadians(-90)), DistanceFromBackdrop.NEAR, parking);
+        super.initializeAuto(new Pose2d(12.0, -63.5, Math.toRadians(-90)));
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
                 detectTeamPropAndSwitchCameraToAprilTag();
             }
-//            spikeMark = SpikeMark.RIGHT;
 
             telemetry.addData("SpikeMark", spikeMark + ", confidence" + detectionConfidence);
             if (spikeMark == SpikeMark.LEFT) {
@@ -110,7 +109,7 @@ public abstract class XBotRedNear extends XBotRed {
 
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
             sleep(1200);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 40, 0.3);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 20, 0.3);
             sleep(600);
 
             openLeftClaw();
@@ -119,6 +118,17 @@ public abstract class XBotRedNear extends XBotRed {
             if (!SKIP_PICKING_WHITE_PIXELS_NEAR) {
                 //STEP 3 to 6 -- Grab White Pixels and drop the on backboard
                 grabAndDropWhitePixels(trajectorySeqToPickWhitePixels, inchForwardSeq, inchBackwardSeq, trajectorySeqToDropWhitePixels);
+                if (parking == Parking.RIGHT) {
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end()).strafeLeft(strafeDistance).back(15).build();
+                } else {
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end()).strafeRight(strafeDistance).back(15).build();
+                }
+            } else {
+                if (parking == Parking.RIGHT) {
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end()).strafeLeft(PARKING_OFFSET).back(15).build();
+                } else {
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end()).strafeRight(PARKING_OFFSET).back(15).build();
+                }
             }
             //STEP 7 -- Park
             moveArmToPosition(MIN_ARM_POSITION);
