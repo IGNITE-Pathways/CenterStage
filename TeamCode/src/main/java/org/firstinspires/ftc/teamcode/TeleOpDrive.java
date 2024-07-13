@@ -230,7 +230,7 @@ public class TeleOpDrive extends XBotOpMode {
                         }
                         if (gamepad2.dpad_down) {
                             //Hang the Robot
-                            armPosition = 300;
+                            armPosition = 200;
                             moveArmToPosition(armPosition);
                         }
                         break;
