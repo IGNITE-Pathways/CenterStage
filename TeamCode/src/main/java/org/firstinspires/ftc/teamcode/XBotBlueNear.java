@@ -36,8 +36,8 @@ public abstract class XBotBlueNear extends XBotBlue {
                         .build();
 
                 trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                        .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y))
-                        .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
+                        .strafeTo(new Vector2d(DROP_LINE_X, WHITE_STACK_Y - 0.5)) //0.5 is to fix Claw hitting center of White pixel stack
+                        .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y - 0.5))
                         .build();
 
             } else if (spikeMark == SpikeMark.CENTER) {

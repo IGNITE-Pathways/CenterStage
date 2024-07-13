@@ -199,8 +199,17 @@ public class TeleOpDrive extends XBotOpMode {
                         if (gameModeChanged) {
                             gameModeChanged = Boolean.FALSE;
                             // Move Arm to back board -- only once
-                            armPosition = saved_drop_arm_position - 40;
-                            moveArmToPosition(armPosition);
+                            if (saved_drop_arm_position > 1450) {
+                                //Arm moving too fast and flipping robot -- do it in two steps
+                                armPosition = 1410;
+                                moveArmToPosition(armPosition);
+                                sleep(200);
+                                armPosition = saved_drop_arm_position - 40;
+                                moveArmToPosition(armPosition);
+                            } else {
+                                armPosition = saved_drop_arm_position - 40;
+                                moveArmToPosition(armPosition);
+                            }
                             sleep(200);
                         }
                         //User Action :: Press O (or if distance sensor is close) to drop pixels
