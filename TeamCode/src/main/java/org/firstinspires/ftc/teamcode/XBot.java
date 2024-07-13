@@ -38,7 +38,7 @@ public class XBot {
 
     //Variables to change / Tune
     static final int TFOD_CAM_EXPOSURE = 7; //Change this based on the amount of light in the room. Lower exposure if room is bright and vice-versa
-    static boolean SKIP_PICKING_WHITE_PIXELS_FAR = false;
+    static boolean SKIP_PICKING_WHITE_PIXELS_FAR = true;
     static boolean SKIP_PICKING_WHITE_PIXELS_NEAR = false;
     static long WAIT_TIME_FOR_ALLIANCE_TO_CLEAR = 0; //milliseconds
 }

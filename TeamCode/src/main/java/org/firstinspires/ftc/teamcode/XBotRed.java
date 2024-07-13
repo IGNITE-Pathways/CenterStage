@@ -58,12 +58,12 @@ public abstract class XBotRed extends XBotAutoOpMode {
                     .build();
 
             trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                    .strafeTo(new Vector2d(DROP_LINE_X + 1.0, -44.5))
+                    .strafeTo(new Vector2d(DROP_LINE_X, -43))
                     .build();
 
             trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
-                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 1.5))
+                    .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
+                    .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
                     .build();
         }
 

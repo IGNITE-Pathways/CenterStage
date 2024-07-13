@@ -35,7 +35,7 @@ public abstract class XBotRedNear extends XBotRed {
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                            .strafeTo(new Vector2d(DROP_LINE_X + 1.0, -32.5)) //ID 4 Red
+                            .strafeTo(new Vector2d(DROP_LINE_X, -32.5)) //ID 4 Red
 //                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -32.5), 0,
 //                                    SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
 //                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -50,7 +50,7 @@ public abstract class XBotRedNear extends XBotRed {
                             .build();
 
                     trajectorySeqToDropYellowPixel = xDrive.trajectorySequenceBuilder(trajectorySeqToDropPurplePixel.end())
-                            .splineToConstantHeading(new Vector2d(DROP_LINE_X + 1.0, -37), 0,
+                            .splineToConstantHeading(new Vector2d(DROP_LINE_X, -37), 0,
                                     SampleMecanumDrive.getVelocityConstraint(25, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build();

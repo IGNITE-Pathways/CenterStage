@@ -47,7 +47,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 
     Double DROP_LINE_X = 40.0;
     Double WHITE_STACK_Y = 11.0;
-    Double WHITE_STACK_X = -53.0;
+    Double WHITE_STACK_X = -52.0;
     Double PARKING_OFFSET = 24.0;
 
     boolean detectDesiredAprilTag(int tagId) {
@@ -649,7 +649,7 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
         xDrive.followTrajectorySequence(trajSeq4);
         sleep(100);
         closeBothClaws();
-        sleep(200);
+        sleep(300);
 
         //STEP 5 -- Move back to make sure pixels are in claw
         xDrive.followTrajectorySequence(trajSeq5);
