@@ -18,6 +18,47 @@ public class MeepMeepTesting_Far {
         MeepMeep meepMeep = new MeepMeep(800);
 
         RoadRunnerBotEntity redFarCenterPixelRightParking = new DefaultBotBuilder(meepMeep)
+                .setDimensions(14, 14)
+                .setDriveTrainType(DriveTrainType.MECANUM)
+                .setColorScheme(new ColorSchemeRedLight())
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(52.48291908330528, 52.48291908330528,
+                        5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
+                .followTrajectorySequence(drive ->
+                                drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
+                                        .setReversed(true)
+                                        .strafeTo(new Vector2d(-50, -30))
+                                        .splineToConstantHeading(new Vector2d(-43, -15.5), Math.toRadians(-90))
+
+//                                .back(51)
+                                        //Drop Pixel on Spikemark
+                                        .waitSeconds(1)
+                                        .turn(Math.toRadians(-90))
+                                        .lineTo(new Vector2d(DROP_LINE_X, -15.5))
+                                        .strafeTo(new Vector2d(DROP_LINE_X, -39))
+
+//                                .splineTo(new Vector2d(25, -21), Math.toRadians(-35))
+//                                .splineTo(new Vector2d(DROP_LINE_X, -36), 0)
+                                        //Drop Yellow Pixel on Backboard
+                                        .waitSeconds(1)
+                                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y))
+                                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y))
+                                        .forward(5)
+                                        //Pick White Pixels
+                                        .waitSeconds(0.5)
+                                        .back(10)
+                                        //Go Back
+                                        .lineTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y))
+                                        .strafeTo(new Vector2d(DROP_LINE_X, -36))
+                                        //Drop White Pixels
+                                        .waitSeconds(1)
+                                        .strafeLeft(22.5)
+                                        //Park
+                                        .back(15)
+                                        .build()
+                );
+
+        RoadRunnerBotEntity redFarCenterPixelRightParking1 = new DefaultBotBuilder(meepMeep)
                 .setDimensions(14,14)
                 .setDriveTrainType(DriveTrainType.MECANUM)
                 .setColorScheme(new ColorSchemeRedLight())
@@ -25,37 +66,29 @@ public class MeepMeepTesting_Far {
                 .setConstraints(52.48291908330528, 52.48291908330528,
                         5.426119932065176, Math.toRadians(238.65474285714288), 12.75)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
-                                .setReversed(true)
-                                .strafeTo(new Vector2d(-50, -30))
-                                .splineToConstantHeading(new Vector2d(-43, -15.5), Math.toRadians(-90))
+                                drive.trajectorySequenceBuilder(new Pose2d(-36, -63.5, Math.toRadians(-90)))
+                                        .setReversed(true)
+                                        .strafeTo(new Vector2d(-50, -30))
+                                        .splineToConstantHeading(new Vector2d(-43, -15.5), Math.toRadians(-90))
+                                        //Drop Pixel on Spikemark
+                                        .waitSeconds(1)
 
-//                                .back(51)
-                                //Drop Pixel on Spikemark
-                                .waitSeconds(1)
-                                .turn(Math.toRadians(-90))
-                                .lineTo(new Vector2d(DROP_LINE_X, -15.5))
-                                .strafeTo(new Vector2d(DROP_LINE_X, -36))
+                                        .turn(Math.toRadians(-90))
+                                        .strafeTo(new Vector2d(WHITE_STACK_X, -9.5))
+                                        .forward(5)
+                                        //Pick White Pixels
+                                        .waitSeconds(0.5)
 
-//                                .splineTo(new Vector2d(25, -21), Math.toRadians(-35))
-//                                .splineTo(new Vector2d(DROP_LINE_X, -36), 0)
-                                //Drop Yellow Pixel on Backboard
-                                .waitSeconds(1)
-                                .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y))
-                                .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y))
-                                .forward(5)
-                                //Pick White Pixels
-                                .waitSeconds(0.5)
-                                .back(10)
-                                //Go Back
-                                .lineTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y))
-                                .strafeTo(new Vector2d(DROP_LINE_X, -36))
-                                //Drop White Pixels
-                                .waitSeconds(1)
-                                .strafeLeft(22.5)
-                                //Park
-                                .back(15)
-                                .build()
+                                        .back(10)
+                                        .lineTo(new Vector2d(DROP_LINE_X, -15.5))
+                                        .strafeTo(new Vector2d(DROP_LINE_X, -39))
+                                        //Drop White and Yellow Pixels
+                                        .waitSeconds(1)
+
+                                        .strafeLeft(22.5)
+                                        //Park
+                                        .back(15)
+                                        .build()
                 );
 
         RoadRunnerBotEntity blueFarCenterPixelLeftParking = new DefaultBotBuilder(meepMeep)
@@ -266,7 +299,7 @@ public class MeepMeepTesting_Far {
 //                .addEntity(redFarRightPixelRightParking)
 
 //                .addEntity(blueFarCenterPixelLeftParking)
-                .addEntity(redFarCenterPixelRightParking)
+                .addEntity(redFarCenterPixelRightParking1)
 ////
 //                .addEntity(blueFarRightPixelLeftParking)
 //                .addEntity(redFarLeftPixelRightParking)

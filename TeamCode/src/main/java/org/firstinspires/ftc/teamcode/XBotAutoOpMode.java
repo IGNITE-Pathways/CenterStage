@@ -45,9 +45,9 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
     boolean reachedAprilTag = false;
     SampleMecanumDrive xDrive = null;
 
-    Double DROP_LINE_X = 40.0;
+    Double DROP_LINE_X = 39.8;
     Double WHITE_STACK_Y = 11.0;
-    Double WHITE_STACK_X = -52.0;
+    Double WHITE_STACK_X = -51.5;
     Double PARKING_OFFSET = 24.0;
 
     boolean detectDesiredAprilTag(int tagId) {
@@ -663,8 +663,8 @@ public abstract class XBotAutoOpMode extends XBotOpMode {
 //        sleep(1400);
 
         moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
-        sleep(1200);
-        moveArmToPosition(DEFAULT_DROP_ARM_POSITION, 0.3);
+        sleep(1000);
+        moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 27, 0.3);
         sleep(600);
 
         openBothClaws();

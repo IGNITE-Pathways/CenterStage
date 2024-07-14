@@ -41,7 +41,7 @@ public abstract class XBotBlueNear extends XBotBlue {
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y - 0.5))
                         .build();
 
-                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 10 : PARKING_OFFSET + 10;
+//                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 10 : PARKING_OFFSET + 10;
 
             } else if (spikeMark == SpikeMark.CENTER) {
                 trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
@@ -81,7 +81,7 @@ public abstract class XBotBlueNear extends XBotBlue {
                         .lineTo(new Vector2d(WHITE_STACK_X, WHITE_STACK_Y))
                         .build();
 
-                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 10 : PARKING_OFFSET - 10;
+//                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 10 : PARKING_OFFSET - 10;
 
             }
             sleep(10);
@@ -107,8 +107,8 @@ public abstract class XBotBlueNear extends XBotBlue {
             sleep(50);
             xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
-            sleep(1200);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 20, 0.3);
+            sleep(1000);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 27, 0.3);
             sleep(600);
 
             openRightClaw();

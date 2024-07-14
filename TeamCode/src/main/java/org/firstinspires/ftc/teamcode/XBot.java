@@ -41,4 +41,6 @@ public class XBot {
     static boolean SKIP_PICKING_WHITE_PIXELS_FAR = true;
     static boolean SKIP_PICKING_WHITE_PIXELS_NEAR = false;
     static long WAIT_TIME_FOR_ALLIANCE_TO_CLEAR = 0; //milliseconds
+
+    static boolean RED_CENTER_PICK_WHITE_PIXEL_ON_THE_WAY = false;
 }

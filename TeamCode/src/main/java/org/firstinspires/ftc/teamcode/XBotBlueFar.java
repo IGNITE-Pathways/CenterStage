@@ -125,7 +125,7 @@ public abstract class XBotBlueFar extends XBotBlue {
 
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
             sleep(1000);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 10, 0.3);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 30, 0.3);
             sleep(600);
             openLeftClaw();
             sleep(200);

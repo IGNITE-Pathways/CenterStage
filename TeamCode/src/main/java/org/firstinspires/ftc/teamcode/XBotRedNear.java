@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 public abstract class XBotRedNear extends XBotRed {
     public void autoRedNear(Parking parking) {
         super.initializeAuto(new Pose2d(12.0, -63.5, Math.toRadians(-90)));
+        Double strafeDistance = PARKING_OFFSET;
 
         if (opModeIsActive()) {
             while (!teamPropDetectionCompleted) {
@@ -39,9 +40,12 @@ public abstract class XBotRedNear extends XBotRed {
                         .build();
 
                 trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
-                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 1.5))
+                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
+                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
                         .build();
+
+//                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 8 : PARKING_OFFSET + 10;
+
             } else if (spikeMark == SpikeMark.CENTER) {
                 trajectorySeqToDropPurplePixel = xDrive.trajectorySequenceBuilder(startPose)
                         .setReversed(true)
@@ -58,8 +62,8 @@ public abstract class XBotRedNear extends XBotRed {
                         .build();
 
                 trajectorySeqToPickWhitePixels = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end())
-                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
-                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 1.5))
+                        .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.3))
+                        .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 1.3))
                         .build();
 
             } else if (spikeMark == SpikeMark.RIGHT) {
@@ -77,6 +81,9 @@ public abstract class XBotRedNear extends XBotRed {
                         .strafeTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 2))
                         .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
                         .build();
+
+//                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET - 8 : PARKING_OFFSET + 10;
+
             }
 
             inchForwardSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToPickWhitePixels.end()).forward(5).build();
@@ -86,13 +93,6 @@ public abstract class XBotRedNear extends XBotRed {
                     .lineTo(new Vector2d(DROP_LINE_X, -WHITE_STACK_Y - 1.5))
                     .strafeTo(new Vector2d(DROP_LINE_X, -39))
                     .build();
-
-            Double strafeDistance = PARKING_OFFSET;
-            if (parking == Parking.RIGHT) {
-                parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end()).strafeLeft(strafeDistance).back(15).build();
-            } else {
-                parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropWhitePixels.end()).strafeRight(strafeDistance).back(15).build();
-            }
 
             if (isStopRequested()) return;
             //STEP 1 -- Purple Pixel Drop on spike mark
@@ -108,8 +108,8 @@ public abstract class XBotRedNear extends XBotRed {
             xDrive.followTrajectorySequence(trajectorySeqToDropYellowPixel);
 
             moveArmToPosition(DEFAULT_DROP_ARM_POSITION - 300);
-            sleep(1200);
-            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 20, 0.3);
+            sleep(1000);
+            moveArmToPosition(DEFAULT_DROP_ARM_POSITION + 30, 0.3);
             sleep(600);
 
             openLeftClaw();
@@ -125,9 +125,9 @@ public abstract class XBotRedNear extends XBotRed {
                 }
             } else {
                 if (parking == Parking.RIGHT) {
-                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end()).strafeLeft(PARKING_OFFSET).back(15).build();
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end()).strafeLeft(strafeDistance).back(15).build();
                 } else {
-                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end()).strafeRight(PARKING_OFFSET).back(15).build();
+                    parkingSeq = xDrive.trajectorySequenceBuilder(trajectorySeqToDropYellowPixel.end()).strafeRight(strafeDistance).back(15).build();
                 }
             }
             //STEP 7 -- Park
