@@ -93,7 +93,7 @@ public abstract class XBotRedFar extends XBotRed {
                         .lineTo(new Vector2d(WHITE_STACK_X, -WHITE_STACK_Y - 2))
                         .build();
 
-//                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 9 : PARKING_OFFSET - 8;
+                strafeDistance = parking == Parking.LEFT ? PARKING_OFFSET + 10 : PARKING_OFFSET - 8;
 
             }
             sleep(10);
