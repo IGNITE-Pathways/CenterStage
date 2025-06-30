@@ -1,3 +1,22 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+// Add dependency resolution management
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        google()
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://maven.brott.dev/' }
+    }
+}
+
 include ':FtcRobotController'
 include ':TeamCode'
 include ':MeepMeepTesting'
