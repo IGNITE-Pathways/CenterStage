@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 /*
  * This is the main manual OpMode
  */
-@TeleOp(name = "Manual Drive", group = "Concept")
+@TeleOp(name = "KidsMode", group = "Concept")
 public class KidsMode extends XBotOpMode {
     double leftClawPosition = LEFT_CLAW_OPEN_POSITION;
     double rightClawPosition = RIGHT_CLAW_OPEN_POSITION;
