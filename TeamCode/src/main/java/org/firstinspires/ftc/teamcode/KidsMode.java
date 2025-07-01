@@ -350,6 +350,7 @@ public class KidsMode extends XBotOpMode {
         rightClaw.setPosition(RIGHT_CLAW_OPEN_POSITION);
     }
 
+
 //    public void moveRobotBack() {
 //        leftFront.setPower(0.2);
 //        rightFront.setPower(0.2);
